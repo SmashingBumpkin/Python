@@ -29,32 +29,31 @@ and subtotal = 9,
 
 '''
 
-def ex1(intList, subtotal):
-    
-    intList = intList.split(',')
 
+def ex1(int_list, subtotal):
+    
     count = 0
     i = 1 # end of window
     j = 0 # start of window
-    
-    intList[0] = int(intList[0])
+    intList = [int(i) for i in int_list.split(",")]
     winSum = intList[0] #sum of elements in window
-    contLoop = True
+
     try:
-        while contLoop:
+        while 1:
             while winSum < subtotal: #iterates window to the right while the sum is too low
-                intList[i] = int(intList[i])
                 winSum += intList[i]
                 i += 1
             
             while winSum == subtotal: #counts when window is correct, checks trailing 0s and iterates if possible
                 tempI = i
-                try:
-                    while intList[tempI] == "0": #checks trailing 0s and counts them
+                count += 1
+                try: 
+                    while intList[tempI] == 0: 
                         tempI += 1
-                except:
+                        count += 1  #checks trailing 0s and counts them
+                    
+                except: 
                     pass
-                count += 1 + tempI - i
                 winSum -= intList[j]                    
                 j += 1
             
@@ -64,8 +63,3 @@ def ex1(intList, subtotal):
     except:
         pass
     return count
-        
-
-if __name__ == '__main__':
-    # Insert your own tests here
-    pass
