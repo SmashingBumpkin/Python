@@ -82,3 +82,44 @@ if __name__ == "__main__":
   print(RepeatingChars(['a', 'a', 'z', 'b', 'b', 'b', 'a', 'a', 'a', 'z', 'c', 'c'], 2))
   print(RepeatingChars(['a', 'a', 'z', 'b', 'b', 'b', 'a', 'a', 'a', 'z', 'c', 'c'], 3))
   print(RepeatingChars(['a', 'a', 'z', 'b', 'b', 'b', 'a', 'a', 'a', 'z', 'c', 'c'], 4))
+  
+
+# The goal of this assignment is to write a text-based version of the hangman game:
+
+# https://en.wikipedia.org/wiki/Hangman_(game)
+# http://www.playhangman.com/PH.asp?g=cats
+# https://play.google.com/store/apps/details?id=com.klikapp.hangman2
+# https://itunes.apple.com/IE/app/id327449554
+
+# we assume that the program contains a pre-defined list of words among
+# which the secret one is chosen from
+
+# the best approach will be to solve simpler problems first and then
+# combine their solutions into the a single program, for example
+# (the list is only a suggestion, it does not mean that you have to follow it):
+#    • problem 1: given a word of any length, generate a string of the same
+#      length containing stars only (e.g., given the word "hello",
+#      you will generate "*****")
+#    • problem 2: given a string, replace the n-th character of
+#      the string with a different one
+#    • problem 3: given a word and a character, generate a string of
+#      the same length containing stars everywhere, except for the
+#      positions occupied by the character (e.g., given "hello" and "l",
+#      you will generate "**ll*")
+#    • problem 4: given a string containing a mix of characters and stars,
+#      count the number of stars (e.g., given "**llo", you will get 2)
+
+def HangMan():
+    # your code goes here
+    word = "shlong"
+    censored = ""
+    for i in word: censored += "_ " 
+    print("Your word is: ", censored)
+    guesses = 8
+    for i in range(8):
+        print("you have ", guesses - i, "guesses left")
+        guess = input("Input your guess here: ")
+        
+        
+if __name__ == "__main__":
+  HangMan()
