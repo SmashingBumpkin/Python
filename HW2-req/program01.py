@@ -50,7 +50,7 @@ pytest test_01.py -v -rA
 
 #BEGIN CODE
 
-
+#import time
 def decode_XKCD_tuple(xkcd_values : tuple, k : int) -> list:
     '''
     Receives as arguments a list of strings representing values in the
@@ -65,11 +65,12 @@ def decode_XKCD_tuple(xkcd_values : tuple, k : int) -> list:
     list[int]                   k maximum values in decreasing order
     '''
     
+    #t = time.time()
     
     #iterates through input and creates an array of decoded values
     decValues = list(map(decode_value, xkcd_values))
     decValues.sort(reverse = 1)
-        
+    #print(time.time() - t)
     return decValues[:k]
 
 
@@ -106,30 +107,72 @@ def xkcd_to_list_of_weights(xkcd : str) -> list:
     '''
     
     
-    lenXKCD , i = len(xkcd) , 0
+    #NEW PLAN
+    
+    #Iterate through the string and call a switch statement each time
+    """
+    
+    switcher = { 
+        100: 1000, 
+        50: 500,
+        10: 100,
+        5: 50,
+        1: 10,
+        "1": 1,
+        "5": 5
+        }
+    
+    
     listXKCD = []
-    while i < lenXKCD: #appends value to list based on the next weight
-        if xkcd[i:i+4] == "1000":
-            listXKCD.append(1000)
-            i += 4
-        elif xkcd[i:i+3] == "500":
-            listXKCD.append(500)
-            i += 3
-        elif xkcd[i:i+3] == "100":
-            listXKCD.append(100)
-            i += 3
-        elif xkcd[i:i+2] == "50":
-            listXKCD.append(50)
-            i += 2
-        elif xkcd[i:i+2] == "10":
-            listXKCD.append(10)
-            i += 2
-        elif xkcd[i] == "5":
-            listXKCD.append(5)
-            i += 1
+    
+    subtotal = int(xkcd[0])
+    t = time.time()
+    
+    j = 0
+    
+    for i in xkcd[1:]:
+        if i == "0":
+            subtotal = switcher.get(subtotal)
         else:
-            listXKCD.append(1)
-            i += 1
+            listXKCD.append(subtotal)
+            subtotal = switcher.get(i)
+    
+    #print(time.time() - t)
+    listXKCD.append(subtotal)
+    #print(listXKCD)
+    
+        
+        
+    """
+    listXKCD = []
+    i = 0
+    try:
+        for _ in range(len(xkcd)): #appends value to list based on the next weight
+            if xkcd[i:i+4] == "1000":
+                listXKCD.append(1000)
+                i += 4
+            elif xkcd[i:i+3] == "100":
+                listXKCD.append(100)
+                i += 3
+            elif xkcd[i:i+3] == "500":
+                listXKCD.append(500)
+                i += 3
+            elif xkcd[i:i+2] == "10":
+                listXKCD.append(10)
+                i += 2
+            elif xkcd[i:i+2] == "50":
+                listXKCD.append(50)
+                i += 2
+            elif xkcd[i] == "1":
+                listXKCD.append(1)
+                i += 1
+            else:
+                listXKCD.append(5)
+                i += 1
+    except:
+        pass
+    
+    
     return listXKCD
 
 
@@ -162,14 +205,20 @@ def list_of_weights_to_number(weights : list ) -> int:
 
 ###################################################################################
 
-if __name__ == '__main__':
+if __name__ == '__main__':   
+
+    #t = time.time()    
    # add here your personal tests
-    #print(decode_XKCD_tuple(['10010010010100511','100010010010100511'],2))
-    #print(decode_XKCD_tuple(['10010010010100511','100010010010100511'],2))
-    #print(decode_XKCD_tuple(["1101001000"],1)) #889
-    #print(decode_XKCD_tuple(["1000100100010100110"],1)) #1999
-    #print(decode_XKCD_tuple([ "1000100100010100110",  "100010001050015" , "50010010050101015"], 2)) #[2494, 1999]
-    #print(decode_XKCD_tuple([ "150",  "1050110" , "100100010100110", "11000", "1500", "10050010100110"],6))
-    #print(decode_value("50010010050101015")) #
-    #print(list_of_weights_to_number([500, 100, 100, 50, 10, 10, 1, 5])) #774
+    #xkcd_to_list_of_weights("10051111")
+    #for _ in range(10000):
+    #    print(decode_XKCD_tuple(['10010010010100511','100010010010100511'],2))
+    #    print(decode_XKCD_tuple(['10010010010100511','100010010010100511'],2))
+    #    print(decode_XKCD_tuple(["1101001000"],1)) #889
+    #    print(decode_XKCD_tuple(["1000100100010100110"],1)) #1999
+    #    print(decode_XKCD_tuple([ "1000100100010100110",  "100010001050015" , "50010010050101015"], 2)) #[2494, 1999]
+    #    print(decode_XKCD_tuple([ "150",  "1050110" , "100100010100110", "11000", "1500", "10050010100110"],6))
+    #    print(decode_value("50010010050101015")) #
+    #    print(list_of_weights_to_number([500, 100, 100, 50, 10, 10, 1, 5])) #774
+    
+    #print(time.time() - t)
     pass
