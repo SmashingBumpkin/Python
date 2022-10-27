@@ -50,10 +50,6 @@ def decode_XKCD_tuple(xkcd_values : tuple, k : int) -> list:
     for i in xkcd_values:
         decValues.append(decode_value(i))
     decValues.sort(reverse = 1)
-    
-    output = []
-    for i in range(k):
-        output.append(decValues[i])
         
     return decValues[:k]
 
