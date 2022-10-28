@@ -146,33 +146,29 @@ def xkcd_to_list_of_weights(xkcd : str) -> list:
     """
     listXKCD = []
     i = 0
-    try:
-        for _ in range(len(xkcd)): #appends value to list based on the next weight
-            if xkcd[i:i+4] == "1000":
-                listXKCD.append(1000)
-                i += 4
-            elif xkcd[i:i+3] == "100":
-                listXKCD.append(100)
-                i += 3
-            elif xkcd[i:i+3] == "500":
-                listXKCD.append(500)
-                i += 3
-            elif xkcd[i:i+2] == "10":
-                listXKCD.append(10)
-                i += 2
-            elif xkcd[i:i+2] == "50":
-                listXKCD.append(50)
-                i += 2
-            elif xkcd[i] == "1":
-                listXKCD.append(1)
-                i += 1
-            else:
-                listXKCD.append(5)
-                i += 1
-    except:
-        pass
-    
-    
+    while i <len(xkcd): 
+        if xkcd[i:i+4] == "1000":
+            listXKCD.append(1000)
+            i += 4
+        elif xkcd[i:i+3] == "100":
+            listXKCD.append(100)
+            i += 3
+        elif xkcd[i:i+3] == "500":
+            listXKCD.append(500)
+            i += 3
+        elif xkcd[i:i+2] == "10":
+            listXKCD.append(10)
+            i += 2
+        elif xkcd[i:i+2] == "50":
+            listXKCD.append(50)
+            i += 2
+        elif xkcd[i] == "1":
+            listXKCD.append(1)
+            i += 1
+        else:
+            listXKCD.append(5)
+            i += 1
+
     return listXKCD
 
 
@@ -194,6 +190,7 @@ def list_of_weights_to_number(weights : list ) -> int:
     #  EXCEPT when a character is followed by a higher-value character;
     #  in that case, the lower-value char is subtracted from instead of summed to
     #  the higher-value char
+    
     output , i = weights[-1] , 1 #adds end of list as it will always be +ve
     for element in weights[:-1]:
         output += -element if element < weights[i] else element
@@ -205,13 +202,15 @@ def list_of_weights_to_number(weights : list ) -> int:
 
 ###################################################################################
 
-if __name__ == '__main__':   
+if __name__ == '__main__':  
+    
+    
 
     #t = time.time()    
    # add here your personal tests
     #xkcd_to_list_of_weights("10051111")
     #for _ in range(10000):
-    #    print(decode_XKCD_tuple(['10010010010100511','100010010010100511'],2))
+    #print(decode_XKCD_tuple(['10010010010100511','100010010010100511'],2))
     #    print(decode_XKCD_tuple(['10010010010100511','100010010010100511'],2))
     #    print(decode_XKCD_tuple(["1101001000"],1)) #889
     #    print(decode_XKCD_tuple(["1000100100010100110"],1)) #1999

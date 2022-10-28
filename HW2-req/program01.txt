@@ -1,167 +1,47 @@
-# -*- coding: utf-8 -*-
-
-""""
-The standard encoding for Roman numerals follows the rules:
-- there is no zero
-- only the chars 'IVXLCDM' are used, which correspond to the decimal values
-  'I' = 1, 'V' = 5, 'X' = 10, 'L' = 50, 'C' = 100, 'D' = 500, 'M' = 1000
-- numbers are written from left to right, starting with higher values letters
-  (thousands, hundreds, tens, units)
-- the value of a Roman numeral is obtained by adding the values of the characters,
-  EXCEPT when a character is followed by a higher-value character;
-  in that case, the lower-value char is subtracted from instead of summed to
-  the higher-value char
-- at most, 3 equal symbols can be used together, only for the 'IXCM' ones
-  ('III' = 3, 'XXX' = 30, 'CCC' = 300 , 'MMM' = 3000)
-- to represent numbers containing digit 4 and/or 9, we use the subtraction from the
-  symbol that follows
-  e.g.: 4 = 'IV'   9 = 'IX',    40 = 'XL'    39 = 'IXL'   499 = 'ID'
-
-The XKCD encoding
-
-Let us now consider the Roman numerals encoding suggested by Randall Munroe in his XKCD blog.
-He encodes each Roman symbol with the corresponding value and then joins all digits together.
-E.g.    397 =>  'CCCXCVII' => 100 100 100 10 100 5 1 1 => '10010010010100511'
-Let call this encoding "XKCD format".
-To go back to our example, the XKCD sequence '10010010010100511' corresponds to 397.
-
-The goal of this homework is to decode a list of strings representing Roman numerals
-in the XKCD format, and return the K maximum corresponding values, in decreasing order.
-
-Design and implement the following functions:
-
-NOTICE: no other libraries are allowed.
-
-#'I' = 1, 'V' = 5, 'X' = 10, 'L' = 50, 'C' = 100, 'D' = 500, 'M' = 1000
-switcher = { 
-000": 1000, 
-00": 500, 
-00": 100, 
-    "50": 50,
-    "10": 10,
-    "5": 5,
-    "1": 1
-Can't work out how to implement this, as I need to compare it to a
-string of variable length 
-
-pytest test_01.py -v -rA
-"""
-
-
-#BEGIN CODE
-
-
 def decode_XKCD_tuple(xkcd_values : tuple, k : int) -> list:
-    '''
-    Receives as arguments a list of strings representing values in the
-    XKCD format, and a positive integer k <= len(xkcd_values).
-    Decodes all XKCD formatted values and return the k higher values
-    sorted in decreasing order.
 
-    Parameters
-    xkcd_values : list[str]     list of strings (values) in XKCD format
-    k : int                     how many values to return
-    Returns
-    list[int]                   k maximum values in decreasing order
-    '''
-    #iterates through input and creates an array of decoded values
-    decValues = list(map(decode_value, xkcd_values))
-    decValues.sort(reverse = 1)
-        
-    return decValues[:k]
+Use the map function to iterate through xkcd_values and apply the "decode_value(...)" to each element.
+Then sort the list in reverse order and return the values as far as k
+
 
 
 
 def decode_value(xkcd : str ) -> int:
-    '''
-    Decode a string representing a value in XKCD format
-    and returns the corresponding decimal value (integer).
 
-    Parameters
-    xkcd : str                  string in XKCD format
-    Returns
-    int                         the corresponding value
-    
-    E.g.: '10010010010100511' -> 397
-    '''
-    return list_of_weights_to_number(xkcd_to_list_of_weights(xkcd))
+Simply calls the two functions below
+
+
 
 
 def xkcd_to_list_of_weights(xkcd : str) -> list:
-    '''
-    Splits an XKCD formatted string into the corresponding
-    list of weights, each corresponding to one of the original roman 
-    numeral symbols the encoding is based on.
 
-    Parameters
-    xkcd : str              XKCD formatted string
-    Returns
-    list[int]               list of 'weights' corresponding to roman symbols
+I tried 2 solutions.
 
-    E.g.: '10010010010100511' -> [100, 100, 100, 10, 100, 5, 1, 1,]
-    '''
-    lenXKCD , i = len(xkcd) , 0
-    listXKCD = []
-    while i < lenXKCD: #appends value to list based on the next weight
-        if xkcd[i:i+4] == "1000":
-            listXKCD.append(1000)
-            i += 4
-        elif xkcd[i:i+3] == "500":
-            listXKCD.append(500)
-            i += 3
-        elif xkcd[i:i+3] == "100":
-            listXKCD.append(100)
-            i += 3
-        elif xkcd[i:i+2] == "50":
-            listXKCD.append(50)
-            i += 2
-        elif xkcd[i:i+2] == "10":
-            listXKCD.append(10)
-            i += 2
-        elif xkcd[i] == "5":
-            listXKCD.append(5)
-            i += 1
-        else:
-            listXKCD.append(1)
-            i += 1
-    return listXKCD
+Solution 1:
+The algorithm loops forward with a while loop, using a cursor "i" starting from 0. When i is greater than the length, the loop ends.
+Long list of if/elif statements. Checks if the next 4 letters in the string are "1000", and appends that to the list, 
+and moves the cursor forward 4 positions.
+If the letters aren't "1000", it checks if they are "500", and all other variations down to 1, and appends to list and moves
+the cursor forward the appropriate amount.
+Returns the list.
+
+Solution 2:
+A subtotal is set to the first value in the string.
+The algo loops with a for loop, checking every character in the string. 
+If the algorithm finds a "1" or a "5", it will append the subtotal to the list. Then it will use a dictionary to set a temp string to int 
+1 or 5 based on the current string element.
+If the algo finds a 0, it will use a dictionary to set the next element based on the subtotal (ie if it finds 1, it will return 10).
+Returns the list
+
+Both functions perform comparably, the solution 2 tends to be a bit faster. The bigger the number, the better soln 2 performs.
+Apparently we can't use dict so the source code uses soln 1.
+
+
 
 
 def list_of_weights_to_number(weights : list ) -> int:
-    '''
-    Transforms a list of weights obtained from the XKCD format
-    to the corresponding decimal value, by using the 'sum/subtract' rules.
 
-    Parameters
-    weights : list[int]    list of 'weights' of Roman numerals
-    Returns
-    int                    corresponding integer value
-    
-    E.g.: [100, 100, 100, 10, 100, 5, 1, 1,] -> 397
-    '''
-    #- the value of a Roman numeral is obtained by adding the values of the characters,
-    #  EXCEPT when a character is followed by a higher-value character;
-    #  in that case, the lower-value char is subtracted from instead of summed to
-    #  the higher-value char
-    output , i = weights[-1] , 1 #adds end of list as it will always be +ve
-    for element in weights[:-1]:
-        output += -element if element < weights[i] else element
-        i += 1
-    return output
+Sets the return value, output, to the last element in the list weights, as the last element is always positive. Sets the iterator i to 1.
+Loops through the list of weights comparing elementA in list the to the following elementB. If the following value is greater, the first 
+value is subtracted. If the following value is lower, then first value is added.
 
-
-
-
-###################################################################################
-
-if __name__ == '__main__':
-   # add here your personal tests
-    #print(decode_XKCD_tuple(['10010010010100511','100010010010100511'],2))
-    #print(decode_XKCD_tuple(['10010010010100511','100010010010100511'],2))
-    #print(decode_XKCD_tuple(["1101001000"],1)) #889
-    #print(decode_XKCD_tuple(["1000100100010100110"],1)) #1999
-    #print(decode_XKCD_tuple([ "1000100100010100110",  "100010001050015" , "50010010050101015"], 2)) #[2494, 1999]
-    #print(decode_XKCD_tuple([ "150",  "1050110" , "100100010100110", "11000", "1500", "10050010100110"],6))
-    #print(decode_value("50010010050101015")) #
-    #print(list_of_weights_to_number([500, 100, 100, 50, 10, 10, 1, 5])) #774
-    pass
