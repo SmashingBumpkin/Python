@@ -35,5 +35,12 @@ def es26(table, column):
 
     '''
     # enter your code here
-    table.sort_values(column, ascending = False)
+    table.sort(key=lambda item: item.get(column),reverse = True)
     return len(table[0])
+
+
+table = [{'name': 'Sophie','year': 1973, 'tel': 5553546},
+              {'name': 'Bruno', 'year': 1981 ,'tel': 5558432}]
+
+print(es26(table, 'year')) #returns 3 and  modifies 
+print(table)

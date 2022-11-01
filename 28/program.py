@@ -34,11 +34,34 @@ def es28(table, col, val):
     [{'name': 'Bruno','tel': 5558432}]
 
     '''
+    import copy
     # insert here your code
-    for j in table[:]: #table[:] makes sure nothing gets skipped
-        if j[column] == value: #deletes column from table
-            del j[column]
+    table2 = copy.deepcopy(table)
+    for j in table2[:]: #[:] makes sure nothing gets skipped
+        if j[col] == val: #deletes column from row of table
+            del j[col]
         else: #or deletes row from table
-            table.remove(j)
-        
-    return table
+            table2.remove(j)
+    return table2
+
+#table = [{'C1': 2, 'C2': 1 ,'C3': 'd'},{'C1': 4, 'C2': 7 ,'C3': 'a'}, {'C1': 6, 'C2': 1 ,'C3': 'b'},{'C1':8, 'C2': 3 ,'C3': 'c'}]
+
+#print(es28(table, 'C1', 8))
+"""
+table = [{'name': 'Sophie', 'year': 1973 ,'tel': 5553546},
+             {'name': 'Bruno', 'year': 1981 ,'tel': 5558432},
+             {'name': 'Jeff', 'year': 1981 ,'tel': 5553547}]
+print(es28(table, 'year', 1981))
+table = [{'name': 'Sophie', 'year': 1973 ,'tel': 5553546},
+             {'name': 'Bruno', 'year': 1981 ,'tel': 5558432},
+             {'name': 'Jeff', 'year': 1981 ,'tel': 5553547}]
+print(es28(table, 'name', "Sophie"))
+
+def es28(table,column,value):
+    table2 = [
+        {
+            c: v for c, v in row.items() if c != column
+        } for row in table if row[column] == value
+    ]
+    return table2
+"""

@@ -56,18 +56,13 @@ def ex30(fname1,fname2,fname3):
                    break
             i += 1
             
-    lastWasSpace = False
     output = ""
     i=0
     count = 0
     while i < len(file1):
-        if file1[i] == " ":
-            if not lastWasSpace:
-                output += " "
-                lastWasSpace = True
+        while file1[i] == " ":
+            output += " "
             i += 1
-            continue
-        else: lastWasSpace = False
         if file1[i] in "0123456789":
             code = file1[i] + file1[i+1] + file1[i+2]
             i += 2
@@ -81,12 +76,10 @@ def ex30(fname1,fname2,fname3):
             output += file1[i]
         
         i += 1
-    print(output)
-    
-    f = open(fname3, "x")
-    f.write(output)
-    f.close()
-    
+        
+    with open(fname3, "w") as myfile:
+        myfile.write(output)
+
     return count
         
     

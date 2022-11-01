@@ -144,34 +144,35 @@ def xkcd_to_list_of_weights(xkcd : str) -> list:
         
         
     """
-    listXKCD = []
-    i = 0
-    try:
-        for _ in range(len(xkcd)): #appends value to list based on the next weight
-            if xkcd[i:i+4] == "1000":
-                listXKCD.append(1000)
-                i += 4
-            elif xkcd[i:i+3] == "100":
-                listXKCD.append(100)
-                i += 3
-            elif xkcd[i:i+3] == "500":
-                listXKCD.append(500)
-                i += 3
-            elif xkcd[i:i+2] == "10":
-                listXKCD.append(10)
-                i += 2
-            elif xkcd[i:i+2] == "50":
-                listXKCD.append(50)
-                i += 2
-            elif xkcd[i] == "1":
-                listXKCD.append(1)
-                i += 1
-            else:
-                listXKCD.append(5)
-                i += 1
-    except:
-        pass
     
+    i = 0
+    listXKCD = [
+        try:
+            for _ in range(len(xkcd)): #appends value to list based on the next weight
+                if xkcd[i:i+4] == "1000":
+                    listXKCD.append(1000)
+                    i += 4
+                elif xkcd[i:i+3] == "100":
+                    listXKCD.append(100)
+                    i += 3
+                elif xkcd[i:i+3] == "500":
+                    listXKCD.append(500)
+                    i += 3
+                elif xkcd[i:i+2] == "10":
+                    listXKCD.append(10)
+                    i += 2
+                elif xkcd[i:i+2] == "50":
+                    listXKCD.append(50)
+                    i += 2
+                elif xkcd[i] == "1":
+                    listXKCD.append(1)
+                    i += 1
+                else:
+                    listXKCD.append(5)
+                    i += 1
+        except:
+            pass
+        ]
     
     return listXKCD
 

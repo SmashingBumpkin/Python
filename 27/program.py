@@ -47,4 +47,4 @@ tabl = [{'name': 'Sophie', 'year': 1973 ,'tel': 5553546},
              {'name': 'Bruno', 'year': 1981 ,'tel': 5558432}]
 tabl2 = es27(tabl, 'year', 1981)
 
-print(tabl2)
+#print(tabl2)
