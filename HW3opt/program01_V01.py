@@ -57,10 +57,13 @@ WARNING: Make sure that the uploaded file is UTF8-encoded
     (to that end, we recommend you edit the file with Spyder)
 
 '''
-
+#import time
 
 def ex1(text_file, min_len, max_len, n):
+    #t= time.time()
+    
     # Enter your code here
+    
     fileRef = open(text_file, "r", encoding = "utf8")
     strIn = ""
     for line in fileRef:
@@ -70,19 +73,27 @@ def ex1(text_file, min_len, max_len, n):
     #next loop - loop through the string in windows
     #if window is in dict, add 1, else add to dict at = 1
     
+    #print(time.time()-t)
+    #t= time.time()
     
     strDict = {}
-    
+    i=0
     for width in range(min_len, max_len+1):
-        for posn in range(len(strIn)-width):
+        for posn in range(len(strIn)-width+1):
             strDict[strIn[posn:posn+width]] = strDict.get(strIn[posn:posn+width],0) + 1
+    
+    
+    #print(time.time()-t)
+    #t= time.time()
+    
+    
     
     #iterate through keys in dict
     #iterate through elements of output
     #if value of key is in output list, add key to output
     #
     #else append a append new tuple to output
-    
+
     
     output = [(-1,'-1')]
     
@@ -95,26 +106,36 @@ def ex1(text_file, min_len, max_len, n):
                 break
         if enterIf:
             output.append((strDict[element],[element]))
-            
-    output.remove((-1,'-1'))
-    output.sort()
     
-    totalEntries, i = 0, 0
-    while totalEntries < n and i < len(output):
-        i+=1
-        totalEntries += len(output[-i][1])
-        
-    #print(i, len(output))
-        
-    output = output[-i+1:]
-    #print(output)
+    #print(time.time()-t)
+    #t= time.time()
     
-    return output
+    output.remove((-1,'-1'))  
     
     #sort output
     #count entries until greater than n. Remove all entried after n
     
+    output.sort()
+    
+    for line in output:
+        line[1].sort()
+        
+    output = output[-n:]
+    
+    #print(time.time()-t)
+    #t= time.time()
+    
+    return output
 
 
 if __name__ == '__main__':
-    ex1('ft1.txt', 2, 4, 20)
+    
+    #t= time.time()
+    #output = ex1('ft1.txt', 2, 4, 20)
+    #print(ex1('ft1.txt', 2, 4, 20))
+    #print(ex1("ft100.txt", 23, 49, 17))
+    output = ex1('ft9600.txt', 23, 69, 22)
+    for i in output:
+        #print(i)
+        pass
+    #print("Total:",time.time()-t)
