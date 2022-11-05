@@ -24,4 +24,33 @@ def es36(dictionariesList):
     {'a':[3,5],'d':[]}
 
     '''
-    # insert here your code
+    #start a new dictionary = first dictionary in list
+    #compare first dictionary to next dictionary, remove anything that's not repeated
+    #repeat above step to end of list
+    dicOut: dict = dictionariesList[0]
+    
+    #iterate through dictionaries in list
+    for dick in dictionariesList:
+        #iterate through key/value pairs in dick. Remove any keys that aren't present
+        tempDic = dicOut.copy()
+        for key, value in tempDic.items():
+            if key not in dick:
+                dicOut.pop(key)
+            #if keys are present, remove anything that's not in dick values for key
+            else:
+                for element in dicOut[key]:
+                    if element not in dick[key]:
+                        dicOut[key].remove(element)
+    
+    for values in dicOut.values():
+        values.sort()
+    return dicOut
+                    
+
+#dicList = [{'a': [1,3,5],'b':[2,3 ],'d':[3]},
+#{'a':[5,1,2,3], 'b':[2],'d':[3]},
+#{'a':[3,5], 'c':[4,1,2],'d':[4]}]
+
+#print(dicList, dicList[0])
+
+#print(es36(dicList))
