@@ -68,10 +68,10 @@ def decode_XKCD_tuple(xkcd_values : tuple, k : int) -> list:
     #t = time.time()
     
     #iterates through input and creates an array of decoded values
-    decValues = list(map(decode_value, xkcd_values))
-    decValues.sort(reverse = 1)
+    #decValues = list(map(decode_value, xkcd_values))
+    #decValues.sort(reverse = 1)
     #print(time.time() - t)
-    return decValues[:k]
+    return sorted(map(decode_value, xkcd_values), reverse = True)[:k]
 
 
 
@@ -194,10 +194,9 @@ def list_of_weights_to_number(weights : list ) -> int:
     #  EXCEPT when a character is followed by a higher-value character;
     #  in that case, the lower-value char is subtracted from instead of summed to
     #  the higher-value char
-    output , i = weights[-1] , 1 #adds end of list as it will always be +ve
-    for element in weights[:-1]:
-        output += -element if element < weights[i] else element
-        i += 1
+    output = weights[-1] #adds end of list as it will always be +ve
+    for i, element in enumerate(weights[:-1]):
+        output += -element if element < weights[i+1] else element
     return output
 
 
@@ -213,7 +212,7 @@ if __name__ == '__main__':
     #for _ in range(10000):
     #    print(decode_XKCD_tuple(['10010010010100511','100010010010100511'],2))
     #    print(decode_XKCD_tuple(['10010010010100511','100010010010100511'],2))
-    #    print(decode_XKCD_tuple(["1101001000"],1)) #889
+        print(decode_XKCD_tuple(["1101001000"],1)) #889
     #    print(decode_XKCD_tuple(["1000100100010100110"],1)) #1999
     #    print(decode_XKCD_tuple([ "1000100100010100110",  "100010001050015" , "50010010050101015"], 2)) #[2494, 1999]
     #    print(decode_XKCD_tuple([ "150",  "1050110" , "100100010100110", "11000", "1500", "10050010100110"],6))
@@ -221,4 +220,4 @@ if __name__ == '__main__':
     #    print(list_of_weights_to_number([500, 100, 100, 50, 10, 10, 1, 5])) #774
     
     #print(time.time() - t)
-    pass
+    #pass

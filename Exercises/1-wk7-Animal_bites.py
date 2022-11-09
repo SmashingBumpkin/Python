@@ -50,14 +50,23 @@
 
 def AnimalBites(dbFile):
     with open('Health_AnimalBites.csv','r',encoding = 'utf8') as jeff:
-        jeff.readline().strip().split(',')[1]
+        jeff.readline()
         biteList = [steve.strip().split(',') for steve in jeff]
         animalList = [steve.strip().split(',') for steve in jeff]
     
     print('Number of bite events is', len(biteList))
-    print(biteList[0][1])
-    animals = set(biteList[0:3][1])
-    print(animals)
-
+    nastyBastards = list(set(el[1] for el in biteList))
+    nastyBastards.remove('')
+    print('The little shits are',  nastyBastards)
+    
+    yrQty = {}
+    for el in biteList:
+        year = el[0][0:4]
+        yrQty[year] = yrQty.get(year,0) + 1
+    
+    print(yrQty)
+        
+    
+    
 if __name__ == "__main__":
   AnimalBites("Health_AnimalBites.csv")
