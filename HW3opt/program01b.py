@@ -59,30 +59,24 @@
 # WARNING: Make sure that the uploaded file is UTF8-encoded
 #     (to that end, we recommend you edit the file with Spyder)
 
-#pytest test_01.py -v -rA
 
-#import time
+import time
 def ex1(text_file, min_len, max_len, n):
     
-    
-    #t = time.time()
+    t = time.time()
     #open file and put entire contents into a single string with no \n
-    with open(text_file, "r", encoding = "utf8") as fileRef:
-        strIn = ""
-        for line in fileRef:
-            strIn += line.strip()
-    
-    #if max_len - min_len > n:
-    #    max_len = min_len + n
+    fileRef = open(text_file, "r", encoding = "utf8")
+    strIn = ""
+    for line in fileRef:
+        strIn += line.strip()
     
     #Outermost loop - width = length of window, from min_len to max_len
     #next loop - loop through the string in window of size width
     #add key to list with val 0 if it's not there already
     #add 1 to val
-    #print(time.time() - t)
-    #t = time.time()
+    print(time.time() - t)
+    t = time.time()
     strDict = {}
-    
     for width in range(min_len, max_len+1):
         for posn in range(len(strIn)-width+1):
             key = strIn[posn:posn+width]
@@ -92,53 +86,49 @@ def ex1(text_file, min_len, max_len, n):
     #if not found append value to output0 and [key] to output1
     #if found append key to correct index of output1
     #zip together output0 and output1
-    #print(time.time() - t)
-    #t = time.time()
+    print(time.time() - t)
+    t = time.time()
     
+    """
+    output0 = []
+    output1 = []
     
-    # output0 = []
-    # output1 = []
-    
-    # for key in strDict:
-    #     value = strDict[key]
-    #     try:
-    #         output1[output0.index(value)].append(key)
-    #     except:
-    #         output0.append(value)
-    #         output1.append([key])    
-    
-    output0 = list(set(strDict.values()))
-    output0.sort()
-    output0 = output0[-n:]
-    limit = output0[0]
-    output1 = list([] for _ in range(len(output0)))
-    for key, value in strDict.items():
-        if value >= limit:
+    for key in strDict:
+        value = strDict[key]
+        try:
             output1[output0.index(value)].append(key)
+        except:
+            output0.append(value)
+            output1.append([key])    
+    """
+    output0 = list(set(strDict.values()))
+    output1 = list([] for _ in range(len(output0)))
+    for key in strDict:
+        output1[output0.index(strDict[key])].append(key)
+    
     
     #print( strings)
-    #print("time to build output 0 & 1: ", time.time() - t)
-    #t = time.time()
-    for line in output1:
-        line.sort()
+    print("time to build output 0 & 1: ", time.time() - t)
+    t = time.time()
+    output = list(zip(output0,output1))
+    output = output[-n:]
+    print(time.time() - t)
+    t = time.time()
     
-    # output.sort()
-    # output = output[-n:]
-    #print(time.time() - t)
-    #t = time.time()
     
-    #print(time.time() - t)
-    #t = time.time()
-    return list(zip(output0,output1))
+    for line in output:
+        line[1].sort()
+    print(time.time() - t)
+    t = time.time()
+    return output
 
 if __name__ == '__main__':
     
     #t= time.time()
     #output = ex1('ft1.txt', 2, 4, 20)
     #print(ex1('ft1.txt', 2, 4, 20))
-    #print(ex1('ft2.txt', 2, 5, 10))
     #print(ex1("ft100.txt", 23, 49, 17))
-    #output = ex1('ft9600.txt', 23, 69, 22)
+    output = ex1('ft9600.txt', 23, 69, 22)
     #output = ex1('ft3600.txt', 5, 39, 35)
     #print("Total:",time.time()-t)
     #for i in output:
