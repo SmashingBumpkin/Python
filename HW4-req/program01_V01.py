@@ -65,8 +65,7 @@ def most_frequent_chars(filename: str) -> str:
                     
         if currFile == filename:
             contLoop = False
-    
-    wordList.sort(key = len, reverse = True)
+            
     return wordlist_to_string(wordList)
 
 
@@ -76,16 +75,19 @@ def wordlist_to_string(wordList):
     #get earliest letter from highest counts
     #append letter to string
     output = ""
-    for posn in range(len(wordList[0])):
+    for posn in range(len(max(wordList,key = len))):
+        newWordList = []
         wordDic = {}
         
-        try:
-            for word in wordList:
+        for word in wordList:
+            try:
                 letter = word[posn]
-                wordDic[letter] = wordDic.get(letter,0) + 1
-        except IndexError:
-            pass
-        
+            except IndexError:
+                continue
+            newWordList.append(word)
+            wordDic[letter] = wordDic.get(letter,0) + 1
+            
+        wordList = newWordList
         maxCount = max(wordDic.values())
         output += min([key for key, value in wordDic.items() if value == maxCount])
         

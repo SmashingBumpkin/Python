@@ -1,2 +1,25 @@
-Write here your algorithm description (no code or personal info)
-Scrivi qui la descrizione del tuo algoritmo (senza codice o info personali)
+Main function:
+
+A while loop creates list of words. Loop continues until the next file == the original filename input
+	Open each file, then read through the lines. Strip it down hopefully giving a word. 
+	Check if there are any " " or "\t" in the line. If there are, there is more than one word, 
+	so seperate the words by " " and "\t" and add to words to wordlist.
+	If not, that means there is only a single word in the string, so add to the wordlist.
+The complete list of words is then sorted by length.
+Call to a second function using wordlist as the input. The program returns the result of this function call.
+
+Second function:
+
+Input is the list of words extracted from the .txt documents.
+
+Primary for loop that loops through each position (eg 0 to 9 if the longest word has 10 chars).
+	Secondary for loop loops through each word in the word list.
+		If the word is too short (eg looking for the 4th letter of a 3 letter word), the loop breaks.
+		If the word is long enough, a dictionary is used to keep track of the count of each letter.
+
+	The max count in the dictionary of letters is recorded.
+	A list is generated of letters which have a count == to the max count value. The "min" letter is taken (ie first choice a then b then c etc)
+	The min letter is added to the output string
+The function then returns the output string.
+
+100% accuracy
