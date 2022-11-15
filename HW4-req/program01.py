@@ -47,11 +47,11 @@
 
                                                                                                                                                                                                                                                                                                                                                                                                
 def most_frequent_chars(filename: str) -> str:
-    contLoop, currFile, wordList = True, filename, []
+    currFile, wordList = filename, []
     #Opens each file, then extracts the next file, then builds the wordlist
     #from the data contained within.
     
-    while contLoop:
+    while True:
         with open(currFile, 'r', encoding = 'utf8') as fileRef:
             currFile = fileRef.readline().strip()
             
@@ -64,7 +64,7 @@ def most_frequent_chars(filename: str) -> str:
                     wordList.append(currWord)
                     
         if currFile == filename:
-            contLoop = False
+            break
     
     wordList.sort(key = len, reverse = True)
     return wordlist_to_string(wordList)
@@ -83,7 +83,7 @@ def wordlist_to_string(wordList):
             for word in wordList:
                 letter = word[posn]
                 wordDic[letter] = wordDic.get(letter,0) + 1
-        except IndexError:
+        except:
             pass
         
         maxCount = max(wordDic.values())

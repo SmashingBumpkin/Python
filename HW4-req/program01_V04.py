@@ -47,11 +47,11 @@
 
                                                                                                                                                                                                                                                                                                                                                                                                
 def most_frequent_chars(filename: str) -> str:
-    contLoop, currFile, wordList = True, filename, []
+    currFile, wordList = filename, []
     #Opens each file, then extracts the next file, then builds the wordlist
     #from the data contained within.
     
-    while contLoop:
+    while True:
         with open(currFile, 'r', encoding = 'utf8') as fileRef:
             currFile = fileRef.readline().strip()
             
@@ -64,11 +64,10 @@ def most_frequent_chars(filename: str) -> str:
                     wordList.append(currWord)
                     
         if currFile == filename:
-            contLoop = False
-        
+            break
+    
     wordList.sort(key = len, reverse = True)
     return wordlist_to_string(wordList)
-
 
 def wordlist_to_string(wordList):
     #go through words and add them to dic, or add 1 to count in dic
@@ -76,20 +75,20 @@ def wordlist_to_string(wordList):
     #get earliest letter from highest counts
     #append letter to string
     output = ""
-    for posn in range(len(max(wordList,key = len))):
+    for posn in range(len(wordList[0])):
         wordDic = {}
         
-        for index, word in enumerate(wordList):
-            try:
+        try:
+            for word in wordList:
                 letter = word[posn]
-            except IndexError:
-                break
-            wordDic[letter] = wordDic.get(letter,0) + 1
+                wordDic[letter] = wordDic.get(letter,0) + 1
+        except:
+            pass
+        
         maxCount = max(wordDic.values())
         output += min([key for key, value in wordDic.items() if value == maxCount])
         
     return output
-
 
 #print(most_frequent_chars('test04/capillarities.txt'))
 #print(most_frequent_chars('test01/A.txt'))

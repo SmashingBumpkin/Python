@@ -57,15 +57,11 @@ def most_frequent_chars(filename: str) -> str:
     return wordlist_to_string(wordList)
 
 def line_to_words(line):
-    wordList = []
     currWord = line.strip()
-    if currWord == '':
-        return
-    elif ' ' in currWord or '\t' in currWord:
-        wordList.extend(currWord.replace('\t', ' ').split())
+    if ' ' in currWord or '\t' in currWord:
+        return currWord.replace('\t', ' ').split()
     else:
-        wordList.append(currWord)
-    return wordList
+        return [currWord]
 
 
 def wordlist_to_string(wordList):
