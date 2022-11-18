@@ -88,7 +88,7 @@ def ex1(text_file, pngfile):
     #iterate through each entry in rectList
     #iterate over center of rectangle and write wht to the entire center
     #iterate around edge of rectangle writing grn keeping track of grn pixels
-    for rect in rectList:
+    for rect in rectList: # could this be outsourced to a function?
         edgeRH = rect[2]
         edgeLH = rect[0]
         edgeTp = rect[3]
@@ -113,7 +113,7 @@ def ex1(text_file, pngfile):
     #if blk, make pixel red and count
     # for x in range(0,maxW-9):
     #     for y in range(0,maxH-9):
-    count = 0
+    count = 0 # Dirty great if statement - how to improve?
     for y,x in grnArr:
         if (picArr[y][x] == grn and
                (picArr[y+1][x+1] == blk or picArr[y-1][x-1]  == blk or 
@@ -122,7 +122,7 @@ def ex1(text_file, pngfile):
                 picArr[y][x+1]  == blk or picArr[y][x-1]  == blk)):
             
             picArr[y][x] = red
-            count += 1 
+            count += 1
     
     images.save(picArr,pngfile)
     
@@ -132,7 +132,7 @@ def ex1(text_file, pngfile):
 
 
 if __name__ == '__main__':
-    print(ex1('rectangles_smol.txt', 'test_smol.png'))
+    #print(ex1('rectangles_smol.txt', 'test_smol.png'))
     print(ex1('rectangles_1.txt', 'test_1.png'))
     pass
     # insert your examples here
