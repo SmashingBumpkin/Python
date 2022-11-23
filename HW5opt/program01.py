@@ -80,6 +80,8 @@ def ex1(text_file, pngfile):
     blk = (0,0,0)
     wht = (255,255,255)
     
+    
+    
     picArr = [[blk] * maxW for i in range(maxH)]
     grnArr = []
 
@@ -117,7 +119,7 @@ def ex1(text_file, pngfile):
     for y,x in grnArr:
         if (picArr[y][x] == grn and
                (picArr[y+1][x+1] == blk or picArr[y-1][x-1]  == blk or 
-                picArr[y+1][x-1]  == blk or picArr[y-1][x+1]  == blk or 
+                picArr[y+1][x-1] == blk or picArr[y-1][x+1]  == blk or 
                 picArr[y+1][x]  == blk or picArr[y-1][x] == blk or
                 picArr[y][x+1]  == blk or picArr[y][x-1]  == blk)):
             

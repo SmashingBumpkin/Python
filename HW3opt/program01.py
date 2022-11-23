@@ -87,6 +87,8 @@ def ex1(text_file, min_len, max_len, n):
         for posn in range(len(strIn)-width+1):
             key = strIn[posn:posn+width]
             strDict[key] = strDict.get(key,0) + 1
+    # 
+    
     
     #search output0 for value
     #if not found append value to output0 and [key] to output1
@@ -107,6 +109,8 @@ def ex1(text_file, min_len, max_len, n):
     #         output0.append(value)
     #         output1.append([key])    
     
+    
+    
     output0 = list(set(strDict.values()))
     output0.sort()
     output0 = output0[-n:]
@@ -115,26 +119,18 @@ def ex1(text_file, min_len, max_len, n):
     for key, value in strDict.items():
         if value >= limit:
             output1[output0.index(value)].append(key)
-    
-    #print( strings)
-    #print("time to build output 0 & 1: ", time.time() - t)
-    #t = time.time()
+            
     for line in output1:
         line.sort()
+
+    return list(zip(output0,output1))    
+        
     
-    # output.sort()
-    # output = output[-n:]
-    #print(time.time() - t)
-    #t = time.time()
-    
-    #print(time.time() - t)
-    #t = time.time()
-    return list(zip(output0,output1))
 
 if __name__ == '__main__':
     
     #t= time.time()
-    #output = ex1('ft1.txt', 2, 4, 20)
+    output = ex1('ft1.txt', 2, 4, 20)
     #print(ex1('ft1.txt', 2, 4, 20))
     #print(ex1('ft2.txt', 2, 5, 10))
     #print(ex1("ft100.txt", 23, 49, 17))

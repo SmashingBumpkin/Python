@@ -56,22 +56,17 @@ def most_frequent_chars(filename: str) -> str:
             currFile = fileRef.readline().strip()
             
             for lines in fileRef:
-                currWord = lines.strip()
-                
-                if ' ' in currWord or '\t' in currWord:
-                    wordList.extend(currWord.replace('\t', ' ').split())
-                elif currWord != '':
-                    wordList.append(currWord)
+                wordList.extend(lines.split())
                     
         if currFile == filename:
             break
-    
+        
     wordList.sort(key = len, reverse = True)
     return wordlist_to_string(wordList)
 
 
 def wordlist_to_string(wordList):
-    #go through words and add them to dic, or add 1 to count in dic
+    #go through each letter of each word and add it to dic, or add 1 to count in dic
     #get highest counts from dictionary
     #get earliest letter from highest counts
     #append letter to string
@@ -87,7 +82,7 @@ def wordlist_to_string(wordList):
             pass
         
         maxCount = max(wordDic.values())
-        output += min([key for key, value in wordDic.items() if value == maxCount])
+        output += min([letter for letter, lCount in wordDic.items() if lCount == maxCount])
         
     return output
 

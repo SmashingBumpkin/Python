@@ -43,7 +43,7 @@ def es10(ftext,k):
         output += currLtr    
     return output
 
-es10('ft9.txt',3)
+print(es10('ft9.txt',3))
 es10('ft9.txt', 3)
 es10('ft9.txt', 6)
-es10('ft9.txt', 10)
+print(es10('ft9.txt', 10))
