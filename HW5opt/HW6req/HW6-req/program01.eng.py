@@ -68,4 +68,4 @@ import images
 def generate_snake(start_img: str, position: list[int, int],
                    commands: str, out_img: str) -> int:
     # Write your code here
-    return 10
+    pass

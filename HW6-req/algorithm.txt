@@ -1,0 +1,25 @@
+def generate_snake:
+	load in image and turn commands into a list
+	Set the constants
+		colours
+		map size
+		"command map" dictionary (containing the change in coordinates for each directional movement)
+	Set the starting parameters
+		Array containing all snake positions (initially 1)
+		Snake head starting point
+	Loop through list of commands
+		Get next head X and Y positions based on the output of the command map
+		Get next colour based on next head position
+		Check if the move is legal:
+			Check if next position is into an obstacle or into the snake
+			If the move is diagonal, check if the snake is crossing itself
+				End game, break the loop
+		If the next color is NOT orange:
+			Remove tail from the snake posn array, and turn the removed coordinates grey
+		Set head x and y to be the next x and y
+		Append next x and y to snake position array
+	
+	Save output image
+	Return length of the snake position array
+
+100% accuracy, <50ms, cyclometric complexity B
