@@ -18,10 +18,10 @@ class Employee:
     def Print(self):
         print(self.name, self.age, self.address, sep = '\n')
         
-E0 = Employee("jeff")
-E0.address = "123 defintiely real stret"
-E0.age = 95
-E0.Print()
+# E0 = Employee("jeff")
+# E0.address = "123 defintiely real stret"
+# E0.age = 95
+# E0.Print()
 
 
 # given the Matrix class:
@@ -75,17 +75,104 @@ class Matrix:
         return result
     
 
-steve = Matrix()
-steve.zeros(4,2)
-steve.values[0][1] = 1
-print(steve.values)
-print(steve.width,steve.height)
-steve.transpose()
+# steve = Matrix()
+# steve.zeros(4,2)
+# steve.values[0][1] = 1
+# print(steve.values)
+# print(steve.width,steve.height)
+# steve.transpose()
+# print(steve)
+# print(steve.transpose())
+# print(steve.symmetric())
+# steve.zeros(3,3)
+# print(steve.symmetric())
+# paul = [[1,2,3,4,5],[1,2,3,4,5]]
+# steve.add(paul)
+# print(steve)
+
+
+# write 2 classes, Book and Author:
+
+# Author has the following attributes and methods:
+# name : str, email : str
+# getName()
+# getEmail()
+# setEmail(str)
+# __repr__()
+
+# Book has the following attributes and methods:
+# isbn : str, title : str, authors : list[Author], price : float
+# getISBN()
+# getAuthorsNames()
+# getPrice()
+# setPrice(float)
+# __repr__()
+
+# read the list of books stored in the file books.txt, in which
+# each book is stored as a sequence of comma-separated values:
+# isbn, title, price, author1 name, author1 email, author2 name, author2 email, ...
+# the function returns a list of Book objects
+
+class Author:
+    # Author has the following attributes and methods:
+    name = "str"
+    email = ""
+    
+    def __init__(self, nam, ema):
+        self.name = nam
+        self.email = ema
+    
+    def getName(self):
+        return self.name
+    
+    def getEmail(self):
+        return self.email
+    
+    def setEmail(self,newEmail):
+        self.email = newEmail
+    
+    def __repr__(self):
+        result = self.name + "\n" + self.email
+        return result
+
+class Book:
+    isbn = ""
+    title = ""
+    authors = []
+    price = 0.0
+    def getISBN(self):
+        return self.isbn
+    def getAuthorsNames(self):
+        return self.authors
+    def getPrice(self):
+        return self.price
+    
+    def setPrice(self, newPr):
+        self.price = newPr
+        
+    def __repr__(self):
+        output = self.title + "\n"
+        for i in self.authors:
+            output += "i"
+        return output
+    
+with open('books.txt', 'r') as fileRef:
+    books = []
+    for i, line in enumerate(fileRef):
+        line = line.split(', ')
+        books.append(Book())
+        books[i].isbn = line[0]
+        books[i].title = line[1]
+        books[i].price = float(line[2])
+        theseAuthors = []
+        for j, auth in enumerate(line[3::2]):
+            
+            theseAuthors.append(Author(auth, line[j+4]))
+        print(theseAuthors)
+        books[i].authors.extend(theseAuthors)
+    
+print(books[1].authors)
+        
+steve = Author("steve","aokf@{sdaf")
 print(steve)
-print(steve.transpose())
-print(steve.symmetric())
-steve.zeros(3,3)
-print(steve.symmetric())
-paul = [[1,2,3,4,5],[1,2,3,4,5]]
-steve.add(paul)
-print(steve)
+
