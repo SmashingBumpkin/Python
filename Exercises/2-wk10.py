@@ -55,3 +55,15 @@ for line in imag:
 import images
 
 images.save(imag,"squareMkr.png")
+
+def paldro(s):
+    if len(s)<2:
+        return True
+    
+    elif s[0] == s[-1]:
+        return paldro(s[1:-1])
+    
+    else:
+        return False
+    
+print(paldro(""))
