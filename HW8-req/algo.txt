@@ -1,0 +1,21 @@
+def dumbothello(filename : str) -> tuple[int,int,int] :
+
+opens file and reads board to array
+returns result from movechecker function
+
+def move_checker(board, target, newcol)
+	sets number of wins and ties to 0
+	iterates through x and y in board looking for '.'
+		copies the board to a new temporary board
+		gets ranges for iteration (to ensure it doesn't seek a position outside the game board)
+		iterates through surround spaces checking if the colour is the target colour
+			Sets colour to be newcolour
+			Keeps track that there was a legal move, so the result is valid
+		If there was one legal move
+			the move position is set to newcol
+			the function calls itself with the temporary board, and switches target and newcol
+			adds the result of the recursive call to the count for wins and ties.
+	if there wasn't a single successful move, the winner of the current board is checked and added to the wins/ties
+	the number of wins and ties is returned
+		
+All tests passed.
