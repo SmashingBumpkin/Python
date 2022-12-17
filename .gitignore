@@ -580,14 +580,7 @@ HW6-req/png.py
 HW6-req/testlib.py
 HW7opt/game_tree.pdf
 HW7opt/isrecursive.py
-HW7opt/program01.eng.py
 HW7opt/program01.ita.py
-HW7opt/test_01.py
 HW7opt/testlib.py
-Exercises/tree-exercise/__MACOSX/._exercise.json
-Exercises/tree-exercise/__MACOSX/._isrecursive.py
-Exercises/tree-exercise/__MACOSX/._program.empty.py
-Exercises/tree-exercise/__MACOSX/._README.txt
-Exercises/tree-exercise/__MACOSX/._test.py
-Exercises/tree-exercise/__MACOSX/._testlib.py
-Exercises/tree-exercise/__MACOSX/._tree.py
+HW7opt/test_01.py
+HW7opt/program01.eng.py
