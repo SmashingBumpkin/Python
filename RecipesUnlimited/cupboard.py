@@ -25,7 +25,8 @@ def cupboardBuilder(filename = "mycupboard.txt"):
 
 class Ingredient:
     
-    def __init__(self, name, shelflifeDays = -1, alwaysAvailable = 1, created = time.time()):
+    def __init__(self, name, shelflifeDays = -1, alwaysAvailable = 1, created = time.time(),
+                 expiry = 0.0):
         self.name = name
         self.shelflifeDays = shelflifeDays
         self.alwaysAvailable = alwaysAvailable
@@ -34,7 +35,7 @@ class Ingredient:
             shelflifeSecs = shelflifeDays*24*60*60
             self.expiry = created + shelflifeSecs
         else:
-            self.expiry = 0.0
+            self.expiry = expiry
     
     def __repr__(self):
         return (self.name + "\t\t\tShelflife: " + str(self.shelflifeDays) 
@@ -59,9 +60,17 @@ class Ingredient:
                 + str(self.alwaysAvailable) + ";" + str(self.created)
                 + ";" + str(self.expiry))
     
-    def strIn(s):
+    def strIn(headers,s):
+        #TODO: refactor to receive 2 strings, use strings to make dictionary
+        #return Ingredient built with dictionary
+        
         s = s.split(';')
-        return Ingredient(s[0],int(s[1]),int(s[2]),float(s[3]))
+        s = dict(zip(headers,s))
+        return Ingredient(s["name"],int(s["shelflife"]),
+                          int(s["alwaysAvailable"]),float(s["created"]),
+                          float(s["expiry"]))
+        # s = s.split(';')
+        # return Ingredient(s[0],int(s[1]),int(s[2]),float(s[3]))
     
     def getName(self):
         return self.name
@@ -81,19 +90,24 @@ class Cupboard:
         return output
         
     def loadCupboard(file):
+        #TODO: Handle column titles
         with open(file, 'r', encoding = 'utf8') as fileref:
             #load in cupboard data
             #loop through lines in cupboard file
                 #use data from each line to create new ingredient
                 #add ingredient to cupboard list
-            output = [Ingredient.strIn(line) for line in fileref.readlines()]
+            headers = fileref.readline().split(";")
+            headers[-1] = headers[-1][:-1]
+            output = [Ingredient.strIn(headers,line) for line in fileref.readlines()]
         return Cupboard(output)
     
     def saveCupboard(self, file):
+        #TODO: refactor to include column titles
         filecontents = self.cupboardToTxtLst()
         with open(file,'w',encoding = 'utf8') as fileref:
             #loop through each ingredient in cupboard
             #add to txt file containing all data
+            fileref.write("name;shelflife;alwaysAvailable;created;expiry\n")
             for line in filecontents:
                 fileref.write(line + "\n") if "\n" not in line else fileref.write(line)
         

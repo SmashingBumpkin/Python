@@ -1,3 +1,5 @@
+name;shelflife;alwaysAvailable;created;expiry
 penne;-1;1;1672061755.8274949;0.0
 basmati rice;-1;1;1672061830.7596176;0.0
 risotto rice;-1;1;1672066467.1237;0.0
+flour;-1;1;1672080528.1603699;0.0
