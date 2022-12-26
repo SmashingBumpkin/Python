@@ -22,8 +22,8 @@ def pretty_pic_maker(sizeX,sizeY):
     centerY = sizeY // 2 -15
     radiusSq = radius**2
     tanPoint = centerX - radius//2 - 10
-    heartMnR = 255
-    heartMxR = 255
+    heartMnR = 125
+    heartMxR = 125
     heartMnG = 50
     heartMxG = 150
     heartMnB = 50

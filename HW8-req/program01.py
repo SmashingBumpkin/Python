@@ -130,7 +130,6 @@ def board_winner(board: list):
         return (0,1,0)
     else:
         return (0,0,1)
-    
 
 if __name__ == "__main__":
     R = dumbothello("boards/01.txt")
