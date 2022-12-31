@@ -22,6 +22,35 @@ def cupboardBuilder(filename = "mycupboard.txt"):
     myCupboard.saveCupboard(filename)
 
 
+class Recipe:
+    
+    def __init__(self, name: str, ingredients: list, method: str, serves = 0,
+                 prepTime = 0, cookTime = 0):
+        self.name = name
+        self.ingredients = ingredients
+        self.method = method
+        self.serves = serves
+        self.prepTime = prepTime 
+        self.cookTime = cookTime
+
+class RecipeBook:
+    #loads in recipes, adds recipes
+    #saves recipes, removes recipes
+    def __init__(self, recipe, filename):
+        pass
+    
+    # def saveRecipes(self, file):
+    #     #TODO: refactor to include column titles
+    #     filecontents = self.cupboardToTxtLst()
+    #     with open(file,'w',encoding = 'utf8') as fileref:
+    #         #loop through each ingredient in cupboard
+    #         #add to txt file containing all data
+    #         fileref.write("name;shelflife;alwaysAvailable;created;expiry\n")
+    #         for line in filecontents:
+    #             fileref.write(line + "\n") if "\n" not in line else fileref.write(line)
+        
+
+
 
 class Ingredient:
     

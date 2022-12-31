@@ -30,17 +30,27 @@ while True:
     mustUse += nextIngredient + ", "
 
 mustUse = mustUse[:-2]
-print("Here are some ingredients that may be used in a recipe: \n\n" + canUse 
-      + "\n\n\nHere is another list of ingredients. At least one of these must be used:\n\n" + mustUse
-      +"\n\n\nProvide an easy to cook recipe that uses only the ingredients listed above")
+myprompt = ("Provide an easy to cook recipe that may use some of these ingredients:\n"
+            + canUse 
+            + "\n\nAnd must be at least one of these ingredients:\n\n" + mustUse
+            + "\n\nThis recipe doesn't need to be influenced by other suggestions"
+            + "you have made")
+myprompt = ("Provide a 1-2 sentence overview of 5 recipes sentences which"
+            + " notes all it's key ingredients once. The recipe may only "
+            + "use ingredients that are listed below:\n" + canUse
+            + "\n\nThe suggestions must use at least one of these ingredients:\n"
+            + mustUse +"\n\n")
+print(myprompt)
+
     
-cont = input("\n\n\n\nPlease type 1 to continue (will spend openai credits) ")
+cont = input("\n____\n\n\nPlease type 1 to continue (will spend openai credits) ")
 if cont != "1":
     sys.exit()
-# response = openai.Completion.create(
-#   model="text-davinci-003",
-#   prompt=myprompt,
-#   max_tokens=7,
-#   temperature=0
-# )
-# print(response)
+response = openai.Completion.create(
+  model="text-davinci-003",
+  prompt=myprompt,
+  max_tokens=600,
+  temperature=0.01
+)
+
+print(response)
