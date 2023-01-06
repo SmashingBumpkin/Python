@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
 import time 
+import re
+
+
 """
 Created on Sun Dec 25 22:37:12 2022
 
@@ -20,8 +23,27 @@ def cupboardBuilder(filename = "mycupboard.txt"):
             break
         myCupboard.addIngredient(Ingredient(nextIngredient))
     myCupboard.saveCupboard(filename)
+    
 
-
+def split_responses(response):
+    response = """\n1. Penne with Olive Oil, Butter, White Pepper, and 
+    Rosemary: A classic Italian dish with a twist, this recipe combines penne 
+    pasta with olive oil, butter, white pepper, and rosemary for a delicious 
+    and aromatic meal. \n2. Risotto Rice with Curry Powder, Ground Coriander, 
+    and Eggs: A creamy and flavorful risotto dish, this recipe combines risotto 
+    rice with curry powder, ground coriander, and eggs for a unique and delicious 
+    meal. \n3. Buckwheat Tagliatelle with Garlic, Nutmeg, and Pine Nuts: A 
+    delicious and hearty pasta dish, this recipe combines buckwheat tagliatelle 
+    with garlic, nutmeg, and pine nuts for a flavorful and satisfying meal. \n4. 
+    Polenta with Milk, Butter, and Jerk Seasoning: A savory and spicy dish, this 
+    recipe combines polenta with milk, butter, and jerk seasoning for a unique 
+    and flavorful meal. \n5. Urad Dal with Curry Leaves, Deggi Mirch, and Sesame 
+    Seeds: A flavorful and aromatic Indian dish, this recipe combines urad dal 
+    with curry leaves, deggi mirch, and sesame seeds for a delicious and 
+    satisfying meal.
+    """
+    response = re.split(r"1.|2.|3.|4.|5.",response)
+    
 class Recipe:
     
     def __init__(self, name: str, ingredients: list, method: str, serves = 0,
@@ -38,7 +60,6 @@ class RecipeBook:
     #saves recipes, removes recipes
     def __init__(self, recipe, filename):
         pass
-    
     # def saveRecipes(self, file):
     #     #TODO: refactor to include column titles
     #     filecontents = self.cupboardToTxtLst()
@@ -152,6 +173,13 @@ class Cupboard:
     
     def ingredientNames(self):
         return [ingredient.getName() for ingredient in self.ingredients]
+    
+    #TODO return all long life ingredients
+    
+    #TODO return all perishable ingredients
+    
+    #TODO remove ingredient from list
+
             
 #Handles everything about what's in the cupboard
 #loads list of ingredients into program
