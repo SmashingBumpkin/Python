@@ -1,7 +1,7 @@
 import sqlite3
 
 class databaseTool:
-    def connect(name = "tutorial.db"):
+    def connect(self, name = "tutorial.db"):
         self.con = sqlite3.connect(name)
         """
         The returned Connection object con represents the connection to the on-disk database.
@@ -9,9 +9,9 @@ class databaseTool:
         In order to execute SQL statements and fetch results from SQL queries, we will 
         need to use a database cursor. Call con.cursor() to create the Cursor:
         """
-        self.cur = con.cursor()
+        self.cur = self.con.cursor()
         
-    def create_new():
+    def create_new(self):
         """
         Now that we’ve got a database connection and a cursor, we can create a database 
         table movie with columns for title, release year, and review score. For 
@@ -31,17 +31,17 @@ class databaseTool:
 
 
 
-"""
-We can verify that the new table has been created by querying the sqlite_master 
-table built-in to SQLite, which should now contain an entry for the movie table 
-definition (see The Schema Table for details). Execute that query by calling 
-cur.execute(...), assign the result to res, and call res.fetchone() to fetch 
-the resulting row:
-"""
-    def fetch_one(name = "name")
-        res = cur.execute("SELECT {name} FROM sqlite_master")
+    """
+    We can verify that the new table has been created by querying the sqlite_master 
+    table built-in to SQLite, which should now contain an entry for the movie table 
+    definition (see The Schema Table for details). Execute that query by calling 
+    cur.execute(...), assign the result to res, and call res.fetchone() to fetch 
+    the resulting row:
+    """
+    def fetch_one(self,name = "name"):
+        res = self.cur.execute("SELECT name FROM sqlite_master")
 
-        res.fetchone()
+        return res.fetchone()
         """
 
         We can see that the table has been created, as the query returns a tuple 
@@ -50,17 +50,17 @@ the resulting row:
 
         """
         
-    def fetch_spam():
-    """If we query sqlite_master for a non-existent 
-    table spam, res.fetchone() will return None:"""
-        res = self.cur.execute("SELECT name FROM sqlite_master WHERE name='spam'")
+    def fetch_spam(self):
+        """If we query sqlite_master for a non-existent 
+        table spam, res.fetchone() will return None:"""
+        res = self.cur.execute("SELECT name FROM sqlite_master WHERE name='Monty Python'")
 
-        res.fetchone() is None
+        return res.fetchone() is None
 
-"""
-Now, add two rows of data supplied as SQL literals by executing an INSERT statement, once again by calling cur.execute(...):
-"""
-    def insert_movies():
+    """
+    Now, add two rows of data supplied as SQL literals by executing an INSERT statement, once again by calling cur.execute(...):
+    """
+    def insert_movies(self):
         
         self.cur.execute("""
             INSERT INTO movie VALUES
@@ -81,7 +81,7 @@ Now, add two rows of data supplied as SQL literals by executing an INSERT statem
         
         res = self.cur.execute("SELECT score FROM movie")
         
-        res.fetchall()
+        print(res.fetchall())
 
         """
         The result is a list of two tuples, one per row, each containing that row’s score value.
@@ -106,7 +106,7 @@ Now, add two rows of data supplied as SQL literals by executing an INSERT statem
         time iterating over the results of the query:
         """
         
-        for row in cur.execute("SELECT year, title FROM movie ORDER BY year"):
+        for row in self.cur.execute("SELECT year, title FROM movie ORDER BY year"):
         
             print(row)
         """
@@ -116,7 +116,13 @@ Now, add two rows of data supplied as SQL literals by executing an INSERT statem
         Finally, verify that the database has been written to disk by calling con.close() to close the existing connection, opening a new one, creating a new cursor, then querying the database:
         """
         
-        con.close()
-    def reconnect():
+        self.con.close()
+    def reconnect(self):
+        new_con = sqlite3.connect("tutorial.db")
 
+        new_cur = new_con.cursor()
+
+        res = new_cur.execute("SELECT title, year FROM movie ORDER BY score DESC")
+
+        title, year = res.fetchone()
          

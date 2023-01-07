@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import time 
 import re
+import sqlite3
 
 
 """
@@ -105,6 +106,10 @@ class Ingredient:
     def infolist(self):
         return [self.name, self.shelflifeDays, self.alwaysAvailable]
     
+    def infotuple(self):
+        return (self.name, self.shelflifeDays, self.alwaysAvailable, 
+                self.created, self.expiry)
+    
     def strOut(self):
         return (self.name + ";" + str(self.shelflifeDays) + ";" 
                 + str(self.alwaysAvailable) + ";" + str(self.created)
@@ -132,6 +137,44 @@ class Ingredient:
 class Cupboard:
     def __init__(self, ingredientList: list):
         self.ingredients = ingredientList
+        
+    def connectDb(self, name = "cupboardContents.db"):
+        self.con = sqlite3.connect(name)
+        self.dbname = name
+        self.cur = self.con.cursor()
+        """
+        The returned Connection object con represents the connection to the on-disk database.
+
+        In order to execute SQL statements and fetch results from SQL queries, we will 
+        need to use a database cursor. Call con.cursor() to create the Cursor:
+        """
+    
+    def createDb(self):
+        """
+        Now that we’ve got a database connection and a cursor, we can create a database 
+        table movie with columns for title, release year, and review score. For 
+        simplicity, we can just use column names in the table declaration – thanks to 
+        the flexible typing feature of SQLite, specifying the data types is optional. 
+        Execute the CREATE TABLE statement by calling cur.execute(...):
+        """
+        self.cur.execute("CREATE TABLE ingredient(name, shelflife, availability, created, expiry)")
+        self.con.close()
+        
+    def saveDb(self):
+        #TODO: refactor to include column titles
+        filecontents = [ingredient.infotuple() for ingredient in self.listView()]
+        dbname = self.dbname
+        self.connectDb(dbname)
+        self.cur.executemany("INSERT INTO ingredient VALUES(?, ?, ?, ?, ?)", filecontents)
+        self.con.commit()
+        self.con.close()
+        
+    def loadDb(file = "cupboardContents.db"):
+        Cupboard.connectDb(file)
+        output = [Ingredient(row[0],row[1],row[2],row[3],row[4]) 
+                  for row in self.cur.execute("SELECT * FROM ingredient")]
+        return Cupboard(output)
+        
         
     def __repr__(self):
         output = ""
