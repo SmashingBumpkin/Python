@@ -159,10 +159,33 @@ class Cupboard:
         """
         self.cur.execute("CREATE TABLE ingredient(name, shelflife, availability, created, expiry)")
         self.con.close()
+    
+    def addIngredToDb(self, ingredient):
+        #adds the ingredient to the mysql database
+        pass
         
-    def saveDb(self):
+    
+    def initializeCupboard(name = "cupboardContents.db"):
+        con = sqlite3.connect(name)
+        dbname = name
+        cur = con.cursor()
+        """
+        The returned Connection object con represents the connection to the on-disk database.
+
+        In order to execute SQL statements and fetch results from SQL queries, we will 
+        need to use a database cursor. Call con.cursor() to create the Cursor:
+        """
+        output = [Ingredient(row[0],row[1],row[2],row[3],row[4]) 
+                  for row in cur.execute("SELECT * FROM ingredient")]
+        con.close()
+        return Cupboard(output)
+    
+    def saveDb(self, filecontents = None):
         #TODO: refactor to include column titles
-        filecontents = [ingredient.infotuple() for ingredient in self.listView()]
+        if filecontents = None:
+            filecontents = [ingredient.infotuple() for ingredient in self.listView()]
+        else:
+            filecontents = [filecontents]
         dbname = self.dbname
         self.connectDb(dbname)
         self.cur.executemany("INSERT INTO ingredient VALUES(?, ?, ?, ?, ?)", filecontents)
