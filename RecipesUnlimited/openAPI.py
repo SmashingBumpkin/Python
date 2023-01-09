@@ -1,6 +1,6 @@
 import openai
 import sys
-import cupboard
+import kitchenManager
 from re import split as resplit
 # -*- coding: utf-8 -*-
 """
@@ -9,58 +9,56 @@ Created on Mon Dec 26 15:33:44 2022
 @author: Charl
 """
 
-#load in cupboard
-
 
 #api key: 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
 
 #openai.organization = "YOUR_ORG_ID"
 def cupboardImporter():
-    mycupboard = cupboard.Cupboard.loadCupboard("mycupboard.txt")
+    mycupboard = kitchenManager.Cupboard("kitchenContents.db")
     print(mycupboard)
     return mycupboard
 
 def ingredientReturner(cupboard):
-    return ", ".join(cupboard.ingredientNames())
-
-
-
-def perishableChecker(cupboard):    #load in 
-    print("These perishable ingredients are saved:")
-    #display perishable ingredients from cupbaord
+    return ", ".join(cupboard.returnLongLifeNames())
     
-    
-    print("Enter any perishable ingredients that aren't available any more")
-    
-    while True: #Remove any ingredients from this list?
-        removeIngredient = input("Remove ingredient number: ")
-        if nextIngredient == "":
-            break
-        #remove ingredient from list
-    
-    #save updated list
-    
-def perishableAdder():
+def perishableAdder(cupboard):
     #add perishable ingredients that could do with using to the cupboard
-    while True:
-        nextIngredient = input("Input an ingredient that needs using: ")
-        if nextIngredient == "":
-            break
-        shelflife = input("About how many days is the shelf life?': ")
-        #add to cupboard
-    #save updated cupboard
+    cupboard.perishableChecker()
+    perishables = cupboard.returnPerishableNames()
+    if perishables:
+        perishables = cupboard.returnPerishableNames()
+        print("\n\nThese perishables remain from last time: \n")
+        cupboard.printPerishablesNumbered()
+        print("\nEnter any perishable ingredients that aren't available any more.")
+        
+        while True: #Remove any ingredients from this list?
+            removeIngredient = input("Remove ingredient number: ")
+            if removeIngredient == "":
+                break
+            cupboard.removeIngredient(perishables[int(removeIngredient)])
+        perishables = cupboard.returnPerishableNames()
+        mustUse = ", ".join(perishables)
+    else:
+        mustUse = ""
+        print("There are no saved perishables")
     
-
-def mustUsePrompt():
-    #refactor to simply load in perishables from cupboard
-    mustUse = ""
     while True:
         nextIngredient = input("Input an ingredient that needs using: ")
         if nextIngredient == "":
+            print("__________________________________\n\n\n")
             break
-        shelflife = input("About how many days is the shelf life?': ")
-        mustUse += nextIngredient + ", "
-    return mustUse[:-2]
+        shelflife = input("About how many days is the shelf life?: ")
+        ingredient = kitchenManager.Ingredient(name = nextIngredient, 
+                                         shelflifeDays = shelflife, alwaysAvailable = 0)
+        cupboard.addIngredient(ingredient)
+        mustUse += ", " + nextIngredient
+    
+    return mustUse
+
+def recipebookImporter():
+    myrecipes = kitchenManager.Cupboard("kitchenContents.db")
+    print(myrecipes)
+    return myrecipes
 
 
 def optionsPrompt(mustUse, canUse):
@@ -106,11 +104,27 @@ def recipePrompt(outline, mustUse, canUse):
     myprompt = ("Write a recipe for this dish: \n\n" + outline
                 + "\nthe recipe can include any of these ingredients:\n"
                 + canUse + mustUse)
-    return myprompt
     
+    print("\n_______________\n\n\n" + myprompt)
+    return myprompt
 
-canUse = ingredientReturner(cupboardImporter())
-mustUse = mustUsePrompt()
+def recipebookImporter():
+    myrecipes = kitchenManager.RecipeBook("cupboardContents.db")
+    return myrecipes
+
+def recipeAdder(recipebook, recipe):
+    #adds recipe to recipe book
+    cont = int(input("\n\nType 1 to add the recipe to the recipe book: "))
+    
+    if cont:
+        recipebook.addRecipe(Recipe.textToRecipe(recipe))
+        print("Recipe added")
+    else:
+        print("\nRecipe not added.")
+    
+cupboard = cupboardImporter()
+canUse = ingredientReturner(cupboard)
+mustUse = perishableAdder(cupboard)
 myprompt = optionsPromptBroad(mustUse,canUse)
 options = sendPrompt(myprompt)
 """options = \n1. Penne with Olive Oil, Butter, White Pepper, and 
@@ -133,5 +147,8 @@ print(options)
 option = optionChooser(options)
 recipeRequest = recipePrompt(option, mustUse, canUse)
 recipe = sendPrompt(recipeRequest)
+#recipe="\n\nPenne Alfredo with Black Mustard Seeds\n\nIngredients:\n\n- 1 package penne pasta\n- 2 tablespoons olive oil\n- 2 tablespoons vegetable oil\n- 2 tablespoons black mustard seeds\n- 2 cloves garlic, minced\n- 2 tablespoons ground cumin\n- 1 tablespoon dried basil\n- 1 tablespoon garam masala\n- 1 tablespoon paprika\n- 1 teaspoon turmeric\n- 1 teaspoon black pepper\n- 1 cup cooked basmati rice\n- 2 tablespoons pau bhaji\n- 1/4 cup pine nuts\n- 1/4 cup sesame seeds\n- 1/2 cup milk\n- 2 tablespoons butter\n- 2 eggs\n- 1 tablespoon rosemary, chopped\n\nInstructions:\n\n1. Bring a large pot of salted water to a boil and cook the penne according to package instructions. Drain and set aside.\n\n2. Heat the olive oil and vegetable oil in a large skillet over medium heat. Add the mustard seeds and cook until they start to pop, about 1 minute.\n\n3. Add the garlic, cumin, basil, garam masala, paprika, and turmeric and cook for another minute.\n\n4. Add the rice and pau bhaji and cook for 3-4 minutes, stirring occasionally.\n\n5. Add the pine nuts, sesame seeds, milk, butter, and eggs and cook until the eggs are cooked through, about 4 minutes.\n\n6. Add the penne and rosemary and toss to combine.\n\n7. Serve warm, topped with additional sesame seeds, if desired."
 
 print(recipe)
+recipebook = recipebookImporter()
+recipeAdder(recipebook, recipe)
