@@ -21,26 +21,6 @@ def cupboardBuilder(filename = "mycupboard.txt"):
         myCupboard.addIngredient(Ingredient(nextIngredient))
     myCupboard.saveCupboard(filename)
     
-
-def split_responses(response):
-    responseDEL = """\n1. Penne with Olive Oil, Butter, White Pepper, and 
-    Rosemary: A classic Italian dish with a twist, this recipe combines penne 
-    pasta with olive oil, butter, white pepper, and rosemary for a delicious 
-    and aromatic meal. \n2. Risotto Rice with Curry Powder, Ground Coriander, 
-    and Eggs: A creamy and flavorful risotto dish, this recipe combines risotto 
-    rice with curry powder, ground coriander, and eggs for a unique and delicious 
-    meal. \n3. Buckwheat Tagliatelle with Garlic, Nutmeg, and Pine Nuts: A 
-    delicious and hearty pasta dish, this recipe combines buckwheat tagliatelle 
-    with garlic, nutmeg, and pine nuts for a flavorful and satisfying meal. \n4. 
-    Polenta with Milk, Butter, and Jerk Seasoning: A savory and spicy dish, this 
-    recipe combines polenta with milk, butter, and jerk seasoning for a unique 
-    and flavorful meal. \n5. Urad Dal with Curry Leaves, Deggi Mirch, and Sesame 
-    Seeds: A flavorful and aromatic Indian dish, this recipe combines urad dal 
-    with curry leaves, deggi mirch, and sesame seeds for a delicious and 
-    satisfying meal.
-    """
-    response = resplit(r"1.|2.|3.|4.|5.",response)
-    
 class Recipe:
     
     def __init__(self, name: str, ingredients,method, description = None,
@@ -60,6 +40,12 @@ class Recipe:
         [name, ingredients] = text.strip().split("\n\n",1)
         [_, ingredients, method] = resplit(r"Ingredients:|Instructions:",ingredients)
         return Recipe(name = name.strip(), ingredients = ingredients.strip(), method = method.strip())
+    
+    #TODO: Take ingredients from a recipe and return list of individual ingredients
+    
+    #TODO: Extract a recipe from a photo of a recipe
+    
+    #TODO: Extract a recipe from a website.
     
     def infotuple(self):
         return (self.name, self.ingredients, self.method, self.description, 
@@ -200,7 +186,7 @@ class Ingredient:
         
 
 class Cupboard:
-    def __init__(self, name = "kitchenContents.db"):
+    def __init__(self, name = "cupboardContents.db"):
         self.dbname = name
     
     def __repr__(self):
@@ -291,14 +277,3 @@ class Cupboard:
     
     def cupboardToTxtLst(self):
         return [item.strOut() for item in self.ingredients]
-
-            
-#Handles everything about what's in the cupboard
-#loads list of ingredients into program
-#saves ingredients to file
-#returns list of indgredients and metadata about them
-#return only ingredients always available
-#returns list of ingredients that may be available but not definitely
-#add ingredients to the list
-#remove ingredients from the list
-#
