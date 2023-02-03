@@ -7,6 +7,23 @@ from django.utils import timezone
 
 from .models import Question, Choice
 
+from django.shortcuts import render
+from .forms import ImageForm
+
+
+def image_upload_view(request):
+    """Process images uploaded by users"""
+    if request.method == 'POST':
+        form = ImageForm(request.POST, request.FILES)
+        if form.is_valid():
+            #form.save()
+            # Get the current instance object to display in the template
+            #img_obj = form.instance
+            return render(request, 'polls/upload.html', {'form': form, 'success': 1})
+    else:
+        form = ImageForm()
+    return render(request, 'polls/upload.html', {'form': form})
+
 class IndexView(generic.ListView):
     template_name = 'polls/index.html'
     context_object_name = 'latest_question_list'
