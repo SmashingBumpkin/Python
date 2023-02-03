@@ -1,6 +1,6 @@
 from django.http import HttpResponse
 from django.template import loader
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 from .models import Recipe
 
 def index(request):
@@ -9,9 +9,14 @@ def index(request):
     context = {'recipe_list': recipe_list}
     return render(request, 'recipes/index.html', context)
 
-
 def detail(request, recipe_id):
-    return HttpResponse("You're looking at recipe %s." % recipe_id)
+    recipe = get_object_or_404(Recipe, pk=recipe_id)
+    return render(request, 'recipes/detail.html', {'recipe': recipe})
 
 def add_recipe(request):
+    recipe_name = "test"
+    recipe_method = "try to test"
+    ingredients_string = "1 test"
+    new_recipe = Recipe.objects.create(recipe_name = recipe_name, 
+        recipe_method = recipe_method, ingredients_string = ingredients_string)
     return HttpResponse("Hello, world. You're at the add recipe page.")
