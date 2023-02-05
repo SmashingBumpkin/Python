@@ -2,6 +2,10 @@ from django.http import HttpResponse
 from django.template import loader
 from django.shortcuts import get_object_or_404, render
 from .models import Recipe
+from .forms import UploadFileForm
+from PIL import Image
+# Imaginary function to handle an uploaded file.
+from . import image_processing
 
 def index(request):
     recipe_list = Recipe.objects.all()
@@ -20,3 +24,19 @@ def add_recipe(request):
     new_recipe = Recipe.objects.create(recipe_name = recipe_name, 
         recipe_method = recipe_method, ingredients_string = ingredients_string)
     return HttpResponse("Hello, world. You're at the add recipe page.")
+
+def upload_file(request):
+    if request.method == 'POST':
+        form = UploadFileForm(request.POST, request.FILES)
+        if form.is_valid():
+            img = Image.open(request.FILES['img'])
+            
+            text = image_processing.image_to_string(img)
+            recipe = image_processing.text_to_recipe(text)
+            return render(request, 'recipes/success.html', {'name': recipe.recipe_name, 
+                                                            'ingredients': recipe.ingredients_string, 
+                                                            'method': recipe.recipe_method}
+                                                            )
+    else:
+        form = UploadFileForm()
+    return render(request, 'recipes/upload.html', {'form': form})

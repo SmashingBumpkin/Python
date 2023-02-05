@@ -4,8 +4,11 @@ from django.db import models
 class Recipe(models.Model):
     recipe_name = models.CharField(max_length=200)
     recipe_method = models.CharField(max_length=1000)
-    #pub_date = models.DateTimeField('date published')
     ingredients_string = models.CharField(max_length=200)#Plain text of ingredients
+    book = models.CharField(max_length=200, null = True, blank = True)
+    page = models.CharField(max_length=5, null = True, blank = True)
+    serves = models.CharField(max_length=5, null = True, blank = True)
+    description = models.CharField(max_length=200, null = True, blank = True)
     def __str__(self):
         return self.recipe_name
 
