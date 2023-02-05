@@ -26,7 +26,8 @@ def add_recipe(request):
     return HttpResponse("Hello, world. You're at the add recipe page.")
 
 def upload_file(request):
-    if request.method == 'POST':
+    if request.method == 'POST' and request.FILES:
+        print("Helkoo")
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
             img = Image.open(request.FILES['img'])
@@ -37,6 +38,11 @@ def upload_file(request):
                                                             'ingredients': recipe.ingredients_string, 
                                                             'method': recipe.recipe_method}
                                                             )
+    elif request.method == 'POST':
+        print("hi")
+        #Add recipe to database
+        #return success page
+        #go back to recipes home
     else:
         form = UploadFileForm()
     return render(request, 'recipes/upload.html', {'form': form})
