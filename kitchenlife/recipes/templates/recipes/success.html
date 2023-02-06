@@ -1,24 +1,24 @@
 <form method="post">
     {% csrf_token %}
-<h1>{{name}}</h1>
+<h1>{{recipe.name}}</h1>
 <ul>
     <pre>
 {{description}}
     </pre>
 </ul>
-<ul>Serves: {{serves}}</ul>
+<ul>Serves: {{recipe.serves}}</ul>
 <h2>Ingredients</h2>
 <ul>
     <pre>
-{{ingredients}}
+{{recipe.ingredients_string}}
     </pre>  
 </ul>
 <h2>Method</h2>
 <ul>
     <pre>
-{{method}}
+{{recipe.method}}
     </pre>
 </ul>
-
-    <button type="submit">Upload</button>
+    <button type="Save recipe" name="add_to_db" value="save">Upload</button>
+    <button type="Forget recipe" name="add_to_db" value="forget">Forget</button>
 </form>

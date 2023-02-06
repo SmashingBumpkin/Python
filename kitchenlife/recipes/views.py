@@ -34,12 +34,9 @@ def upload_file(request):
             
             text = image_processing.image_to_string(img)
             recipe = image_processing.text_to_recipe(text)
-            return render(request, 'recipes/success.html', {'name': recipe.recipe_name, 
-                                                            'ingredients': recipe.ingredients_string, 
-                                                            'method': recipe.recipe_method}
-                                                            )
+            return render(request, 'recipes/success.html', {'recipe': recipe})
     elif request.method == 'POST':
-        print(text)
+        print(ifsave)
         #Add recipe to database
         #return success page
         #go back to recipes home

@@ -1,4 +1,5 @@
 <!-- dwitter/templates/base.html -->
+<!-- https://realpython.com/django-social-network-1/ -->
 
 <!DOCTYPE html>
 <html lang="en">
@@ -12,6 +13,8 @@
     <title>Dwitter</title>
 </head>
 <body>
+    <a href="{% url 'dwitter:dashboard' %} ">
+
     <section class="hero is-small is-success mb-4">
         <div class="hero-body">
             <h1 class="title is-1">Dwitter</h1>
@@ -20,6 +23,7 @@
             </p>
         </div>
     </section>
+    </a>
 
     <div class="container">
         <div class="columns">
