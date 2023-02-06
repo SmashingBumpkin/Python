@@ -1,3 +1,5 @@
+{% extends 'base.html' %}
+{% block content %}
 <h1>{{ recipe.name}}</h1>
 <ul>
 {{recipe.ingredients_string}}
@@ -5,3 +7,4 @@
 <ul>
     {{recipe.method}}
 </ul>
+{% endblock content %}
