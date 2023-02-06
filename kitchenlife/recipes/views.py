@@ -39,7 +39,7 @@ def upload_file(request):
                                                             'method': recipe.recipe_method}
                                                             )
     elif request.method == 'POST':
-        print("hi")
+        print(text)
         #Add recipe to database
         #return success page
         #go back to recipes home
