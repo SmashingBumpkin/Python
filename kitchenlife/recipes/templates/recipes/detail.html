@@ -1,12 +1,44 @@
 {% extends 'base.html' %}
 {% block content %}
-<ul><a href="{% url 'recipes:edit_recipe' recipe.id %}">Edit recipe</a></ul>
-<ul><a href="{% url 'recipes:delete_recipe' recipe.id %}">Delete recipe</a></ul>
-<h1>{{ recipe.name}}</h1>
-<ul>
+<section class="section">
+    <h1 class="title">{{ recipe.name }}</h1>
+    <div class="columns">
+        <div class="column is-one-third">
+            <h2 class="subtitle">
+                {{ recipe.description }}
+            </h2>
+            {% if recipe.serves %}
+                <p>
+Serves: {{ recipe.serves }}
+                </p>
+            {% endif %}
+            {% if recipe.book %}
+                <p>
+Book: {{ recipe.book }} <br>
+Page: {{ recipe.page }}
+                </p>
+            {% endif %}
+            {% if recipe.url %}
+                <p>
+<a href={{recipe.url}}>Click here to go to website</a>
+                </p>
+            {% endif %}
+        </div>
+        <div class="column">
+            <pre>
 {{recipe.ingredients_string}}
-</ul>
-<ul>
-    {{recipe.method}}
-</ul>
+                        </pre>
+        </div>
+      </div>
+    
+    
+
+
+    {% for step in method_as_list %}
+    <p> {{ step }} <br><br></p>
+    {% endfor %}
+    <ul><a href="{% url 'recipes:edit_recipe' recipe.id %}">Edit recipe</a></ul>
+    <ul><a href="{% url 'recipes:delete_recipe' recipe.id %}">Delete recipe</a></ul>
+  </section>
+
 {% endblock content %}

@@ -8,7 +8,7 @@ class EditRecipeForm(forms.ModelForm):
     class Meta:
         model = Recipe
         fields = ['name','serves', 'description', 'book',
-                 'page', 'ingredients_string', 'method']
+                 'page', 'ingredients_string', 'method', 'url']
         
         widgets = {
             'name': forms.TextInput(attrs={"class": "input",}),
@@ -18,7 +18,9 @@ class EditRecipeForm(forms.ModelForm):
             'page': forms.TextInput(attrs={"class": "input",}),
             'ingredients_string': forms.Textarea(attrs={"class": "textarea"}),
             'method': forms.Textarea(attrs={"class": "textarea",}),
-         }
+            'url': forms.TextInput(attrs={"class": "input",}),
+        }
+        
         labels = {
             'ingredients_string': "Ingredients"
         }

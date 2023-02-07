@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
-<ul><a href="{% url 'recipes:upload' %}">Upload new recipe from image</a>
+<ul><a href="{% url 'recipes:upload' %}">Upload new recipe from image</a><br>
+<a href="{% url 'recipes:ingredients_index' %}">View saved ingredients</a>
 {% if recipe_list %}
     {% for recipe in recipe_list %}
     <li><a href="{% url 'recipes:detail' recipe.id %}">{{ recipe.name }}</a></li>
