@@ -1,4 +1,3 @@
-from django.http import HttpResponse
 from django.template import loader
 from django.shortcuts import get_object_or_404, redirect, render
 from .models import Recipe
@@ -20,51 +19,37 @@ def detail(request, recipe_id):
 def upload_file(request):
     if request.method == 'POST' and request.FILES:
         form = UploadFileForm(request.POST, request.FILES)
+
         if form.is_valid():
             img = Image.open(request.FILES['img'])
-            
             text = image_processing.image_to_string(img)
             recipe = image_processing.text_to_recipe(text)
-            form = EditRecipeForm(initial = {
-                        'name': recipe.name,
-                        'method':recipe.method,
-                        'serves':recipe.serves,
-                        'description':recipe.description,
-                        'book':recipe.book,
-                        'page':recipe.page,
-                        'ingredients_string':recipe.ingredients_string,
-                        'method':recipe.method,
-                    })
+            form = EditRecipeForm(initial = recipe.return_dict())
             return render(request, "recipes/edit_recipe.html", {"form": form})
+
     elif request.method == 'POST':
         form = EditRecipeForm(request.POST)
         recipe = form.save()
-        return redirect("recipes:index")
+        return redirect('recipes:detail', recipe_id=recipe.id)
     else:
         form = UploadFileForm()
+
     return render(request, 'recipes/upload.html', {'form': form})
 
-def edit_recipe(request):
-    if request.method == 'POST' and request.FILES:
-        form = UploadFileForm(request.POST, request.FILES)
+def edit_recipe(request, recipe_id):
+    recipe = get_object_or_404(Recipe, pk=recipe_id)
+    if request.method == 'POST':
+        form = EditRecipeForm(request.POST, instance= recipe)
         if form.is_valid():
-            img = Image.open(request.FILES['img'])
-            
-            text = image_processing.image_to_string(img)
-            recipe = image_processing.text_to_recipe(text)
-            form = EditRecipeForm(initial = {
-                        'name': recipe.name,
-                        'method':recipe.method,
-                        'serves':recipe.serves,
-                        'description':recipe.description,
-                        'book':recipe.book,
-                        'page':recipe.page,
-                        'ingredients_string':recipe.ingredients_string,
-                        'method':recipe.method,
-                    })
-            return render(request, "recipes/edit_recipe.html", {"form": form})
-    elif request.method == 'POST':
-        form = EditRecipeForm(request.POST)
-        if form.is_valid():
-            recipe = form.save()
-            return redirect("recipes:index")
+            form.save()
+            #return render(request, 'recipes/detail.html', {'recipe': recipe})
+            return redirect('recipes:detail', recipe_id=recipe_id)
+    form = EditRecipeForm(initial = recipe.return_dict())
+    return render(request, 'recipes/edit_recipe.html', {'form':form})
+
+def delete_recipe(request, recipe_id):
+    if request.method == 'POST':
+        recipe = get_object_or_404(Recipe, pk=recipe_id)
+        recipe.delete()
+        return redirect("recipes:index")
+    return render(request, 'recipes/delete.html')

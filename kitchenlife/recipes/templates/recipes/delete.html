@@ -1,0 +1,8 @@
+{% extends 'base.html' %}
+{% block content %}
+<form method="post">
+    {% csrf_token %}
+    <button type="submit">Confirm delete</button> 
+</form>
+<ul><a href="{% url 'recipes:index' %}">Return to index</a></ul>
+{% endblock content %}

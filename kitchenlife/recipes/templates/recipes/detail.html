@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
+<ul><a href="{% url 'recipes:edit_recipe' recipe.id %}">Edit recipe</a></ul>
+<ul><a href="{% url 'recipes:delete_recipe' recipe.id %}">Delete recipe</a></ul>
 <h1>{{ recipe.name}}</h1>
 <ul>
 {{recipe.ingredients_string}}
