@@ -26,6 +26,8 @@ def ingredient_detail(request, ingredient_id):
     ingredient = get_object_or_404(Ingredient, pk=ingredient_id)
     return render(request, 'recipes/ingredient_detail.html', {'ingredient': ingredient})
 
+
+
 def upload_file(request):
     if request.method == 'POST' and request.FILES:
         form = UploadFileForm(request.POST, request.FILES)

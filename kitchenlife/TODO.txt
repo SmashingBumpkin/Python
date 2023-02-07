@@ -3,6 +3,7 @@ Features:
 -Add recipes from URL
     -Implement add from url
 -Search for recipes by ingredient
+    -
 -Rate recipes
 -Create cupboards which show which ingredients are stocked
     -New ingredient model variables:
@@ -26,3 +27,10 @@ Formatting issues:
 -Navigation links ugly af
 -Recipe display is fucked
 -Edit recipe should be wider
+
+-Search for recipes by ingredient
+    -Add form on index page
+    -Add search box to form
+    -filter ingredients list by ingredients
+    -display results
+    -only show recipes using that ingredient
