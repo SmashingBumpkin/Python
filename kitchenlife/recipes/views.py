@@ -30,6 +30,7 @@ def upload_file(request):
     elif request.method == 'POST':
         form = EditRecipeForm(request.POST)
         recipe = form.save()
+        recipe.string_to_ingredients()
         return redirect('recipes:detail', recipe_id=recipe.id)
     else:
         form = UploadFileForm()
@@ -41,8 +42,10 @@ def edit_recipe(request, recipe_id):
     if request.method == 'POST':
         form = EditRecipeForm(request.POST, instance= recipe)
         if form.is_valid():
+            #TODO: compare new ingredients to old ingredients
+            #       add new ones to db
+            #       remove link to removed ingredients
             form.save()
-            #return render(request, 'recipes/detail.html', {'recipe': recipe})
             return redirect('recipes:detail', recipe_id=recipe_id)
     form = EditRecipeForm(initial = recipe.return_dict())
     return render(request, 'recipes/edit_recipe.html', {'form':form})
