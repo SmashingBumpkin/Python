@@ -5,12 +5,12 @@ from re import split as resplit
 
 class Recipe(models.Model):
     name = models.CharField(max_length=200)
-    method = models.TextField(max_length=2000)
-    ingredients_string = models.TextField(max_length=500)#Plain text of ingredients
+    method = models.TextField(max_length=5000)
+    ingredients_string = models.TextField(max_length=1000)#Plain text of ingredients
     book = models.CharField(max_length=200, null = True, blank = True)
     page = models.CharField(max_length=5, null = True, blank = True)
     serves = models.CharField(max_length=5, null = True, blank = True)
-    description = models.TextField(max_length=200, null = True, blank = True)
+    description = models.TextField(max_length=500, null = True, blank = True)
     url = models.URLField(null = True, blank = True)
     def __str__(self):
         return self.name
@@ -29,13 +29,12 @@ class Recipe(models.Model):
                     }
     
     def string_to_ingredients(self):
-        #TODO: FINISH FUNCTION
-        myprompt = ("Remove all units of measurement from this list of ingredients, "
-                + "seperate the ingredients with '\\n': \n\n"
+        myprompt = ("Take this list of ingredients, and return a simple list containing only "
+                + "raw ingredients seperated by ',': \n\n"
                 + self.ingredients_string)
-        #text = openai_link.sendPrompt(myprompt)
-        text = tempingredients()
-        ingredientsList = resplit("\n|or", text)
+        text = openai_link.sendPrompt(myprompt, model = "text-curie-001", temperature=0.7)
+        text = text.replace('to taste', '')
+        ingredientsList = resplit("\n|or|,", text)
         for ingredientName in ingredientsList:
             ingredientName = ingredientName.strip().capitalize()
             if ingredientName != "":

@@ -30,22 +30,19 @@
             <div class="column is-2">
                 <aside class="menu">
                   <p class="menu-label">
-                    Cupboard
+                    Menu
                   </p>
                   
                   <ul class="menu-list">
                     
                     <li><a  href="{% url 'recipes:ingredients_index' %}" class="{% is_active request 'recipes:ingredients_index' %}">Ingredients</a></li>
                   </ul>
-                  <p class="menu-label">
-                    Recipes
-                  </p>
                   <ul class="menu-list"> 
                     <li>
                         <a href="{% url 'recipes:index' %}" class="{% is_active request 'recipes:index' %}">Recipes</a>
                             <ul>
-                                <li><a href="{% url 'recipes:upload' %}" class="{% is_active request 'recipes:upload' %}">Upload from Photo</a></li>
-                                <li><a>Upload from URL</a></li>
+                                <li><a href="{% url 'recipes:upload_photo' %}" class="{% is_active request 'recipes:upload_photo' %}">Upload from Photo</a></li>
+                                <li><a href="{% url 'recipes:upload_url' %}" class="{% is_active request 'recipes:upload_url' %}">Upload from URL</a></li>
                             </ul>
                     </li>
                   </ul>     

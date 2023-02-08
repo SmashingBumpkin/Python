@@ -4,6 +4,12 @@ from .models import Recipe
 class UploadFileForm(forms.Form):
     img = forms.ImageField()
 
+class SearchForm(forms.Form):
+    search_term = forms.CharField(max_length=50)
+
+class UploadURLForm(forms.Form):
+    uploadedurl = forms.URLField()
+
 class EditRecipeForm(forms.ModelForm):
     class Meta:
         model = Recipe

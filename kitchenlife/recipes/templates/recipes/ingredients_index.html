@@ -1,6 +1,12 @@
 {% extends 'base.html' %}
 {% block content %}
 <ul>
+    <form method="post">
+        {% csrf_token %}
+         {{ form.as_p }}
+        <button type="submit">Search</button>
+    </form>
+    <br>
 {% if ingredient_list %}
     {% for ingredient in ingredient_list %}
     <li><a href="{% url 'recipes:ingredient_detail' ingredient.id %}">{{ ingredient.ingredient_name }}</a></li>

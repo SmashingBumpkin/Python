@@ -1,9 +1,5 @@
 Features:
 -Edit recipes page needs to properly link with ingredients
--Add recipes from URL
-    -Implement add from url
--Search for recipes by ingredient
-    -
 -Rate recipes
 -Create cupboards which show which ingredients are stocked
     -New ingredient model variables:
@@ -12,6 +8,7 @@ Features:
             -Automatically update availability to make unavailable if they expire
 -shopping lists based on recipes (select which ingredients are needed)
 -Meal planning to save what recipes will be cooked over the week
+
 
 
 Big things:
@@ -24,13 +21,4 @@ Big things:
 
 
 Formatting issues:
--Navigation links ugly af
 -Recipe display is fucked
--Edit recipe should be wider
-
--Search for recipes by ingredient
-    -Add form on index page
-    -Add search box to form
-    -filter ingredients list by ingredients
-    -display results
-    -only show recipes using that ingredient

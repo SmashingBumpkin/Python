@@ -1,9 +1,33 @@
 from re import split as resplit
 from kitchenlife import openai_link
 from .models import Recipe
+import scrape_schema_recipe
 
 import pytesseract
 pytesseract.pytesseract.tesseract_cmd = r'C:\\Program Files\\Tesseract-OCR\\tesseract.exe'
+
+def url_to_recipe(url):
+    recipe_dict = scrape_schema_recipe.scrape_url(url, python_objects=True)[0]
+    name = recipe_dict['name']
+    description = recipe_dict['description']
+    if type(recipe_dict['recipeIngredient']) == str:
+        ingredients_string = recipe_dict['recipeIngredient']
+    else:
+        ingredients_string = '\n'.join(recipe_dict['recipeIngredient'])
+    
+    if type(recipe_dict['recipeInstructions']) == str:
+        method = recipe_dict['recipeInstructions']
+    else:
+        method = "\n".join([step for step in recipe_dict['recipeInstructions']])
+    serves = str(recipe_dict['recipeYield'])
+    if len(serves) > 5:
+        serves = serves.split(' ')[1]
+    return Recipe(name = name.strip(), ingredients_string = ingredients_string.strip(), method = method.strip(), serves = serves.strip(),
+                        description = description.strip(), url = url)
+
+
+
+
 
 def image_to_string(img):
     text = pytesseract.image_to_string(img)
