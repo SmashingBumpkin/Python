@@ -1,6 +1,7 @@
 from django.db import models
 from kitchenlife import openai_link
 from re import split as resplit
+from sys import exit as sysexit
 
 
 class Recipe(models.Model):
@@ -12,6 +13,9 @@ class Recipe(models.Model):
     serves = models.CharField(max_length=5, null = True, blank = True)
     description = models.TextField(max_length=500, null = True, blank = True)
     url = models.URLField(null = True, blank = True)
+    jumbled_input = models.TextField(max_length=8000, null = True, blank = True)
+    simplified_ingredients = models.TextField(max_length=1000, null = True, blank = True)
+
     def __str__(self):
         return self.name
     
@@ -33,8 +37,12 @@ class Recipe(models.Model):
                 + "raw ingredients seperated by ',': \n\n"
                 + self.ingredients_string)
         text = openai_link.sendPrompt(myprompt, model = "text-curie-001", temperature=0.7)
-        text = text.replace('to taste', '')
-        ingredientsList = resplit("\n|or|,", text)
+        print("\n____\n" + text)
+        cont = input("\n____\n\nIf text is correct press 1 to continue ")
+        if cont != "1":
+            text = input("Write corrected list below, seperating ingredients by ',': \n")
+        self.simplified_ingredients = text
+        ingredientsList = resplit("\n| or |,", text)
         for ingredientName in ingredientsList:
             ingredientName = ingredientName.strip().capitalize()
             if ingredientName != "":

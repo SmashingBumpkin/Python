@@ -42,8 +42,8 @@ def image_to_string(img):
     myprompt = ("The following excerpt is a jumbled up recipe. Reformat this recipe with the headers"+
             " name, description, serves, ingredients and then the method."
             + "\n\n" + text)
-    #text = openai_link.sendPrompt(myprompt)
-    text = temptext()
+    text = openai_link.sendPrompt(myprompt)
+    # text = temptext()
     return text
 
 def text_to_recipe(text):

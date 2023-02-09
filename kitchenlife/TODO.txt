@@ -1,5 +1,6 @@
 Features:
 -Edit recipes page needs to properly link with ingredients
+-Make recipe import from photo less fragile
 -Rate recipes
 -Create cupboards which show which ingredients are stocked
     -New ingredient model variables:
@@ -8,6 +9,8 @@ Features:
             -Automatically update availability to make unavailable if they expire
 -shopping lists based on recipes (select which ingredients are needed)
 -Meal planning to save what recipes will be cooked over the week
+-Recipe suggestions based on ingredient
+-Info about ingredients (eg seasonality, substitutes)
 
 
 
@@ -18,7 +21,3 @@ Big things:
 -Collect comparison data for unformatted recipes and formatted recipes
 -Collect comparison data for ingredients string and ingredients lists
 -Collect nutritional info on ingredients to calculate nutritional info for recipes
-
-
-Formatting issues:
--Recipe display is fucked
