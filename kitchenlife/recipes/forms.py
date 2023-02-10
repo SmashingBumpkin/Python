@@ -1,4 +1,5 @@
 from django import forms
+from django.contrib.auth.forms import UserCreationForm
 from .models import Recipe
 
 class UploadFileForm(forms.Form):
@@ -8,7 +9,7 @@ class SearchForm(forms.Form):
     search_term = forms.CharField(max_length=50)
 
 class UploadURLForm(forms.Form):
-    uploadedurl = forms.URLField()
+    uploadedurl = forms.URLField(label = "Enter recipe URL")
 
 class EditRecipeForm(forms.ModelForm):
     class Meta:
@@ -30,3 +31,7 @@ class EditRecipeForm(forms.ModelForm):
         labels = {
             'ingredients_string': "Ingredients"
         }
+
+class CustomUserCreationForm(UserCreationForm):
+    class Meta(UserCreationForm.Meta):
+        fields = UserCreationForm.Meta.fields + ("email",)

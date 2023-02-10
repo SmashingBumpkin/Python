@@ -1,6 +1,8 @@
 Features:
 -Edit recipes page needs to properly link with ingredients
+    -(When ingredients are removed they should be unlinked from recipe)
 -Make recipe import from photo less fragile
+    -(Remove ingredients when they are removed from list)
 -Rate recipes
 -Create cupboards which show which ingredients are stocked
     -New ingredient model variables:
@@ -12,10 +14,15 @@ Features:
 -Recipe suggestions based on ingredient
 -Info about ingredients (eg seasonality, substitutes)
 
+-Recipes should be owned by accounts
+    -Recipes should only be visible by account that owns the recipe
+    -"Cupboard" should be owned by accounts
+
+-Ingredients should have a different name for every recipe also containing the link to the ingredient
+
 
 
 Big things:
--Add accounts
 -Actually host properly
 -Change database to something appropriate for public implementation
 -Collect comparison data for unformatted recipes and formatted recipes

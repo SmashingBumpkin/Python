@@ -25,6 +25,13 @@ Page: {{ recipe.page }}
             {% endif %}
         </div>
         <div class="column">
+            {% if recipe.uses_ingredient.all %}
+    {% for ingredient in recipe.uses_ingredient.all %}
+    <p><a href="{% url 'recipes:ingredient_detail' ingredient.id %}">{{ ingredient.ingredient_name }}</a><br></p>
+    {% endfor %}
+{% else %}
+    <p>Not used anywhere.</p>
+{% endif %}
             <pre>
 {{recipe.ingredients_string}}
                         </pre>

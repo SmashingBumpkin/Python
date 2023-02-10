@@ -1,24 +1,12 @@
 from django.template import loader
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from .models import Recipe, Ingredient
-from .forms import UploadFileForm, EditRecipeForm, SearchForm, UploadURLForm
+from .forms import CustomUserCreationForm, UploadFileForm, EditRecipeForm, SearchForm, UploadURLForm
 from PIL import Image
 # Imaginary function to handle an uploaded file.
 from . import new_recipe_processing
-
-
-
-def index(request):
-    if request.method == 'POST':
-        form = SearchForm(request.POST)
-        if form.is_valid():
-            filtered_recipe = form.cleaned_data['search_term']
-            recipe_list = Recipe.objects.filter(name__contains=filtered_recipe).order_by("name")
-    else:
-        form = SearchForm()
-        recipe_list = Recipe.objects.all().order_by("name")
-    context = {'recipe_list': recipe_list, 'form': form}
-    return render(request, 'recipes/index.html', context)
+from django.contrib.auth import login
 
 
 
@@ -36,17 +24,30 @@ def ingredients_index(request):
 
 
 
-def detail(request, recipe_id):
-    recipe = get_object_or_404(Recipe, pk=recipe_id)
-    method_as_list = recipe.method.split('\n')
-    return render(request, 'recipes/detail.html', {'recipe': recipe, 'method_as_list': method_as_list})
-
-
-
 def ingredient_detail(request, ingredient_id):
     ingredient = get_object_or_404(Ingredient, pk=ingredient_id)
     return render(request, 'recipes/ingredient_detail.html', {'ingredient': ingredient})
 
+
+
+def index(request):
+    if request.method == 'POST':
+        form = SearchForm(request.POST)
+        if form.is_valid():
+            filtered_recipe = form.cleaned_data['search_term']
+            recipe_list = Recipe.objects.filter(name__contains=filtered_recipe).order_by("name")
+    else:
+        form = SearchForm()
+        recipe_list = Recipe.objects.all().order_by("name")
+    context = {'recipe_list': recipe_list, 'form': form}
+    return render(request, 'recipes/index.html', context)
+
+
+
+def detail(request, recipe_id):
+    recipe = get_object_or_404(Recipe, pk=recipe_id)
+    method_as_list = recipe.method.split('\n')
+    return render(request, 'recipes/detail.html', {'recipe': recipe, 'method_as_list': method_as_list})
 
 
 def upload_file(request):

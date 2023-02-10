@@ -76,7 +76,11 @@ black pepper"""
 
 class Ingredient(models.Model):
     ingredient_name = models.CharField(max_length=50)
-    ingredient_uses = models.ManyToManyField(Recipe)
+    ingredient_uses = models.ManyToManyField(Recipe, related_name="uses_ingredient")
     #TODO: create way to reference ingredient uses from the recipe
     def __str__(self):
         return self.ingredient_name
+
+
+class Cupboard(models.Model):
+    pass
