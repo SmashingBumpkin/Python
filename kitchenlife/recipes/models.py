@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 from kitchenlife import openai_link
 from re import split as resplit
 from sys import exit as sysexit
@@ -15,6 +16,7 @@ class Recipe(models.Model):
     url = models.URLField(null = True, blank = True)
     jumbled_input = models.TextField(max_length=8000, null = True, blank = True)
     simplified_ingredients = models.TextField(max_length=1000, null = True, blank = True)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
 
     def __str__(self):
         return self.name

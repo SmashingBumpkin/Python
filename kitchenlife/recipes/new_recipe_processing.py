@@ -8,17 +8,23 @@ pytesseract.pytesseract.tesseract_cmd = r'C:\\Program Files\\Tesseract-OCR\\tess
 
 def url_to_recipe(url):
     recipe_dict = scrape_schema_recipe.scrape_url(url, python_objects=True)[0]
+    print(recipe_dict)
     name = recipe_dict['name']
     description = recipe_dict['description']
-    if type(recipe_dict['recipeIngredient']) == str:
-        ingredients_string = recipe_dict['recipeIngredient']
-    else:
-        ingredients_string = '\n'.join(recipe_dict['recipeIngredient'])
-    
+    try:
+        if type(recipe_dict['recipeIngredient']) == str:
+            ingredients_string = recipe_dict['recipeIngredient']
+        else:
+            ingredients_string = '\n'.join(recipe_dict['recipeIngredient'])
+    except:
+        ingredients_string = ""
     if type(recipe_dict['recipeInstructions']) == str:
         method = recipe_dict['recipeInstructions']
     else:
-        method = "\n".join([step for step in recipe_dict['recipeInstructions']])
+        try:
+            method = "\n".join([step for step in recipe_dict['recipeInstructions']])
+        except:
+            method = "\n".join([step['text'] for step in recipe_dict['recipeInstructions']])
     serves = str(recipe_dict['recipeYield'])
     if len(serves) > 5:
         serves = serves.split(' ')[1]

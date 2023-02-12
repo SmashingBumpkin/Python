@@ -1,12 +1,12 @@
 {% extends 'base.html' %}
 {% block content %}
 <ul><h1 class="title">{{ ingredient.ingredient_name }}</h1>
-{% if ingredient.ingredient_uses.all %}
-    {% for recipe in ingredient.ingredient_uses.all %}
+{% if recipes %}
+    {% for recipe in recipes %}
     <p><a href="{% url 'recipes:detail' recipe.id %}">{{ recipe.name }}</a><br></p>
     {% endfor %}
 {% else %}
-    <p>Not used anywhere.</p>
+    <p>Add a recipe that uses {{ ingredient.ingredient_name }} and it should show up here!</p>
 {% endif %}
 </ul>
 {% endblock content %}

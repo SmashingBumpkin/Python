@@ -1,10 +1,8 @@
-from django.template import loader
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from .models import Recipe, Ingredient
-from .forms import CustomUserCreationForm, UploadFileForm, EditRecipeForm, SearchForm, UploadURLForm
+from .forms import UploadFileForm, EditRecipeForm, SearchForm, UploadURLForm
 from PIL import Image
-# Imaginary function to handle an uploaded file.
 from . import new_recipe_processing
 from django.contrib.auth import login
 
@@ -26,7 +24,9 @@ def ingredients_index(request):
 
 def ingredient_detail(request, ingredient_id):
     ingredient = get_object_or_404(Ingredient, pk=ingredient_id)
-    return render(request, 'recipes/ingredient_detail.html', {'ingredient': ingredient})
+    recipes = ingredient.ingredient_uses.filter(owner = request.user)
+    context = {'ingredient': ingredient, 'recipes': recipes}
+    return render(request, 'recipes/ingredient_detail.html', context)
 
 
 
@@ -35,10 +35,10 @@ def index(request):
         form = SearchForm(request.POST)
         if form.is_valid():
             filtered_recipe = form.cleaned_data['search_term']
-            recipe_list = Recipe.objects.filter(name__contains=filtered_recipe).order_by("name")
+            recipe_list = Recipe.objects.filter(name__contains=filtered_recipe, owner=request.user).order_by("name")
     else:
         form = SearchForm()
-        recipe_list = Recipe.objects.all().order_by("name")
+        recipe_list = Recipe.objects.filter(owner=request.user).order_by("name")
     context = {'recipe_list': recipe_list, 'form': form}
     return render(request, 'recipes/index.html', context)
 
@@ -46,13 +46,23 @@ def index(request):
 
 def detail(request, recipe_id):
     recipe = get_object_or_404(Recipe, pk=recipe_id)
+    if recipe.owner != request.user:
+        return redirect('recipes:index')
     method_as_list = recipe.method.split('\n')
-    return render(request, 'recipes/detail.html', {'recipe': recipe, 'method_as_list': method_as_list})
+    dumb_ingredients = recipe.ingredients_string.split('\n')
+    ingredients = list(recipe.uses_ingredient.all())
+    combined_ingredients = []
+    for ingredient in ingredients:
+        for dumb_ingredient in dumb_ingredients:
+            if ingredient.ingredient_name.lower() in dumb_ingredient.lower():
+                combined_ingredients.append([dumb_ingredient, ingredient])
+    print(combined_ingredients)
+    context = {'recipe': recipe, 'method_as_list': method_as_list, 'combined_ingredients': combined_ingredients}
+    return render(request, 'recipes/detail.html', context)
 
 
 def upload_file(request):
     if request.method == 'POST' and request.FILES:
-
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
             img = Image.open(request.FILES['img'])
@@ -63,9 +73,7 @@ def upload_file(request):
 
     elif request.method == 'POST':
         form = EditRecipeForm(request.POST)
-        recipe = form.save()
-        recipe.string_to_ingredients()
-        return redirect('recipes:detail', recipe_id=recipe.id)
+        return save_recipe(form, request)
     else:
         form = UploadFileForm()
 
@@ -82,9 +90,7 @@ def upload_url(request):
         else:
             editForm = EditRecipeForm(request.POST)
             if editForm.is_valid():
-                recipe = editForm.save()
-                recipe.string_to_ingredients()
-                return redirect('recipes:detail', recipe_id=recipe.id)
+                return save_recipe(editForm, request)
             else:
                 print("ERROR: Submitted form was invalid\n\n\n")
                 print(editForm.errors)
@@ -95,6 +101,9 @@ def upload_url(request):
 
 def edit_recipe(request, recipe_id):
     recipe = get_object_or_404(Recipe, pk=recipe_id)
+    if recipe.owner != request.user:
+        return redirect('recipes:index')
+
     if request.method == 'POST':
         form = EditRecipeForm(request.POST, instance= recipe)
         if form.is_valid():
@@ -109,6 +118,16 @@ def edit_recipe(request, recipe_id):
 def delete_recipe(request, recipe_id):
     if request.method == 'POST':
         recipe = get_object_or_404(Recipe, pk=recipe_id)
+        if recipe.owner != request.user:
+            return redirect('recipes:index')
         recipe.delete()
         return redirect("recipes:index")
+    
     return render(request, 'recipes/delete.html')
+
+def save_recipe(form, request):
+    recipe = form.save()
+    recipe.string_to_ingredients()
+    recipe.owner = request.user
+    recipe.save()
+    return redirect('recipes:detail', recipe_id=recipe.id)
