@@ -32,6 +32,8 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'mealplan.apps.MealplanConfig',
+    'cupboard.apps.CupboardConfig',
     'recipes.apps.RecipesConfig',
     'django.contrib.admin',
     'django.contrib.auth',

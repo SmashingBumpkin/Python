@@ -21,6 +21,8 @@ app_name = "home"
 urlpatterns = [
     path('', views.index, name='index'),
     path('recipes/', include('recipes.urls'), name = 'recipes'),
+    path('cupboard/', include('cupboard.urls'), name = 'cupboard'),
+    path('mealplan/', include('mealplan.urls'), name = 'mealplan'),
     path('admin/', admin.site.urls),
     path("accounts/", include("django.contrib.auth.urls")),
     path("register/", views.register, name="register"),

@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-from .models import MealPlan, Recipe
+from .models import Recipe
 
 class UploadFileForm(forms.Form):
     img = forms.ImageField()
@@ -35,11 +35,3 @@ class EditRecipeForm(forms.ModelForm):
 class CustomUserCreationForm(UserCreationForm):
     class Meta(UserCreationForm.Meta):
         fields = UserCreationForm.Meta.fields + ("email",)
-
-class MealPlanForm(forms.ModelForm):
-    class Meta:
-        model = MealPlan
-        fields = ['name', 'recipes']
-        widgets = {
-            'recipes': forms.CheckboxSelectMultiple
-        }

@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from kitchenlife import openai_link
+from cupboard.models import Ingredient
 from re import split as resplit
 from sys import exit as sysexit
 
@@ -17,6 +18,7 @@ class Recipe(models.Model):
     jumbled_input = models.TextField(max_length=8000, null = True, blank = True)
     simplified_ingredients = models.TextField(max_length=1000, null = True, blank = True)
     owner = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
+    uses_ingredient = models.ManyToManyField(Ingredient, related_name="ingredient_uses")
 
     def __str__(self):
         return self.name
@@ -38,7 +40,7 @@ class Recipe(models.Model):
         myprompt = ("Take this list of ingredients, and return a simple list containing only "
                 + "raw ingredients seperated by ',': \n\n"
                 + self.ingredients_string)
-        text = openai_link.sendPrompt(myprompt, model = "text-curie-001", temperature=0.7)
+        text = tempingredients()#openai_link.sendPrompt(myprompt, model = "text-curie-001", temperature=0.7)
         print("\n____\n" + text)
         cont = input("\n____\n\nIf text is correct press 1 to continue ")
         if cont != "1":
@@ -49,12 +51,13 @@ class Recipe(models.Model):
             ingredientName = ingredientName.strip().capitalize()
             if ingredientName != "":
                 try:
-                    ingredient = Ingredient.objects.get(ingredient_name=ingredientName)
+                    ingredient = Ingredient.objects.get(name=ingredientName)
                 except:
-                    ingredient = Ingredient(ingredient_name = ingredientName)
+                    ingredient = Ingredient(name = ingredientName)
                     ingredient.save()
                 ingredient.ingredient_uses.add(self)
-                active_user.ingredients_referenced.add(ingredient)
+                ingredient.referenced_by_profile.add(active_user.profile)
+                #active_user.ingredients_referenced.add(ingredient)
                 ingredient.save()
     
     def caps_remover(self):
@@ -79,26 +82,10 @@ Parmesan
 Salt
 black pepper"""
 
-class Ingredient(models.Model):
-    name = models.CharField(max_length=50)
-    ingredient_uses = models.ManyToManyField(Recipe, related_name="uses_ingredient")
-
-    def __str__(self):
-        return self.name
-
 class Profile(models.Model):
-    user = models.OneToOneField(User, on_delete= models.CASCADE)
+    user = models.OneToOneField(User, on_delete= models.CASCADE, related_name="profile")
     ingredients_referenced = models.ManyToManyField(Ingredient, related_name="referenced_by_profile") # every ingredient ever used by this user
     ingredients_owned = models.ManyToManyField(Ingredient,related_name="owned_by_profile") # ingredients currently available to this user
 
     def __str__(self):
         return self.user.username
-
-class MealPlan(models.Model):
-    name = models.CharField(max_length=100)
-    recipes = models.ManyToManyField(Recipe)
-    ingredients = models.ManyToManyField(Ingredient)
-    owner = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
-
-    def __str__(self):
-        return self.name

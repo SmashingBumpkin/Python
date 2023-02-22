@@ -27,7 +27,7 @@ Page: {{ recipe.page }}
         <div class="column">
             {% if recipe.uses_ingredient.all %}
     {% for combined_ingredient in combined_ingredients %}
-    <p><a href="{% url 'recipes:ingredient_detail' combined_ingredient.1.id %}">{{ combined_ingredient.0 }}</a><br></p>
+    <p><a href="{% url 'cupboard:ingredient_detail' combined_ingredient.1.id %}">{{ combined_ingredient.0 }}</a><br></p>
     {% endfor %}
 {% else %}
     <p>Not used anywhere.</p>

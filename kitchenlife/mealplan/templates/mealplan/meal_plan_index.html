@@ -9,7 +9,7 @@
     <br>
     {% if meal_plan_list %}
         {% for meal_plan in meal_plan_list %}
-        <li><a href="{% url 'recipes:meal_plan_detail' meal_plan.id %}">{{ meal_plan.name }}</a></li>
+        <li><a href="{% url 'mealplan:meal_plan_detail' meal_plan.id %}">{{ meal_plan.name }}</a></li>
         {% endfor %}
     {% else %}
         <p>No recipes are available.</p>

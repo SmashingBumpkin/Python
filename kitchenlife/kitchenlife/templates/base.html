@@ -61,16 +61,16 @@
                             </ul>
                     </li>
                     <li>
-                        <a  href="{% url 'recipes:ingredients_index' %}" class="{% is_active request 'recipes:ingredients_index' %}">Ingredients</a>
+                        <a  href="{% url 'cupboard:ingredients_index' %}" class="{% is_active request 'cupboard:ingredients_index' %}">Ingredients</a>
                         <ul>
-                            <a href="{% url 'recipes:cupboard_index' %}" class="{% is_active request 'recipes:cupboard_index' %}">In stock</a>
+                            <a href="{% url 'cupboard:cupboard_index' %}" class="{% is_active request 'cupboard:cupboard_index' %}">In stock</a>
                         </ul>
                     </li>
                     <li>
-                        <a href="{% url 'recipes:meal_plan_index' %}" class="{% is_active request 'recipes:meal_plan_index' %}">Meal plan</a>
+                        <a href="{% url 'mealplan:meal_plan_index' %}" class="{% is_active request 'mealplan:meal_plan_index' %}">Meal plan</a>
                         <ul>
                           <li>
-                            <a href="{% url 'recipes:add_meal_plan' %}" class="{% is_active request 'recipes:add_meal_plan' %}">Add new meal plan</a>
+                            <a href="{% url 'mealplan:add_meal_plan' %}" class="{% is_active request 'mealplan:add_meal_plan' %}">Add new meal plan</a>
                           </li>
                         </ul>
                     </li>
