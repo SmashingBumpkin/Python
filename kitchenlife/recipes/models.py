@@ -34,7 +34,7 @@ class Recipe(models.Model):
                         'url': self.url,
                     }
     
-    def string_to_ingredients(self):
+    def string_to_ingredients(self, active_user):
         myprompt = ("Take this list of ingredients, and return a simple list containing only "
                 + "raw ingredients seperated by ',': \n\n"
                 + self.ingredients_string)
@@ -44,7 +44,7 @@ class Recipe(models.Model):
         if cont != "1":
             text = input("Write corrected list below, seperating ingredients by ',': \n")
         self.simplified_ingredients = text
-        ingredientsList = resplit("\n| or |,", text)
+        ingredientsList = resplit("\n| or |,| and ", text)
         for ingredientName in ingredientsList:
             ingredientName = ingredientName.strip().capitalize()
             if ingredientName != "":
@@ -54,8 +54,12 @@ class Recipe(models.Model):
                     ingredient = Ingredient(ingredient_name = ingredientName)
                     ingredient.save()
                 ingredient.ingredient_uses.add(self)
+                active_user.ingredients_referenced.add(ingredient)
                 ingredient.save()
-                
+    
+    def caps_remover(self):
+        #TODO: makea function to reformat stuff to not be all caps
+        pass
     #TODO: Implement a function to rate recipes
 
 def tempingredients():
@@ -75,14 +79,26 @@ Parmesan
 Salt
 black pepper"""
 
-
 class Ingredient(models.Model):
-    ingredient_name = models.CharField(max_length=50)
+    name = models.CharField(max_length=50)
     ingredient_uses = models.ManyToManyField(Recipe, related_name="uses_ingredient")
-    #TODO: create way to reference ingredient uses from the recipe
+
     def __str__(self):
-        return self.ingredient_name
+        return self.name
 
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete= models.CASCADE)
+    ingredients_referenced = models.ManyToManyField(Ingredient, related_name="referenced_by_profile") # every ingredient ever used by this user
+    ingredients_owned = models.ManyToManyField(Ingredient,related_name="owned_by_profile") # ingredients currently available to this user
 
-class Cupboard(models.Model):
-    pass
+    def __str__(self):
+        return self.user.username
+
+class MealPlan(models.Model):
+    name = models.CharField(max_length=100)
+    recipes = models.ManyToManyField(Recipe)
+    ingredients = models.ManyToManyField(Ingredient)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
+
+    def __str__(self):
+        return self.name

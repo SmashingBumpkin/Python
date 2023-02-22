@@ -3,6 +3,7 @@ from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.contrib.auth import login
 from recipes.forms import CustomUserCreationForm
+from recipes.models import Profile
 
 
 # def index(request):
@@ -22,5 +23,7 @@ def register(request):
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
+            profile = Profile.objects.create(user=user)
+            profile.save()
             login(request, user)
             return redirect(reverse("index"))

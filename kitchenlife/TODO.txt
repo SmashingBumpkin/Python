@@ -5,6 +5,7 @@ Features:
     -(Remove ingredients when they are removed from list)
 -Rate recipes
 -Create cupboards which show which ingredients are stocked
+    -Cupboard should be (partially) automatically filled by adding recipes
     -New ingredient model variables:
         -Expiry
         -Availability
@@ -13,6 +14,7 @@ Features:
 -Meal planning to save what recipes will be cooked over the week
 -Recipe suggestions based on ingredient
 -Info about ingredients (eg seasonality, substitutes)
+-Generate recipes based on cupboard contents
 
 -Recipes should be owned by accounts
     -Recipes should only be visible by account that owns the recipe
@@ -25,6 +27,7 @@ Features:
 Big things:
 -Actually host properly
 -Change database to something appropriate for public implementation
+-Call supermarket APIs to see what's in stock and how much it would be
 -Collect comparison data for unformatted recipes and formatted recipes
 -Collect comparison data for ingredients string and ingredients lists
 -Collect nutritional info on ingredients to calculate nutritional info for recipes

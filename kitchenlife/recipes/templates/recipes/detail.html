@@ -26,13 +26,14 @@ Page: {{ recipe.page }}
         </div>
         <div class="column">
             {% if recipe.uses_ingredient.all %}
-    {% for ingredient in recipe.uses_ingredient.all %}
-    <p><a href="{% url 'recipes:ingredient_detail' ingredient.id %}">{{ ingredient.ingredient_name }}</a><br></p>
+    {% for combined_ingredient in combined_ingredients %}
+    <p><a href="{% url 'recipes:ingredient_detail' combined_ingredient.1.id %}">{{ combined_ingredient.0 }}</a><br></p>
     {% endfor %}
 {% else %}
     <p>Not used anywhere.</p>
 {% endif %}
-            <pre>{{recipe.ingredients_string}}</pre>
+            <!-- <pre>
+{{recipe.ingredients_string}}</pre> -->
         </div>
       </div>
     
@@ -44,6 +45,6 @@ Page: {{ recipe.page }}
     {% endfor %}
     <ul><a href="{% url 'recipes:edit_recipe' recipe.id %}">Edit recipe</a></ul>
     <ul><a href="{% url 'recipes:delete_recipe' recipe.id %}">Delete recipe</a></ul>
-  </section>
+</section>
 
 {% endblock content %}

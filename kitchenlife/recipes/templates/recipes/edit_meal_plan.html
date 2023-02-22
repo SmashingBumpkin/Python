@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h1>Edit Meal Plan</h1>
+  <form method="post">
+    {% csrf_token %}
+    <ul>
+    {% for ingredient in ingredients %}
+      <li>
+        <input type="checkbox" id="ingredient-{{ forloop.counter }}" name="ingredients" value="{{ ingredient.1.id }}"
+        {% if ingredient.1 in selected_ingredients %}checked{% endif %}>
+        <label for="ingredient-{{ forloop.counter }}"> {{ ingredient.2 }} - {{ ingredient.1 }} ({{ ingredient.0}}) </label>
+      </li>
+    {% endfor %}
+    </ul>
+    <button type="submit">Save</button>
+  </form>
+{% endblock %}

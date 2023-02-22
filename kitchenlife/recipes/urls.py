@@ -12,4 +12,9 @@ urlpatterns = [
     path('upload_url/', views.upload_url, name='upload_url'),
     path('edit/<int:recipe_id>/', views.edit_recipe, name= 'edit_recipe'),
     path('delete/<int:recipe_id>/', views.delete_recipe, name= 'delete_recipe'),
+    path('cupboard/', views.cupboard_index, name='cupboard_index'),
+    path('mealplans/', views.meal_plan_index, name='meal_plan_index'),
+    path('addmealplan/', views.add_meal_plan, name='add_meal_plan'),
+    path('mealplandetail/<int:meal_plan_id>/', views.meal_plan_detail, name='meal_plan_detail'),
+    path('mealplans/<int:id>/edit/', views.edit_meal_plan, name='edit_meal_plan'),
 ]
