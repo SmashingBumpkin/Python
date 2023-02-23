@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from .models import MealPlan
-from .forms import MealPlanForm
+from .forms import MealPlanForm, AddItemForm
 from recipes.forms import SearchForm
 
 @login_required
@@ -22,6 +22,7 @@ def meal_plan_index(request):
 
 @login_required
 def meal_plan_detail(request, meal_plan_id):
+    #TODO: Delete mealplan option
     meal_plan = get_object_or_404(MealPlan, id=meal_plan_id, owner=request.user)
     recipe_list = list(meal_plan.recipes.all())
     ingredient_list = list(meal_plan.ingredients.all())
@@ -52,6 +53,11 @@ def edit_meal_plan(request, id):
         selected_ingredients = request.POST.getlist('ingredients')
         meal_plan.ingredients.set(selected_ingredients)
         meal_plan.save()
+        #TODO: add item to meal_plan 
+        # added_item_form = AddItemForm(request.POST)
+        # if added_item_form.name:
+            
+        #     pass
         ingredients_owned = set(ingredient for recipe in meal_plan.recipes.all() for ingredient in recipe.uses_ingredient.exclude(id__in=meal_plan.ingredients.all()) )
         profile = request.user.profile
         profile.ingredients_owned.add(*ingredients_owned)

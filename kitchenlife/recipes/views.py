@@ -89,7 +89,7 @@ def edit_recipe(request, recipe_id):
     recipe = get_object_or_404(Recipe, pk=recipe_id)
     if recipe.owner != request.user:
         return redirect('recipes:index')
-
+    print(request.POST)
     if request.method == 'POST':
         form = EditRecipeForm(request.POST, instance= recipe)
         if form.is_valid():
