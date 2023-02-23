@@ -38,8 +38,6 @@
                         {% endif %}
                     </div>
                 </div>
-                
-                
             </div>
         </section>
     </a>
@@ -55,27 +53,20 @@
                   <ul class="menu-list"> 
                     <li>
                         <a href="{% url 'recipes:index' %}" class="{% is_active request 'recipes:index' %}">Recipes</a>
-                            <ul>
-                                <li><a href="{% url 'recipes:upload_photo' %}" class="{% is_active request 'recipes:upload_photo' %}">Upload from Photo</a></li>
-                                <li><a href="{% url 'recipes:upload_url' %}" class="{% is_active request 'recipes:upload_url' %}">Upload from URL</a></li>
-                            </ul>
-                    </li>
-                    <li>
+                        <ul>
+                            <a href="{% url 'recipes:upload_photo' %}" class="{% is_active request 'recipes:upload_photo' %}">Upload from Photo</a>
+                            <a href="{% url 'recipes:upload_url' %}" class="{% is_active request 'recipes:upload_url' %}">Upload from URL</a>
+                        </ul>
                         <a  href="{% url 'cupboard:ingredients_index' %}" class="{% is_active request 'cupboard:ingredients_index' %}">Ingredients</a>
                         <ul>
                             <a href="{% url 'cupboard:cupboard_index' %}" class="{% is_active request 'cupboard:cupboard_index' %}">In stock</a>
+                            <a href="{% url 'cupboard:edit_cupboard' %}" class="{% is_active request 'cupboard:edit_cupboard' %}">Edit cupboard</a>
                         </ul>
-                    </li>
-                    <li>
                         <a href="{% url 'mealplan:meal_plan_index' %}" class="{% is_active request 'mealplan:meal_plan_index' %}">Meal plan</a>
                         <ul>
-                          <li>
                             <a href="{% url 'mealplan:add_meal_plan' %}" class="{% is_active request 'mealplan:add_meal_plan' %}">Add new meal plan</a>
-                          </li>
                         </ul>
                     </li>
-                    
-                      
                   </ul>     
                 </aside>
               <!-- ______________________END_SIDEBAR___________________-->

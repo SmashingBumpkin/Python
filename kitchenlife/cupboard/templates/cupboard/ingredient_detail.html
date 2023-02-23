@@ -1,7 +1,17 @@
 {% extends 'base.html' %}
 {% block content %}
 <ul><h1 class="title">{{ ingredient.name }}</h1>
+    <form method="post">
+        {% csrf_token %}
+        {% if owned_by_user %}
+        <button type="submit">Remove from cupboard</button>
+        {% else %}
+        <button type="submit">Add to cupboard</button>
+        {% endif %}
+    </form>
 {% if recipes %}
+<br><br>
+This ingredient is used in these recipes:
     {% for recipe in recipes %}
     <p><a href="{% url 'recipes:detail' recipe.id %}">{{ recipe.name }}</a><br></p>
     {% endfor %}

@@ -9,7 +9,6 @@ Features:
         -Expiry
         -Availability
             -Automatically update availability to make unavailable if they expire
-    -Edit cupboard and remove ingredients
 -Recipe suggestions based on ingredient
 -Info about ingredients (eg seasonality, substitutes, shelf life)
 -Generate recipes based on cupboard contents

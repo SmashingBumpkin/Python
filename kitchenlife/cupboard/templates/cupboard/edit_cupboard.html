@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h1>Edit Cupboard Contents</h1>
+  <form method="post">
+    {% csrf_token %}
+    <ul>
+    {% for ingredient in ingredients %}
+      <li>
+        <input type="checkbox" id="ingredient-{{ forloop.counter }}" name="ingredients" value="{{ ingredient.id }}" checked>
+        <label for="ingredient-{{ forloop.counter }}"> {{ ingredient.name }} </label>
+      </li>
+    {% endfor %}
+    </ul>
+    <button type="submit">Save</button>
+  </form>
+{% endblock %}

@@ -7,8 +7,6 @@ from .models import MealPlan
 from .forms import MealPlanForm
 from recipes.forms import SearchForm
 
-# Create your views here.
-
 @login_required
 def meal_plan_index(request):
     if request.method == 'POST':
@@ -20,8 +18,6 @@ def meal_plan_index(request):
         form = SearchForm()
         meal_plan_list = MealPlan.objects.filter(owner=request.user).order_by("name")
     context = {'meal_plan_list': meal_plan_list, 'form': form}
-    print("TEST_________________________________________________________________")
-    print(meal_plan_list)
     return render(request, 'mealplan/meal_plan_index.html', context)
 
 @login_required
