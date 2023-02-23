@@ -40,7 +40,7 @@ class Recipe(models.Model):
         myprompt = ("Take this list of ingredients, and return a simple list containing only "
                 + "raw ingredients seperated by ',': \n\n"
                 + self.ingredients_string)
-        text = tempingredients()#openai_link.sendPrompt(myprompt, model = "text-curie-001", temperature=0.7)
+        text = openai_link.sendPrompt(myprompt, model = "text-curie-001", temperature=0.7)
         print("\n____\n" + text)
         cont = input("\n____\n\nIf text is correct press 1 to continue ")
         if cont != "1":
