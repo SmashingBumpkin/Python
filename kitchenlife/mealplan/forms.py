@@ -1,5 +1,5 @@
 from django import forms
-from .models import MealPlan
+from .models import MealPlan, MiscItem
 
 class MealPlanForm(forms.ModelForm):
     class Meta:
@@ -10,5 +10,6 @@ class MealPlanForm(forms.ModelForm):
         }
 
 class AddItemForm(forms.ModelForm):
-    name = forms.CharField(max_length=50)
-    quantity = forms.CharField(max_length=15)
+    class Meta:
+        model = MiscItem
+        fields = ['name', 'quantity']

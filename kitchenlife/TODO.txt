@@ -13,7 +13,6 @@ Features:
 -Info about ingredients (eg seasonality, substitutes, shelf life)
 -Generate recipes based on cupboard contents
 -Meal plan shopping lists
-    -should be able to add miscelaneous items as well
     
 
 Big things:
@@ -23,6 +22,3 @@ Big things:
 -Collect comparison data for unformatted recipes and formatted recipes
 -Collect comparison data for ingredients string and ingredients lists
 -Collect nutritional info on ingredients to calculate nutritional info for recipes
-
-
-

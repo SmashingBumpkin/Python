@@ -12,7 +12,15 @@
         <label for="ingredient-{{ forloop.counter }}"> {{ ingredient.2 }} - {{ ingredient.1 }} ({{ ingredient.0}}) </label>
       </li>
     {% endfor %}
+    {% for misc_item in misc_items %}
+      <li>
+        <input type="checkbox" id="misc_item-{{ forloop.counter }}" name="misc_items" value="{{ misc_item.id }}" checked>
+        <label for="misc_item-{{ forloop.counter }}"> {{ misc_item.name }} </label>
+      </li>
+    {% endfor %}
     </ul>
-    <button type="submit">Save</button>
+    {{ form.as_p }}
+    <button type="submit" name="add_misc_item">Add miscellaneous item</button>
+    <button type="submit" name="save_list">Save shopping list</button>
   </form>
 {% endblock %}

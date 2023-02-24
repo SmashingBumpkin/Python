@@ -10,3 +10,12 @@ class MealPlan(models.Model):
 
     def __str__(self):
         return self.name
+    
+class MiscItem(models.Model):
+    name = models.CharField(max_length=50, null= True, blank = True)
+    quantity = models.IntegerField(null= True, blank = True)
+    owner = models.ForeignKey(MealPlan, on_delete=models.CASCADE, blank=True, null=True, related_name = "misc_item")
+
+    def __str__(self):
+        return self.name
+    

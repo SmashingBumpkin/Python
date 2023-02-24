@@ -2,46 +2,48 @@ from re import split as resplit
 from kitchenlife import openai_link
 from .models import Recipe
 import scrape_schema_recipe
+from recipe_scrapers import scrape_me
 
 import pytesseract
 pytesseract.pytesseract.tesseract_cmd = r'C:\\Program Files\\Tesseract-OCR\\tesseract.exe'
 
 def url_to_recipe(url):
-    recipe_dict = scrape_schema_recipe.scrape_url(url, python_objects=True)[0]
-    print(recipe_dict)
-    name = recipe_dict['name']
-    description = recipe_dict['description']
     try:
-        if type(recipe_dict['recipeIngredient']) == str:
-            ingredients_string = recipe_dict['recipeIngredient']
-        else:
-            ingredients_string = '\n'.join(recipe_dict['recipeIngredient'])
-    except:
-        ingredients_string = ""
-    if type(recipe_dict['recipeInstructions']) == str:
-        method = recipe_dict['recipeInstructions']
-    else:
+        recipe_dict = scrape_schema_recipe.scrape_url(url, python_objects=True)[0]
+        print(recipe_dict)
+        name = recipe_dict['name']
+        description = recipe_dict['description']
         try:
-            method = "\n".join([step for step in recipe_dict['recipeInstructions']])
+            if type(recipe_dict['recipeIngredient']) == str:
+                ingredients_string = recipe_dict['recipeIngredient']
+            else:
+                ingredients_string = '\n'.join(recipe_dict['recipeIngredient'])
         except:
-            method = "\n".join([step['text'] for step in recipe_dict['recipeInstructions']])
-    serves = str(recipe_dict['recipeYield'])
-    if len(serves) > 5:
-        serves = serves.split(' ')[1]
-    return Recipe(name = name.strip(), ingredients_string = ingredients_string.strip(), method = method.strip(), serves = serves.strip(),
-                        description = description.strip(), url = url)
-
-
-
-
-
-def image_to_string(img):
-    text = pytesseract.image_to_string(img)
-    myprompt = ("The following excerpt is a jumbled up recipe. Reformat this recipe "+
-            "to be the name, the description, how many it serves, the ingredients and then the method."
-            + "\n\n" + text)
-    text = openai_link.sendPrompt(myprompt)
-    return text
+            ingredients_string = ""
+        if type(recipe_dict['recipeInstructions']) == str:
+            method = recipe_dict['recipeInstructions']
+        else:
+            try:
+                method = "\n".join([step for step in recipe_dict['recipeInstructions']])
+            except:
+                method = "\n".join([step['text'] for step in recipe_dict['recipeInstructions']])
+        serves = str(recipe_dict['recipeYield'])
+        if len(serves) > 5:
+            serves = serves.split(' ')[1]
+        return Recipe(name = name.strip(), ingredients_string = ingredients_string.strip(), 
+                      method = method.strip(), serves = serves.strip(),
+                      description = description.strip(), url = url)
+    except:
+        #https://github.com/hhursev/recipe-scrapers
+        #TODO: Add in extra fields
+        scraper = scrape_me(url, wild_mode=True)
+        name = scraper.title()
+        ingredients = scraper.ingredients()
+        instructions = scraper.instructions()
+        serves = scraper.yields()
+        print(ingredients, instructions)
+        return Recipe(name = name, ingredients_string = '\n'.join(ingredients), 
+                      method = instructions, url = url, serves = serves)
 
 def image_to_string(img):
     text = pytesseract.image_to_string(img)
