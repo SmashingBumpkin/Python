@@ -3,7 +3,7 @@ from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
-from .models import MealPlan, MiscItem
+from .models import MealPlan
 from .forms import MealPlanForm, AddItemForm
 from recipes.forms import SearchForm
 
@@ -42,10 +42,8 @@ def add_meal_plan(request):
             mealplan.save()
             form.save_m2m()
             return redirect('mealplan:meal_plan_detail', meal_plan_id=mealplan.id)
-    else:
-        form = MealPlanForm()
-    mealplans = MealPlan.objects.filter(owner=request.user)
-    return render(request, 'mealplan/add_meal_plan.html', {'mealplans': mealplans, 'form': form})
+    form = MealPlanForm(user = request.user)
+    return render(request, 'mealplan/add_meal_plan.html', {'form': form})
 
 @login_required
 def edit_meal_plan(request, id):
@@ -63,7 +61,6 @@ def edit_meal_plan(request, id):
         if "add_misc_item" in request.POST:
             misc_item_form = AddItemForm(request.POST)
             if misc_item_form.is_valid() and request.POST['name']:
-                #TODO: add item to meal_plan 
                 misc_item = misc_item_form.save()
                 misc_item.owner = meal_plan
                 misc_item.save()
@@ -79,7 +76,6 @@ def edit_meal_plan(request, id):
             profile.save()
             return redirect('mealplan:meal_plan_detail', meal_plan_id=id)
     
-    form = AddItemForm()
     selected_ingredients = set(meal_plan.ingredients.all())
     combined_ingredients = []
     for recipe in meal_plan.recipes.all():
@@ -95,6 +91,6 @@ def edit_meal_plan(request, id):
         'ingredients': combined_ingredients,
         'selected_ingredients': selected_ingredients,
         'misc_items': set(meal_plan.misc_item.all()),
-        'form': form,
+        'form': AddItemForm(),
     }
     return render(request, 'mealplan/edit_meal_plan.html', context)

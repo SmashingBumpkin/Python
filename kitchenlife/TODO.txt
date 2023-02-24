@@ -1,18 +1,21 @@
 Features:
--Edit recipes page needs to properly link with ingredients
-    -(When ingredients are removed they should be unlinked from recipe)
--Make recipe import from photo less fragile
-    -(Remove ingredients when they are removed from list)
--Rate recipes
+-Recipes
+    -Edit recipes page needs to properly link with ingredients
+        -(When ingredients are removed they should be unlinked from recipe)
+    -Make recipe import from photo less fragile
+        -(Remove ingredients when they are removed from list)
+    -Rate recipes
+    -Link each line of ingredients to an Ingredient
+    -Allow some amount of interaction between Ingredients and user
 -Create cupboards which show which ingredients are stocked
     -New ingredient model variables:
         -Expiry
         -Availability
             -Automatically update availability to make unavailable if they expire
--Recipe suggestions based on ingredient
--Info about ingredients (eg seasonality, substitutes, shelf life)
+    -Info about ingredients (eg seasonality, substitutes, shelf life)
 -Generate recipes based on cupboard contents
-    
+
+     
 
 Big things:
 -Actually host properly
