@@ -12,7 +12,7 @@
         <li><a href="{% url 'mealplan:meal_plan_detail' meal_plan.id %}">{{ meal_plan.name }}</a></li>
         {% endfor %}
     {% else %}
-        <p>No recipes are available.</p>
+        <p>Create a meal plan to get started</p>
     {% endif %}
 </ul>
 {% endblock content %}

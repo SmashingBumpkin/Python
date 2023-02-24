@@ -12,7 +12,6 @@ Features:
 -Recipe suggestions based on ingredient
 -Info about ingredients (eg seasonality, substitutes, shelf life)
 -Generate recipes based on cupboard contents
--Meal plan shopping lists
     
 
 Big things:
