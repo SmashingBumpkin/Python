@@ -19,12 +19,12 @@ def url_to_recipe(url, owner):
         name = "Enter details manually"
         return Recipe(name = name, owner = owner)
 
-def image_to_string(img):
+def image_to_string(img, active_user):
     text = pytesseract.image_to_string(img)
     myprompt = ("The following excerpt is a jumbled up recipe. Reformat this recipe with the headers"+
             " name, description, serves, ingredients and then the method."
             + "\n\n" + text)
-    text = openai_link.sendPrompt(myprompt)
+    text = openai_link.sendPrompt(myprompt, active_user=active_user)
     # text = temptext()
     return text
 

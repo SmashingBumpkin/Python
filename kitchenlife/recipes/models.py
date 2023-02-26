@@ -40,7 +40,7 @@ class Recipe(models.Model):
         myprompt = ("Take this list of ingredients, and return a simple list containing only "
                 + "raw ingredients seperated by ',': \n\n"
                 + self.ingredients_string)
-        text = openai_link.sendPrompt(myprompt, model = "text-curie-001", temperature=0.7)
+        text = openai_link.sendPrompt(myprompt, active_user=active_user, model = "text-curie-001", temperature=0.7)
         print("\n____\n" + text)
         cont = input("\n____\n\nIf text is correct press 1 to continue ")
         if cont != "1":
@@ -60,11 +60,11 @@ class Recipe(models.Model):
                 #active_user.ingredients_referenced.add(ingredient)
                 ingredient.save()
     
-    def simplify_ingredients(self):
+    def simplify_ingredients(self, active_user):
         myprompt = ("Take this list of ingredients for a recipe, and simplify it by returning a " +
                 "list containing only the raw ingredients seperated by '\\n': \n\n"
                 + self.ingredients_string)
-        self.simplified_ingredients = openai_link.sendPrompt(myprompt, model = "text-curie-001", temperature=0.7)
+        self.simplified_ingredients = openai_link.sendPrompt(myprompt, active_user = active_user.profile, model = "text-curie-001", temperature=0.7)
 
     def simplified_to_ingredients(self, active_user):
         ingredientsList = resplit("\n| or |,| and ", self.simplified_ingredients)
@@ -84,7 +84,8 @@ class Recipe(models.Model):
     def method_as_list(self):
         try:
             method_as_list = self.method.split('\n')
-            method_as_list = [str(i+1) + ". " + step for i, step in enumerate(method_as_list)]
+            if method_as_list[0][0] != "1":
+                method_as_list = [str(i+1) + ". " + step for i, step in enumerate(method_as_list)]
         except:
             method_as_list = []
         return method_as_list
@@ -94,27 +95,11 @@ class Recipe(models.Model):
         pass
     #TODO: Implement a function to rate recipes
 
-def tempingredients():
-    return """onion
-carrot
-celery stick
-olive oil
-rosemary
-'nduja
-tomato purée
-cherry tomatoes
-chicken stock
-cannellini beans
-ditalini or macaroni
-cavolo nero
-Parmesan
-Salt
-black pepper"""
-
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete= models.CASCADE, related_name="profile")
     ingredients_referenced = models.ManyToManyField(Ingredient, related_name="referenced_by_profile", blank=True) # every ingredient ever used by this user
     ingredients_owned = models.ManyToManyField(Ingredient,related_name="owned_by_profile", blank=True) # ingredients currently available to this user
+    ai_credits_used = models.IntegerField(default=0)
 
     def __str__(self):
         return self.user.username

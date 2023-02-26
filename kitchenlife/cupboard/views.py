@@ -56,7 +56,7 @@ def edit_cupboard(request):
     profile = request.user.profile
     if request.method == 'POST':
         ingredients = request.POST.getlist('ingredients')
-        profile.ingredients_owned.set(ingredients)
+        profile.ingredients_owned.string_to_ingredientst(ingredients)
         profile.save()
         return redirect('cupboard:cupboard_index')
     else:

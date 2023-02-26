@@ -25,9 +25,9 @@ Features:
 
 Big things:
 -Actually host properly
--Change database to something appropriate for public implementation
--Call supermarket APIs to see what's in stock and how much it would be
 -Collect comparison data for unformatted recipes and formatted recipes
 -Collect comparison data for ingredients string and ingredients lists
 -Collect nutritional info on ingredients to calculate nutritional info for recipes
+-Change database to something appropriate for public implementation
+-Call supermarket APIs to see what's in stock and how much it would be
 -Sister app

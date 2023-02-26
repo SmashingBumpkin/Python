@@ -55,7 +55,7 @@ def upload_file(request):
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
             img = Image.open(request.FILES['img'])
-            text = new_recipe_processing.image_to_string(img)
+            text = new_recipe_processing.image_to_string(img, active_user = request.user.profile)
             recipe = new_recipe_processing.text_to_recipe(text)
             recipe.save()
             recipe.owner = request.user
@@ -91,7 +91,7 @@ def edit_recipe(request, recipe_id):
         if form.is_valid():
             form.save()
             if not recipe.simplified_ingredients:
-                recipe.simplify_ingredients()
+                recipe.simplify_ingredients(request.user)
                 recipe.save()
             return redirect('recipes:edit_ingredients', recipe_id=recipe.id)
     form = EditRecipeForm(initial = recipe.return_dict())

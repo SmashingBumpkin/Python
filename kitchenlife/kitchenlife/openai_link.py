@@ -1,7 +1,7 @@
 import openai
 from sys import exit as sysexit
 
-def sendPrompt(myprompt, temperature = 0.01, model = "text-davinci-003"):
+def sendPrompt(myprompt, active_user, temperature = 0.01, model = "text-davinci-003"):
     cont = input("\n____\n\n\nPlease type 1 to continue (will spend openai credits) ")
     if cont != "1":
         print("\nYou have terminated the program, cheapskate.\n")
@@ -13,4 +13,6 @@ def sendPrompt(myprompt, temperature = 0.01, model = "text-davinci-003"):
       max_tokens=600,
       temperature=temperature
     )
+    active_user.ai_credits_used += response["usage"]["total_tokens"]
+    active_user.save()
     return response["choices"][0]["text"]
