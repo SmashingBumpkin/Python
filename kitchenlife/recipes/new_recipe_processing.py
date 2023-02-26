@@ -7,7 +7,7 @@ from recipe_scrapers import scrape_me
 import pytesseract
 pytesseract.pytesseract.tesseract_cmd = r'C:\\Program Files\\Tesseract-OCR\\tesseract.exe'
 
-def url_to_recipe(url):
+def url_to_recipe(url, owner):
     try:
         recipe_dict = scrape_schema_recipe.scrape_url(url, python_objects=True)[0]
         print(recipe_dict)
@@ -32,18 +32,22 @@ def url_to_recipe(url):
             serves = serves.split(' ')[1]
         return Recipe(name = name.strip(), ingredients_string = ingredients_string.strip(), 
                       method = method.strip(), serves = serves.strip(),
-                      description = description.strip(), url = url)
+                      description = description.strip(), url = url, owner = owner)
     except:
         #https://github.com/hhursev/recipe-scrapers
         #TODO: Add in extra fields
-        scraper = scrape_me(url, wild_mode=True)
-        name = scraper.title()
-        ingredients = scraper.ingredients()
-        instructions = scraper.instructions()
-        serves = scraper.yields()
-        print(ingredients, instructions)
-        return Recipe(name = name, ingredients_string = '\n'.join(ingredients), 
-                      method = instructions, url = url, serves = serves)
+        try:
+            scraper = scrape_me(url, wild_mode=True)
+            name = scraper.title()
+            ingredients = scraper.ingredients()
+            instructions = scraper.instructions()
+            serves = scraper.yields()
+            print(ingredients, instructions)
+            return Recipe(name = name, ingredients_string = '\n'.join(ingredients), 
+                      method = instructions, url = url, serves = serves, owner = owner)
+        except:
+            name = "Enter details manually"
+            return Recipe(name = name, owner = owner)
 
 def image_to_string(img):
     text = pytesseract.image_to_string(img)

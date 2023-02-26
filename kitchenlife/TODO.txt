@@ -14,6 +14,11 @@ Features:
             -Automatically update availability to make unavailable if they expire
     -Info about ingredients (eg seasonality, substitutes, shelf life)
 -Generate recipes based on cupboard contents
+-New add recipe workflow:
+    -If title can't successfully be extracted generic title is entered
+    -Workflow from here is normal
+-Have a proper screen to verify that the return from the ai was good.
+    -Link each line of the ai with a line of the original to make it clearer.
 
      
 
@@ -24,3 +29,4 @@ Big things:
 -Collect comparison data for unformatted recipes and formatted recipes
 -Collect comparison data for ingredients string and ingredients lists
 -Collect nutritional info on ingredients to calculate nutritional info for recipes
+-Sister app

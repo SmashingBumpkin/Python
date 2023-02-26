@@ -8,6 +8,17 @@ class UploadFileForm(forms.Form):
 class SearchForm(forms.Form):
     search_term = forms.CharField(max_length=50)
 
+class EditIngredientsForm(forms.ModelForm):
+    class Meta:
+        model = Recipe
+        fields = ['simplified_ingredients']
+        widgets = {
+            'ingredients': forms.Textarea(attrs={'rows': 30, 'cols': 40}),
+        }
+        labels = {
+            'simplified_ingredients': 'Simplified ingredients'
+        }
+
 class UploadURLForm(forms.Form):
     uploadedurl = forms.URLField(label = "Enter recipe URL")
 

@@ -30,7 +30,7 @@ Page: {{ recipe.page }}
     <p><a href="{% url 'cupboard:ingredient_detail' combined_ingredient.1.id %}">{{ combined_ingredient.0 }}</a><br></p>
     {% endfor %}
 {% else %}
-    <p>Not used anywhere.</p>
+    <p>This recipe isn't properly linked with it's ingredients.</p>
 {% endif %}
             <!-- <pre>
 {{recipe.ingredients_string}}</pre> -->

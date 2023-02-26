@@ -10,4 +10,5 @@ urlpatterns = [
     path('upload_url/', views.upload_url, name='upload_url'),
     path('edit/<int:recipe_id>/', views.edit_recipe, name= 'edit_recipe'),
     path('delete/<int:recipe_id>/', views.delete_recipe, name= 'delete_recipe'),
+    path('edit_ingredients/<int:recipe_id>/', views.edit_ingredients, name= 'edit_ingredients'),
 ]
