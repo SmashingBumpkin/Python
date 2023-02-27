@@ -4,6 +4,8 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+
+from kitchenlife.openai_link import sendPrompt
 from .models import Recipe
 from .forms import UploadFileForm, EditRecipeForm, SearchForm, UploadURLForm, EditIngredientsForm
 from PIL import Image
@@ -124,3 +126,12 @@ def delete_recipe(request, recipe_id):
         return redirect("recipes:index")
     
     return render(request, 'recipes/delete.html')
+
+def generate_recipe_suggestion(request):
+    ingredients = ", ".join(request.user.profile.ingredients_owned_list())
+    myprompt = ("Provide 5 varied recipe briefs that use any combination of these ingredients:\n\n\n "+
+                ingredients)
+    
+    response = sendPrompt(myprompt, request.user.profile, temperature=0.5)
+    print(response)
+    return redirect("recipes:index")

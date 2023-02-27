@@ -4,6 +4,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 
 from cupboard.forms import EmptyForm
+from kitchenlife.openai_link import sendPrompt
 from .models import Ingredient
 from recipes.forms import SearchForm
 
@@ -47,6 +48,8 @@ def ingredient_detail(request, ingredient_id):
             profile.ingredients_owned.remove(ingredient)
         profile.save()
         owned_by_user = profile.ingredients_owned.filter(id=ingredient.id)
+    response = sendPrompt("Answer yes or no. Is "+ ingredient.name + " a fruit, a vegetable or a meat?", request.user.profile)
+    print(response)
     recipes = ingredient.ingredient_uses.filter(owner = request.user)
     context = {'ingredient': ingredient, 'recipes': recipes, 'owned_by_user': owned_by_user, 'form': EmptyForm}
     return render(request, 'cupboard/ingredient_detail.html', context)
@@ -56,7 +59,7 @@ def edit_cupboard(request):
     profile = request.user.profile
     if request.method == 'POST':
         ingredients = request.POST.getlist('ingredients')
-        profile.ingredients_owned.string_to_ingredientst(ingredients)
+        profile.ingredients_owned.string_to_ingredients(ingredients)
         profile.save()
         return redirect('cupboard:cupboard_index')
     else:

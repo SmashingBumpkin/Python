@@ -41,5 +41,5 @@ dash of maggi or worcester sauce
 1 tsp sugar
 chopped parsley and parmesan to serve"""
 
-instruct = "Seperate the given string into individual ingredients seperated by \\n"
+instruct = "Seperate the given string into individual ingredients, without any quantities, seperated by \\n"
 print(sendEditPrompt(inny, instruct))

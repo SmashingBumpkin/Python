@@ -103,3 +103,6 @@ class Profile(models.Model):
 
     def __str__(self):
         return self.user.username
+    
+    def ingredients_owned_list(self):
+        return [ingredient.name for ingredient in self.ingredients_owned.all()]

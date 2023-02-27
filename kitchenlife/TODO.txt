@@ -1,25 +1,21 @@
 Features:
 -Recipes
-    -Edit recipes page needs to properly link with ingredients
-        -(When ingredients are removed they should be unlinked from recipe)
     -Make recipe import from photo less fragile
-    -(Remove ingredients when they are removed from list)
     -Rate recipes
-    -Link each line of ingredients to an Ingredient
-    -Allow some amount of interaction between Ingredients and user
+    -Add/edit recipe:
+        -If title can't successfully be extracted generic title is entered
+        -Add hints to all the boxes telling the user what to do
+        -Link each line of the ai with a line of the original to make it clearer.
+        -Edit recipes page needs to properly link with ingredients
+        -(When ingredients are removed they should be unlinked from recipe)
 -Create cupboards which show which ingredients are stocked
     -New ingredient model variables:
         -Expiry
         -Availability
             -Automatically update availability to make unavailable if they expire
     -Info about ingredients (eg seasonality, substitutes, shelf life)
+    -Edit ingredient screen
 -Generate recipes based on cupboard contents
--New add recipe workflow:
-    -If title can't successfully be extracted generic title is entered
-    -Add hints to all the boxes telling the user what to do
-    -Workflow from here is normal
--Have a proper screen to verify that the return from the ai was good.
-    -Link each line of the ai with a line of the original to make it clearer.
 
      
 
@@ -31,3 +27,6 @@ Big things:
 -Change database to something appropriate for public implementation
 -Call supermarket APIs to see what's in stock and how much it would be
 -Sister app
+
+https://realpython.com/django-social-forms-4/
+https://docs.djangoproject.com/en/4.1/intro/tutorial02/
