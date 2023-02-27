@@ -7,7 +7,7 @@ class RecipeFormMixin:
         user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
         if user:
-            self.fields['recipes'].queryset = Recipe.objects.filter(owner=user)
+            self.fields['recipes'].queryset = Recipe.objects.filter(owner=user).order_by('name')
 
 class MealPlanForm(RecipeFormMixin, forms.ModelForm):
     class Meta:

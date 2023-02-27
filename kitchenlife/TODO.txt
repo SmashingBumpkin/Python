@@ -8,6 +8,9 @@ Features:
         -Link each line of the ai with a line of the original to make it clearer.
         -Edit recipes page needs to properly link with ingredients
         -(When ingredients are removed they should be unlinked from recipe)
+    -Link quantities to recipes, storing as JSONField
+        -Learn about json
+
 -Create cupboards which show which ingredients are stocked
     -New ingredient model variables:
         -Expiry

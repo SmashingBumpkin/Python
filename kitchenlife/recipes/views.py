@@ -46,6 +46,7 @@ def detail(request, recipe_id):
     except:
         combined_ingredients = None
     
+    print(recipe.ingredients_string)
                 
     context = {'recipe': recipe, 'method_as_list': method_as_list, 'combined_ingredients': combined_ingredients}
     return render(request, 'recipes/detail.html', context)

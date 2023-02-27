@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from kitchenlife import openai_link
 from cupboard.models import Ingredient
 from re import split as resplit
+from re import findall as refindall
 from sys import exit as sysexit
 
 
@@ -23,6 +24,47 @@ class Recipe(models.Model):
     def __str__(self):
         return self.name
     
+    class Ingredient(Ingredient):
+        recipe_str_a = models.CharField(max_length=200, null=True, blank=True)
+        recipe_int_b = models.IntegerField(null=True, blank=True)
+        recipe_str_c = models.CharField(max_length=200, null=True, blank=True)
+        recipe_int_d = models.IntegerField(null=True, blank=True)
+        recipe_str_e = models.CharField(max_length=200, null=True, blank=True)
+        recipe_int_f = models.IntegerField(null=True, blank=True)
+        recipe_str_g = models.CharField(max_length=200, null=True, blank=True)
+        recipe_int_h = models.IntegerField(null=True, blank=True)
+        recipe_str_i = models.CharField(max_length=200, null=True, blank=True)
+        
+        def __str__(self):
+            pass
+
+        def string_to_ingredient(self, line):
+            parts = refindall(r'\d+|\D+', line)
+            combined_list = [int(p) if p.isdigit() else p for p in parts]
+            if type(combined_list[0]) == str:
+                self.recipe_str_a = combined_list[0]
+                combined_list = combined_list[1:]
+            else:
+                self.recipe_str_a = ""
+            
+            try:
+                self.recipe_int_b = combined_list[0]
+                self.recipe_str_c = combined_list[1]
+                self.recipe_int_d = combined_list[2]
+                self.recipe_str_e = combined_list[3]
+                self.recipe_int_f = combined_list[4]
+                self.recipe_str_g = combined_list[5]
+                self.recipe_int_h = combined_list[6]
+                self.recipe_str_i = combined_list[7]
+            except:
+                pass
+
+        def ingredient_string(self):
+            return (self.recipe_int_b + self.recipe_str_c + self.recipe_int_d + self.recipe_str_e 
+                    + self.recipe_int_f + self.recipe_str_g + self.recipe_int_h + self.recipe_str_i
+                    + self.recipe_int_j)
+        
+            
     def return_dict(self):
         return {
                         'name': self.name,
@@ -36,30 +78,6 @@ class Recipe(models.Model):
                         'url': self.url,
                     }
     
-    def string_to_ingredients(self, active_user):
-        myprompt = ("Take this list of ingredients, and return a simple list containing only "
-                + "raw ingredients seperated by ',': \n\n"
-                + self.ingredients_string)
-        text = openai_link.sendPrompt(myprompt, active_user=active_user, model = "text-curie-001", temperature=0.7)
-        print("\n____\n" + text)
-        cont = input("\n____\n\nIf text is correct press 1 to continue ")
-        if cont != "1":
-            text = input("Write corrected list below, seperating ingredients by ',': \n")
-        self.simplified_ingredients = text
-        ingredientsList = resplit("\n| or |,| and ", text)
-        for ingredientName in ingredientsList:
-            ingredientName = ingredientName.strip().capitalize()
-            if ingredientName != "":
-                try:
-                    ingredient = Ingredient.objects.get(name=ingredientName)
-                except:
-                    ingredient = Ingredient(name = ingredientName)
-                    ingredient.save()
-                ingredient.ingredient_uses.add(self)
-                ingredient.referenced_by_profile.add(active_user.profile)
-                #active_user.ingredients_referenced.add(ingredient)
-                ingredient.save()
-    
     def simplify_ingredients(self, active_user):
         myprompt = ("Take this list of ingredients for a recipe, and simplify it by returning a " +
                 "list containing only the raw ingredients seperated by '\\n': \n\n"
@@ -70,16 +88,18 @@ class Recipe(models.Model):
         ingredientsList = resplit("\n| or |,| and ", self.simplified_ingredients)
         for ingredientName in ingredientsList:
             ingredientName = ingredientName.strip().capitalize()
-            if ingredientName != "":
-                try:
-                    ingredient = Ingredient.objects.get(name=ingredientName)
-                except:
-                    ingredient = Ingredient(name = ingredientName)
-                    ingredient.save()
-                ingredient.ingredient_uses.add(self)
-                ingredient.referenced_by_profile.add(active_user.profile)
-                #active_user.ingredients_referenced.add(ingredient)
+            if ingredientName == "":
+                continue
+            try:
+                ingredient = Ingredient.objects.get(name=ingredientName)
+            except:
+                ingredient = Ingredient(name = ingredientName)
                 ingredient.save()
+            ingredient.ingredient_uses.add(self)
+            ingredient.referenced_by_profile.add(active_user.profile)
+            
+            #active_user.ingredients_referenced.add(ingredient)
+            ingredient.save()
 
     def method_as_list(self):
         try:
