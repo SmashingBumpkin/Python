@@ -1,9 +1,11 @@
 from django.contrib.auth import login
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+
+from re import split as resplit
+from re import findall as refindall
 
 from kitchenlife.openai_link import sendPrompt
 from .models import Recipe
@@ -36,6 +38,11 @@ def detail(request, recipe_id):
     method_as_list = recipe.method_as_list()
     try:
         dumb_ingredients = recipe.ingredients_string.split('\n')
+        for inged in dumb_ingredients:
+            Recipe.parse_dumb_ingredient(inged)
+            parts = refindall(r'\d+|\D+', inged)
+            combined_list = [int(p) if p.isdigit() else p for p in parts]
+            #print(combined_list)
         ingredients = list(recipe.uses_ingredient.all())
         combined_ingredients = []
         for dumb_ingredient in dumb_ingredients:
@@ -45,9 +52,7 @@ def detail(request, recipe_id):
                     break
     except:
         combined_ingredients = None
-    
-    print(recipe.ingredients_string)
-                
+    #print(recipe.ingredients_string)
     context = {'recipe': recipe, 'method_as_list': method_as_list, 'combined_ingredients': combined_ingredients}
     return render(request, 'recipes/detail.html', context)
 
@@ -61,6 +66,7 @@ def upload_file(request):
             text = new_recipe_processing.image_to_string(img, active_user = request.user.profile)
             recipe = new_recipe_processing.text_to_recipe(text)
             recipe.save()
+            recipe.from_photo = True
             recipe.owner = request.user
             recipe.save()
             return redirect('recipes:edit_recipe', recipe_id = recipe.id)

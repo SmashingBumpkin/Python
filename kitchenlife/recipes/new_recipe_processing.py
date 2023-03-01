@@ -21,6 +21,7 @@ def url_to_recipe(url, owner):
 
 def image_to_string(img, active_user):
     text = pytesseract.image_to_string(img)
+    print(text)
     myprompt = ("The following excerpt is a jumbled up recipe. Reformat this recipe with the headers"+
             " name, description, serves, ingredients and then the method. Correct the capitalization where applicable."#Modify prompt to check for "9s"
             + "\n\n" + text)

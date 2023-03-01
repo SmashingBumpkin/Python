@@ -2,68 +2,85 @@ from django.db import models
 from django.contrib.auth.models import User
 from kitchenlife import openai_link
 from cupboard.models import Ingredient
-from re import split as resplit
-from re import findall as refindall
+from re import split as resplit, findall as refindall, sub as resub
 from sys import exit as sysexit
+from fractions import Fraction
 
 
 class Recipe(models.Model):
     name = models.CharField(max_length=200)
     method = models.TextField(max_length=5000, null = True, blank = True)
     ingredients_string = models.TextField(max_length=1000, null = True, blank = True)#Plain text of ingredients
+    simplified_ingredients = models.TextField(max_length=1000, null = True, blank = True)#Ingredients data
+    uses_ingredient = models.ManyToManyField(Ingredient, related_name="ingredient_uses")
     book = models.CharField(max_length=200, null = True, blank = True)
     page = models.CharField(max_length=5, null = True, blank = True)
     serves = models.CharField(max_length=5, null = True, blank = True)
     description = models.TextField(max_length=500, null = True, blank = True)
     url = models.URLField(null = True, blank = True)
     jumbled_input = models.TextField(max_length=8000, null = True, blank = True)
-    simplified_ingredients = models.TextField(max_length=1000, null = True, blank = True)
     owner = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
-    uses_ingredient = models.ManyToManyField(Ingredient, related_name="ingredient_uses")
+    from_photo = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name
     
-    class Ingredient(Ingredient):
-        recipe_str_a = models.CharField(max_length=200, null=True, blank=True)
-        recipe_int_b = models.IntegerField(null=True, blank=True)
-        recipe_str_c = models.CharField(max_length=200, null=True, blank=True)
-        recipe_int_d = models.IntegerField(null=True, blank=True)
-        recipe_str_e = models.CharField(max_length=200, null=True, blank=True)
-        recipe_int_f = models.IntegerField(null=True, blank=True)
-        recipe_str_g = models.CharField(max_length=200, null=True, blank=True)
-        recipe_int_h = models.IntegerField(null=True, blank=True)
-        recipe_str_i = models.CharField(max_length=200, null=True, blank=True)
+    # class Ingredient(Ingredient):
+    #     local_name = models.CharField(max_length=150)#
+    def parse_dumb_ingredient(ingredient_dumb):
+        #TODO Check for import errors, eg Y = 1/, % = 1/2 or 1/3
+        L = refindall(r'\d+|\D+',  ingredient_dumb) #Splits string into list of ints+strings
+        if len(L) == 1: #If length is 1, there is nothing to parse
+            ingredient_dumb = resub(r'^\W+', '', ingredient_dumb)
+            print("1 " + ingredient_dumb)
+            return None
         
-        def __str__(self):
-            pass
-
-        def string_to_ingredient(self, line):
-            parts = refindall(r'\d+|\D+', line)
-            combined_list = [int(p) if p.isdigit() else p for p in parts]
-            if type(combined_list[0]) == str:
-                self.recipe_str_a = combined_list[0]
-                combined_list = combined_list[1:]
-            else:
-                self.recipe_str_a = ""
-            
-            try:
-                self.recipe_int_b = combined_list[0]
-                self.recipe_str_c = combined_list[1]
-                self.recipe_int_d = combined_list[2]
-                self.recipe_str_e = combined_list[3]
-                self.recipe_int_f = combined_list[4]
-                self.recipe_str_g = combined_list[5]
-                self.recipe_int_h = combined_list[6]
-                self.recipe_str_i = combined_list[7]
-            except:
-                pass
-
-        def ingredient_string(self):
-            return (self.recipe_int_b + self.recipe_str_c + self.recipe_int_d + self.recipe_str_e 
-                    + self.recipe_int_f + self.recipe_str_g + self.recipe_int_h + self.recipe_str_i
-                    + self.recipe_int_j)
+        if not any(c.isalnum() for c in L[0]):#Removes start of string if it's eg " -  "
+            L = L[1:]
         
+        #gets posn of first int
+        posn = next((i for i, x in enumerate(L) if x.isdigit()), None)
+        #tried to parse quantity
+        if posn+2 < len(L) and (L[posn+1] in {".",","}):
+            quantity = float("".join(L[posn:posn+3]))
+            posn += 2
+        elif L[posn+1] == "/":
+            quantity = float(Fraction("".join(L[posn:posn+3])))
+            posn += 2
+        elif L[posn+1] == " " and L[posn+3] == "/":
+            #TODO: Improve resiliance
+            quantity = float(int(L[posn])+Fraction("".join(L[posn+2:posn+5])))
+            posn += 4
+        else:
+            quantity = float(L[posn])
+        
+        #Checks for import error on quantity (99.9% chance this is import error)
+        if quantity > 100 and quantity % 10 == 9:
+            quantity = (quantity - 9)/10
+            L[posn+1] = "g" + L[posn+1]
+        
+        posn += 1
+        units = {"grams","g","tbsp","tsp", "kg", "l", "ml", "liters","milliliters"}
+        #gets what's left of string after quantity removed
+        remaining_string = "".join(L[posn:]).lower().strip()
+
+        #Finds units if they are present
+        L[posn] = L[posn].lower()
+        try:
+            first_word = refindall(r'\w+', L[posn])[0]
+        except:
+            first_word = None
+        if first_word in units:
+            unit = first_word
+            remaining_string = remaining_string[remaining_string.index(unit) + len(unit):].strip()
+            print(quantity,unit, remaining_string)
+        else:
+            unit = ""
+            print(quantity,remaining_string)
+        return quantity, unit
+    
+
+    
             
     def return_dict(self):
         return {
@@ -97,8 +114,6 @@ class Recipe(models.Model):
                 ingredient.save()
             ingredient.ingredient_uses.add(self)
             ingredient.referenced_by_profile.add(active_user.profile)
-            
-            #active_user.ingredients_referenced.add(ingredient)
             ingredient.save()
 
     def method_as_list(self):
