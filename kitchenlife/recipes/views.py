@@ -37,7 +37,6 @@ def detail(request, recipe_id):
         return redirect('recipes:index')
     method_as_list = recipe.method_as_list()
     try:
-        print(new_recipe_processing.ingredients_cleaner(recipe.ingredients_string))
         dumb_ingredients = recipe.ingredients_string.split('\n')
         for inged in dumb_ingredients:
             parts = refindall(r'\d+|\D+', inged)
@@ -62,12 +61,12 @@ def upload_file(request):
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
             img = Image.open(request.FILES['img'])
-            text = new_recipe_processing.image_to_string(img, active_user = request.user.profile)
-            recipe = new_recipe_processing.text_to_recipe(text)
+            #text = new_recipe_processing.image_to_string(img, active_user = request.user.profile)
+            recipe = new_recipe_processing.image_to_recipe(img, user = request.user)
             recipe.save()
-            recipe.from_photo = True
-            recipe.owner = request.user
-            recipe.save()
+            # recipe.from_photo = True
+            # recipe.owner = request.user
+            # recipe.save()
             return redirect('recipes:edit_recipe', recipe_id = recipe.id)
 
     form = UploadFileForm()
@@ -97,7 +96,7 @@ def edit_recipe(request, recipe_id):
     if request.method == 'POST':
         form = EditRecipeForm(request.POST, instance= recipe)
         if form.is_valid():
-            new_ingr_str = form.cleaned_data['ingredients_string']
+            new_ingr_str = form.cleaned_data['ingredients_string'].strip()
             old_ingred_str = recipe.simplified_ingredients
             form.save()
             if old_ingred_str != new_ingr_str: 

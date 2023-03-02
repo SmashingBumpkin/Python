@@ -44,7 +44,7 @@ class Recipe(models.Model):
         self.simplified_ingredients = openai_link.sendPromptIngredients(self.ingredients_string, active_user = active_user.profile)
 
     def simplified_to_ingredients(self, active_user):
-        ingredientsList = resplit("\n| or |,| and ", self.simplified_ingredients)
+        ingredientsList = resplit("\n|,", self.simplified_ingredients)
         #TODO:
         #If the number of dumb ingredient lines matches the number of simplified ingredients:
         #   Simple algo to match each ingredient up, then assign quantity and units and everything to the subingredient class
@@ -86,7 +86,7 @@ class Recipe(models.Model):
 #     ingredient = models.ForeignKey('Ingredient', on_delete=models.CASCADE, related_name="recipe_ingredient")
 #     quantity = models.FloatField(null=True, blank=True)
 #     measurement_unit = models.CharField(max_length=50, null=True, blank=True)
-#     string = models.CharField(max_length=100,null=True, blank=True)
+#     string = models.CharField(max_length=100)
 #     position_in_list = models.IntegerField(null=True, blank=True)
     
 #     class Meta:
@@ -96,10 +96,8 @@ class Recipe(models.Model):
 #     def parse_dumb_ingredient(ingredient_dumb):
 #         #TODO Check for import errors, eg Y = 1/, % = 1/2 or 1/3
 #         L = refindall(r'\d+|\D+',  ingredient_dumb) #Splits string into list of ints+strings
-#         if len(L) == 1: #If length is 1, there is nothing to parse
-#             ingredient_dumb = resub(r'^\W+', '', ingredient_dumb)
-#             print("1 " + ingredient_dumb)
-#             return None
+#         if len(L) == 1:
+#             return RecipeIngredient()
         
 #         if not any(c.isalnum() for c in L[0]):#Removes start of string if it's eg " -  "
 #             L = L[1:]
