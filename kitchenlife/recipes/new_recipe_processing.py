@@ -22,12 +22,8 @@ def url_to_recipe(url, owner):
 def image_to_string(img, active_user):
     text = pytesseract.image_to_string(img)
     print(text)
-    myprompt = ("The following excerpt is a jumbled up recipe. Reformat this recipe with the headers"+
-            " name, description, serves, ingredients and then the method. Correct the capitalization where applicable."#Modify prompt to check for "9s"
-            + "\n\n" + text)
-    text = openai_link.sendPrompt(myprompt, active_user=active_user)
-    # text = temptext()
-    return text
+    return openai_link.sendPromptJumbled(text, active_user)
+    
 
 def text_to_recipe(text):
         [_,name,description, serves, ingredients, method] = textlist= resplit(r"Name:|Description:|Serves:|Ingredients:|Method:",text)

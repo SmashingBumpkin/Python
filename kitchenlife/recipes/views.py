@@ -36,14 +36,12 @@ def detail(request, recipe_id):
     if recipe.owner != request.user:
         return redirect('recipes:index')
     method_as_list = recipe.method_as_list()
-    print(sendPromptIngredients(recipe.ingredients_string, request.user.profile))
     try:
         dumb_ingredients = recipe.ingredients_string.split('\n')
         for inged in dumb_ingredients:
             Recipe.parse_dumb_ingredient(inged)
             parts = refindall(r'\d+|\D+', inged)
             combined_list = [int(p) if p.isdigit() else p for p in parts]
-            #print(combined_list)
         ingredients = list(recipe.uses_ingredient.all())
         combined_ingredients = []
         for dumb_ingredient in dumb_ingredients:
