@@ -25,59 +25,6 @@ class Recipe(models.Model):
     def __str__(self):
         return self.name
     
-    def parse_dumb_ingredient(ingredient_dumb):
-        #TODO Check for import errors, eg Y = 1/, % = 1/2 or 1/3
-        L = refindall(r'\d+|\D+',  ingredient_dumb) #Splits string into list of ints+strings
-        if len(L) == 1: #If length is 1, there is nothing to parse
-            ingredient_dumb = resub(r'^\W+', '', ingredient_dumb)
-            print("1 " + ingredient_dumb)
-            return None
-        
-        if not any(c.isalnum() for c in L[0]):#Removes start of string if it's eg " -  "
-            L = L[1:]
-        
-        #gets posn of first int
-        posn = next((i for i, x in enumerate(L) if x.isdigit()), None)
-        #tried to parse quantity
-        if posn+2 < len(L) and (L[posn+1] in {".",","}):
-            quantity = float("".join(L[posn:posn+3]))
-            posn += 2
-        elif L[posn+1] == "/":
-            quantity = float(Fraction("".join(L[posn:posn+3])))
-            posn += 2
-        elif L[posn+1] == " " and L[posn+3] == "/":
-            #TODO: Improve resiliance
-            quantity = float(int(L[posn])+Fraction("".join(L[posn+2:posn+5])))
-            posn += 4
-        else:
-            quantity = float(L[posn])
-        
-        #Checks for import error on quantity (99.9% chance this is import error)
-        if quantity > 100 and quantity % 10 == 9:
-            quantity = (quantity - 9)/10
-            L[posn+1] = "g" + L[posn+1]
-        
-        posn += 1
-        units = {"grams","g","tbsp","tsp", "kg", "l", "ml", "liters","milliliters"}
-        #gets what's left of string after quantity removed
-        remaining_string = "".join(L[posn:]).lower().strip()
-
-        #Finds units if they are present
-        L[posn] = L[posn].lower()
-        try:
-            first_word = refindall(r'\w+', L[posn])[0]
-        except:
-            first_word = None
-        if first_word in units:
-            unit = first_word
-            remaining_string = remaining_string[remaining_string.index(unit) + len(unit):].strip()
-            print(quantity,unit, remaining_string)
-        else:
-            unit = ""
-            print(quantity,remaining_string)
-        return quantity, unit
-    
-
     
             
     def return_dict(self):
@@ -128,21 +75,76 @@ class Recipe(models.Model):
             method_as_list = []
         return method_as_list
     
-    class RecipeIngredient(models.Model):
-        recipe = models.ForeignKey('Recipe', on_delete=models.CASCADE)
-        ingredient = models.ForeignKey('Ingredient', on_delete=models.CASCADE)
-        quantity = models.FloatField(null=True, blank=True)
-        measurement_unit = models.CharField(max_length=50, null=True, blank=True)
-        string = models.CharField(max_length=100,null=True, blank=True)
-        position_in_list = models.IntegerField(null=True, blank=True)
-        
-        class Meta:
-            unique_together = ('recipe', 'ingredient',)
     
     def caps_remover(self):
         #TODO: makea function to reformat stuff to not be all caps
         pass
     #TODO: Implement a function to rate recipes
+
+# class RecipeIngredient(models.Model):
+#     recipe = models.ForeignKey('Recipe', on_delete=models.CASCADE, related_name="recipe_ingredient")
+#     ingredient = models.ForeignKey('Ingredient', on_delete=models.CASCADE, related_name="recipe_ingredient")
+#     quantity = models.FloatField(null=True, blank=True)
+#     measurement_unit = models.CharField(max_length=50, null=True, blank=True)
+#     string = models.CharField(max_length=100,null=True, blank=True)
+#     position_in_list = models.IntegerField(null=True, blank=True)
+    
+#     class Meta:
+#         unique_together = ('recipe', 'ingredient',)
+
+
+#     def parse_dumb_ingredient(ingredient_dumb):
+#         #TODO Check for import errors, eg Y = 1/, % = 1/2 or 1/3
+#         L = refindall(r'\d+|\D+',  ingredient_dumb) #Splits string into list of ints+strings
+#         if len(L) == 1: #If length is 1, there is nothing to parse
+#             ingredient_dumb = resub(r'^\W+', '', ingredient_dumb)
+#             print("1 " + ingredient_dumb)
+#             return None
+        
+#         if not any(c.isalnum() for c in L[0]):#Removes start of string if it's eg " -  "
+#             L = L[1:]
+        
+#         #gets posn of first int
+#         posn = next((i for i, x in enumerate(L) if x.isdigit()), None)
+#         #tried to parse quantity
+#         if posn+2 < len(L) and (L[posn+1] in {".",","}):
+#             quantity = float("".join(L[posn:posn+3]))
+#             posn += 2
+#         elif L[posn+1] == "/":
+#             quantity = float(Fraction("".join(L[posn:posn+3])))
+#             posn += 2
+#         elif L[posn+1] == " " and L[posn+3] == "/":
+#             #TODO: Improve resiliance
+#             quantity = float(int(L[posn])+Fraction("".join(L[posn+2:posn+5])))
+#             posn += 4
+#         else:
+#             quantity = float(L[posn])
+        
+#         #Checks for import error on quantity (99.9% chance this is import error)
+#         if quantity > 100 and quantity % 10 == 9:
+#             quantity = (quantity - 9)/10
+#             L[posn+1] = "g" + L[posn+1]
+        
+#         posn += 1
+#         units = {"grams","g","tbsp","tsp", "kg", "l", "ml", "liters","milliliters"}
+#         #gets what's left of string after quantity removed
+#         remaining_string = "".join(L[posn:]).lower().strip()
+
+#         #Finds units if they are present
+#         L[posn] = L[posn].lower()
+#         try:
+#             first_word = refindall(r'\w+', L[posn])[0]
+#         except:
+#             first_word = None
+#         if first_word in units:
+#             unit = first_word
+#             remaining_string = remaining_string[remaining_string.index(unit) + len(unit):].strip()
+#             print(quantity,unit, remaining_string)
+#         else:
+#             unit = ""
+#             print(quantity,remaining_string)
+#         return quantity, unit    
+
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete= models.CASCADE, related_name="profile")
