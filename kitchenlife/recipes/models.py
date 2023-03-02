@@ -44,7 +44,8 @@ class Recipe(models.Model):
         self.simplified_ingredients = openai_link.sendPromptIngredients(self.ingredients_string, active_user = active_user.profile)
 
     def simplified_to_ingredients(self, active_user):
-        ingredientsList = resplit("\n|,", self.simplified_ingredients)
+        ingredients_list = set(resplit("\n|,", self.simplified_ingredients))
+        dumb_ingredients_list = self.ingredients_string.split('\n')
         #TODO:
         #If the number of dumb ingredient lines matches the number of simplified ingredients:
         #   Simple algo to match each ingredient up, then assign quantity and units and everything to the subingredient class
@@ -53,7 +54,8 @@ class Recipe(models.Model):
         #Order ingredients so they can be returned correctly
         #Find a pairing for each ingredient to each dumb ingredient
         #Save the info of quantity, unit and details to a local instance of the Ingredient variable
-        for ingredientName in ingredientsList:
+        matches = {}
+        for ingredientName in ingredients_list:
             ingredientName = ingredientName.strip().capitalize()
             if ingredientName == "":
                 continue
@@ -62,6 +64,23 @@ class Recipe(models.Model):
             except:
                 ingredient = Ingredient(name = ingredientName)
                 ingredient.save()
+        
+        for dumb_line in dumb_ingredients_list:
+            for ingredient_name in ingredients_list:
+            
+                if ingredient_name in dumb_line:
+                    if "and" in dumb_line:
+                        pass
+                        #Special handlign to check for 2 ingredients in a line
+                    elif "or" in dumb_line:
+                        pass
+                        #special handling in case of "this or that"
+                    #Parse recipe ingredient from line
+                    pass
+                    
+                    ingredients_list.remove(ingredient_name)  # remove matched item from B to avoid redundant matches
+                    break
+            #recipe_ingredient = RecipeIngredient.parse_dumb_ingredient(recipe = self, ingredient = ingredient,)
             ingredient.ingredient_uses.add(self)
             ingredient.referenced_by_profile.add(active_user.profile)
             ingredient.save()
@@ -81,67 +100,67 @@ class Recipe(models.Model):
         pass
     #TODO: Implement a function to rate recipes
 
-# class RecipeIngredient(models.Model):
-#     recipe = models.ForeignKey('Recipe', on_delete=models.CASCADE, related_name="recipe_ingredient")
-#     ingredient = models.ForeignKey('Ingredient', on_delete=models.CASCADE, related_name="recipe_ingredient")
-#     quantity = models.FloatField(null=True, blank=True)
-#     measurement_unit = models.CharField(max_length=50, null=True, blank=True)
-#     string = models.CharField(max_length=100)
-#     position_in_list = models.IntegerField(null=True, blank=True)
+class RecipeIngredient(models.Model):
+    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name="recipe_ingredient")
+    ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE, related_name="recipe_ingredient")
+    quantity = models.FloatField(null=True, blank=True)
+    measurement_unit = models.CharField(max_length=50, null=True, blank=True)
+    string = models.CharField(max_length=100)
+    position_in_list = models.IntegerField(null=True, blank=True)
     
-#     class Meta:
-#         unique_together = ('recipe', 'ingredient',)
+    class Meta:
+        unique_together = ('recipe', 'ingredient',)
 
 
-#     def parse_dumb_ingredient(ingredient_dumb):
-#         #TODO Check for import errors, eg Y = 1/, % = 1/2 or 1/3
-#         L = refindall(r'\d+|\D+',  ingredient_dumb) #Splits string into list of ints+strings
-#         if len(L) == 1:
-#             return RecipeIngredient()
+    def parse_dumb_ingredient(recipe, ingredient, ingredient_dumb):
+        #TODO Check for import errors, eg Y = 1/, % = 1/2 or 1/3
+        L = refindall(r'\d+|\D+',  ingredient_dumb) #Splits string into list of ints+strings
+        if len(L) == 1:
+            return RecipeIngredient()
         
-#         if not any(c.isalnum() for c in L[0]):#Removes start of string if it's eg " -  "
-#             L = L[1:]
+        if not any(c.isalnum() for c in L[0]):#Removes start of string if it's eg " -  "
+            L = L[1:]
         
-#         #gets posn of first int
-#         posn = next((i for i, x in enumerate(L) if x.isdigit()), None)
-#         #tried to parse quantity
-#         if posn+2 < len(L) and (L[posn+1] in {".",","}):
-#             quantity = float("".join(L[posn:posn+3]))
-#             posn += 2
-#         elif L[posn+1] == "/":
-#             quantity = float(Fraction("".join(L[posn:posn+3])))
-#             posn += 2
-#         elif L[posn+1] == " " and L[posn+3] == "/":
-#             #TODO: Improve resiliance
-#             quantity = float(int(L[posn])+Fraction("".join(L[posn+2:posn+5])))
-#             posn += 4
-#         else:
-#             quantity = float(L[posn])
+        #gets posn of first int
+        posn = next((i for i, x in enumerate(L) if x.isdigit()), None)
+        #tried to parse quantity
+        if posn+2 < len(L) and (L[posn+1] in {".",","}):
+            quantity = float("".join(L[posn:posn+3]))
+            posn += 2
+        elif L[posn+1] == "/":
+            quantity = float(Fraction("".join(L[posn:posn+3])))
+            posn += 2
+        elif L[posn+1] == " " and L[posn+3] == "/":
+            #TODO: Improve resiliance
+            quantity = float(int(L[posn])+Fraction("".join(L[posn+2:posn+5])))
+            posn += 4
+        else:
+            quantity = float(L[posn])
         
-#         #Checks for import error on quantity (99.9% chance this is import error)
-#         if quantity > 100 and quantity % 10 == 9:
-#             quantity = (quantity - 9)/10
-#             L[posn+1] = "g" + L[posn+1]
+        #Checks for import error on quantity (99.9% chance this is import error)
+        if quantity > 100 and quantity % 10 == 9:
+            quantity = (quantity - 9)/10
+            L[posn+1] = "g" + L[posn+1]
         
-#         posn += 1
-#         units = {"grams","g","tbsp","tsp", "kg", "l", "ml", "liters","milliliters"}
-#         #gets what's left of string after quantity removed
-#         remaining_string = "".join(L[posn:]).lower().strip()
+        posn += 1
+        units = {"grams","g","tbsp","tsp", "kg", "l", "ml", "liters","milliliters"}
+        #gets what's left of string after quantity removed
+        remaining_string = "".join(L[posn:]).lower().strip()
 
-#         #Finds units if they are present
-#         L[posn] = L[posn].lower()
-#         try:
-#             first_word = refindall(r'\w+', L[posn])[0]
-#         except:
-#             first_word = None
-#         if first_word in units:
-#             unit = first_word
-#             remaining_string = remaining_string[remaining_string.index(unit) + len(unit):].strip()
-#             print(quantity,unit, remaining_string)
-#         else:
-#             unit = ""
-#             print(quantity,remaining_string)
-#         return quantity, unit    
+        #Finds units if they are present
+        L[posn] = L[posn].lower()
+        try:
+            first_word = refindall(r'\w+', L[posn])[0]
+        except:
+            first_word = None
+        if first_word in units:
+            unit = first_word
+            remaining_string = remaining_string[remaining_string.index(unit) + len(unit):].strip()
+            print(quantity,unit, remaining_string)
+        else:
+            unit = ""
+            print(quantity,remaining_string)
+        return quantity, unit    
 
 
 class Profile(models.Model):
