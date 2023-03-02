@@ -25,8 +25,6 @@ class Recipe(models.Model):
     def __str__(self):
         return self.name
     
-    # class Ingredient(Ingredient):
-    #     local_name = models.CharField(max_length=150)#
     def parse_dumb_ingredient(ingredient_dumb):
         #TODO Check for import errors, eg Y = 1/, % = 1/2 or 1/3
         L = refindall(r'\d+|\D+',  ingredient_dumb) #Splits string into list of ints+strings
@@ -100,6 +98,14 @@ class Recipe(models.Model):
 
     def simplified_to_ingredients(self, active_user):
         ingredientsList = resplit("\n| or |,| and ", self.simplified_ingredients)
+        #TODO:
+        #If the number of dumb ingredient lines matches the number of simplified ingredients:
+        #   Simple algo to match each ingredient up, then assign quantity and units and everything to the subingredient class
+        #If there are more simplified ingredients than dumb ingredients
+        #   Find the shared lines and parse somehow
+        #Order ingredients so they can be returned correctly
+        #Find a pairing for each ingredient to each dumb ingredient
+        #Save the info of quantity, unit and details to a local instance of the Ingredient variable
         for ingredientName in ingredientsList:
             ingredientName = ingredientName.strip().capitalize()
             if ingredientName == "":
@@ -121,6 +127,17 @@ class Recipe(models.Model):
         except:
             method_as_list = []
         return method_as_list
+    
+    class RecipeIngredient(models.Model):
+        recipe = models.ForeignKey('Recipe', on_delete=models.CASCADE)
+        ingredient = models.ForeignKey('Ingredient', on_delete=models.CASCADE)
+        quantity = models.FloatField(null=True, blank=True)
+        measurement_unit = models.CharField(max_length=50, null=True, blank=True)
+        string = models.CharField(max_length=100,null=True, blank=True)
+        position_in_list = models.IntegerField(null=True, blank=True)
+        
+        class Meta:
+            unique_together = ('recipe', 'ingredient',)
     
     def caps_remover(self):
         #TODO: makea function to reformat stuff to not be all caps
