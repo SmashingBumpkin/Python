@@ -7,7 +7,7 @@ from django.urls import reverse
 from re import split as resplit
 from re import findall as refindall
 
-from kitchenlife.openai_link import sendPrompt
+from kitchenlife.openai_link import sendPrompt, sendPromptIngredients
 from .models import Recipe
 from .forms import UploadFileForm, EditRecipeForm, SearchForm, UploadURLForm, EditIngredientsForm
 from PIL import Image
@@ -36,6 +36,7 @@ def detail(request, recipe_id):
     if recipe.owner != request.user:
         return redirect('recipes:index')
     method_as_list = recipe.method_as_list()
+    print(sendPromptIngredients(recipe.ingredients_string, request.user.profile))
     try:
         dumb_ingredients = recipe.ingredients_string.split('\n')
         for inged in dumb_ingredients:

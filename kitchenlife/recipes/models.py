@@ -96,10 +96,7 @@ class Recipe(models.Model):
                     }
     
     def simplify_ingredients(self, active_user):
-        myprompt = ("Take this list of ingredients for a recipe, and simplify it by returning a " +
-                "list containing only the raw ingredients seperated by '\\n': \n\n"
-                + self.ingredients_string)
-        self.simplified_ingredients = openai_link.sendPrompt(myprompt, active_user = active_user.profile, model = "text-curie-001", temperature=0.7)
+        self.simplified_ingredients = openai_link.sendPrompt(self.ingredients_string, active_user = active_user.profile)
 
     def simplified_to_ingredients(self, active_user):
         ingredientsList = resplit("\n| or |,| and ", self.simplified_ingredients)
