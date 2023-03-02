@@ -97,8 +97,10 @@ def edit_recipe(request, recipe_id):
     if request.method == 'POST':
         form = EditRecipeForm(request.POST, instance= recipe)
         if form.is_valid():
+            new_ingr_str = form.cleaned_data['ingredients_string']
+            old_ingred_str = recipe.simplified_ingredients
             form.save()
-            if not recipe.simplified_ingredients:
+            if old_ingred_str != new_ingr_str: 
                 recipe.simplify_ingredients(request.user)
                 recipe.save()
             return redirect('recipes:edit_ingredients', recipe_id=recipe.id)
