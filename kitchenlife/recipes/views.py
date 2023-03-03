@@ -8,7 +8,7 @@ from re import split as resplit
 from re import findall as refindall
 
 from kitchenlife.openai_link import sendPrompt, sendPromptIngredients
-from .models import Recipe
+from .models import Recipe, RecipeIngredient
 from .forms import UploadFileForm, EditRecipeForm, SearchForm, UploadURLForm, EditIngredientsForm
 from PIL import Image
 from . import new_recipe_processing

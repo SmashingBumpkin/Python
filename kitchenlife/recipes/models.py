@@ -66,22 +66,25 @@ class Recipe(models.Model):
                 ingredient.save()
         
         for dumb_line in dumb_ingredients_list:
-            for ingredient_name in ingredients_list:
+            for ingredient_name in ingredients_list[:]:
             
                 if ingredient_name in dumb_line:
-                    if "and" in dumb_line:
+                    ingredients_list.remove(ingredient_name)  # remove matched item from B to avoid redundant matches
+                    if " and " in dumb_line:
                         pass
-                        #Special handlign to check for 2 ingredients in a line
-                    elif "or" in dumb_line:
+                        #Special handlign to check for 2 (or more??) ingredients in a line
+                        #loop through 
+                    elif " or " in dumb_line:
+                        #Special handlign to check for 2 (or more??) ingredients in a line
+                        #loop through 
+                        #Add "optional=True" to each instance
                         pass
                         #special handling in case of "this or that"
                     #Parse recipe ingredient from line
                     pass
-                    
-                    ingredients_list.remove(ingredient_name)  # remove matched item from B to avoid redundant matches
-                    break
-            #recipe_ingredient = RecipeIngredient.parse_dumb_ingredient(recipe = self, ingredient = ingredient,)
-            ingredient.ingredient_uses.add(self)
+                    ingredient=Ingredient.objects.get(name=ingredient_name)
+                    recipe_ingredient = RecipeIngredient.parse_dumb_ingredient(recipe=self, ingredient=ingredient,ingredient_dumb=dumb_line)
+                    recipe_ingredient.save()
             ingredient.referenced_by_profile.add(active_user.profile)
             ingredient.save()
 
@@ -105,21 +108,30 @@ class RecipeIngredient(models.Model):
     ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE, related_name="recipe_ingredient")
     quantity = models.FloatField(null=True, blank=True)
     measurement_unit = models.CharField(max_length=50, null=True, blank=True)
-    string = models.CharField(max_length=100)
+    local_name = models.CharField(max_length=100)
     position_in_list = models.IntegerField(null=True, blank=True)
+    optional = models.BooleanField(default = True)
     
     class Meta:
         unique_together = ('recipe', 'ingredient',)
+        
+    def __str__(self):
+        output = ""
+        if self.optional:
+            output = "(Optional) "
+        if self.quantity:
+            output += str(self.quantity)
+        if self.measurement_unit:
+            output += self.measurement_unit
+        output += self.local_name
+        return output
 
 
-    def parse_dumb_ingredient(recipe, ingredient, ingredient_dumb):
+    def parse_dumb_ingredient(recipe, ingredient, ingredient_dumb,):
         #TODO Check for import errors, eg Y = 1/, % = 1/2 or 1/3
         L = refindall(r'\d+|\D+',  ingredient_dumb) #Splits string into list of ints+strings
         if len(L) == 1:
-            return RecipeIngredient()
-        
-        if not any(c.isalnum() for c in L[0]):#Removes start of string if it's eg " -  "
-            L = L[1:]
+            return RecipeIngredient(recipe=recipe,ingredient=ingredient,local_name=ingredient_dumb)
         
         #gets posn of first int
         posn = next((i for i, x in enumerate(L) if x.isdigit()), None)
@@ -137,13 +149,23 @@ class RecipeIngredient(models.Model):
         else:
             quantity = float(L[posn])
         
-        #Checks for import error on quantity (99.9% chance this is import error)
-        if quantity > 100 and quantity % 10 == 9:
-            quantity = (quantity - 9)/10
-            L[posn+1] = "g" + L[posn+1]
-        
         posn += 1
-        units = {"grams","g","tbsp","tsp", "kg", "l", "ml", "liters","milliliters"}
+        
+        #Checks for import error on quantity (99.9% chance this is import error)
+        if recipe.from_photo:
+            if quantity > 100 and quantity % 10 == 9:
+                quantity = (quantity - 9)/10
+                L[posn] = "g" + L[posn]
+            elif quantity > 100 and quantity %100 == 2:
+                quantity = (quantity - 2)/100
+                L[posn] = "oz" + L[posn]
+            elif quantity > 10 and L[posn][0] == "z":
+                #TODO: This import error handling is not very resilient
+                quantity = quantity/10
+                L[posn] = "o" + L[posn]
+        
+        units = {"grams","g","tbsp","tablespoon","tsp","teaspoon","kg","l","ml","liters","milliliters","oz", 
+                 "ounce","ounces","lb","pound","pounds","cup","cups",}
         #gets what's left of string after quantity removed
         remaining_string = "".join(L[posn:]).lower().strip()
 
@@ -156,11 +178,12 @@ class RecipeIngredient(models.Model):
         if first_word in units:
             unit = first_word
             remaining_string = remaining_string[remaining_string.index(unit) + len(unit):].strip()
-            print(quantity,unit, remaining_string)
+            return RecipeIngredient(recipe=recipe,ingredient=ingredient,local_name=remaining_string,
+                                    quantity=quantity,measurement_unit=unit)
         else:
             unit = ""
-            print(quantity,remaining_string)
-        return quantity, unit    
+            return RecipeIngredient(recipe=recipe,ingredient=ingredient,local_name=remaining_string,
+                                    quantity=quantity)
 
 
 class Profile(models.Model):

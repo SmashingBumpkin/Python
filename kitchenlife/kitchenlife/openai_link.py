@@ -40,7 +40,7 @@ chopped tomatoes
 spinach
 cumin
 red onion"""},
-        {"role": "user", "content": "Now repeat modify this list of ingredients, remove anything that isn't a basic ingredient and seperating by '\\n' "+myprompt}
+        {"role": "user", "content": "Now repeat modify this list of ingredients, remove anything that isn't a basic ingredient, (if appropriate) make the ingredient singular, and seperate by '\\n' "+myprompt}
     ]
     )
     active_user.ai_credits_used += response["usage"]["total_tokens"]
