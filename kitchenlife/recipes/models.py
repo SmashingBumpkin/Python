@@ -64,12 +64,16 @@ class Recipe(models.Model):
             except:
                 ingredient = Ingredient(name = ingredientName)
                 ingredient.save()
-        
+        print(ingredients_list)
+        #Pau bhaji - lime, coriander, 
         for dumb_line in dumb_ingredients_list:
-            for ingredient_name in ingredients_list[:]:
+            #print(dumb_line)
+            dumb_line = dumb_line.lower()
+            for ingredient_name in ingredients_list:
+                #print(ingredient_name)
             
-                if ingredient_name in dumb_line:
-                    ingredients_list.remove(ingredient_name)  # remove matched item from B to avoid redundant matches
+                if ingredient_name.strip().lower() in dumb_line:
+                    #ingredients_list.remove(ingredient_name)  # remove matched item from B to avoid redundant matches
                     if " and " in dumb_line:
                         pass
                         #Special handlign to check for 2 (or more??) ingredients in a line
@@ -81,12 +85,12 @@ class Recipe(models.Model):
                         pass
                         #special handling in case of "this or that"
                     #Parse recipe ingredient from line
-                    pass
-                    ingredient=Ingredient.objects.get(name=ingredient_name)
+                    ingredient=Ingredient.objects.get(name=ingredient_name.strip().capitalize())
                     recipe_ingredient = RecipeIngredient.parse_dumb_ingredient(recipe=self, ingredient=ingredient,ingredient_dumb=dumb_line)
-                    recipe_ingredient.save()
-            ingredient.referenced_by_profile.add(active_user.profile)
-            ingredient.save()
+                    print(recipe_ingredient)
+                    #recipe_ingredient.save()
+            #ingredient.referenced_by_profile.add(active_user.profile)
+            #ingredient.save()
 
     def method_as_list(self):
         try:
@@ -110,7 +114,7 @@ class RecipeIngredient(models.Model):
     measurement_unit = models.CharField(max_length=50, null=True, blank=True)
     local_name = models.CharField(max_length=100)
     position_in_list = models.IntegerField(null=True, blank=True)
-    optional = models.BooleanField(default = True)
+    optional = models.BooleanField(default = False)
     
     class Meta:
         unique_together = ('recipe', 'ingredient',)
@@ -120,9 +124,9 @@ class RecipeIngredient(models.Model):
         if self.optional:
             output = "(Optional) "
         if self.quantity:
-            output += str(self.quantity)
+            output += str(self.quantity) + " "
         if self.measurement_unit:
-            output += self.measurement_unit
+            output += self.measurement_unit + " "
         output += self.local_name
         return output
 
@@ -176,8 +180,8 @@ class RecipeIngredient(models.Model):
         except:
             first_word = None
         if first_word in units:
-            unit = first_word
-            remaining_string = remaining_string[remaining_string.index(unit) + len(unit):].strip()
+            unit = first_word.strip()
+            remaining_string = remaining_string[remaining_string.index(unit) + len(unit):].strip().capitalize()
             return RecipeIngredient(recipe=recipe,ingredient=ingredient,local_name=remaining_string,
                                     quantity=quantity,measurement_unit=unit)
         else:
