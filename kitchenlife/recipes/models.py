@@ -44,8 +44,10 @@ class Recipe(models.Model):
         self.simplified_ingredients = openai_link.sendPromptIngredients(self.ingredients_string, active_user = active_user.profile)
 
     def simplified_to_ingredients(self, active_user):
-        ingredients_list = set(resplit("\n|,", self.simplified_ingredients))
-        dumb_ingredients_list = self.ingredients_string.split('\n')
+        #Function that generates a the RecipeIngredients that link this recipe to the ingredients
+        ingredients_list = list(resplit("\n|,", self.simplified_ingredients))
+        print(ingredients_list)
+        dumb_ingredients_list = self.ingredients_string.lower().split('\n')
         #TODO:
         #If the number of dumb ingredient lines matches the number of simplified ingredients:
         #   Simple algo to match each ingredient up, then assign quantity and units and everything to the subingredient class
@@ -54,41 +56,78 @@ class Recipe(models.Model):
         #Order ingredients so they can be returned correctly
         #Find a pairing for each ingredient to each dumb ingredient
         #Save the info of quantity, unit and details to a local instance of the Ingredient variable
-        matches = {}
-        for ingredientName in ingredients_list:
-            ingredientName = ingredientName.strip().capitalize()
-            if ingredientName == "":
+        for i in range(len(ingredients_list)):
+            ingredients_list[i] = ingredients_list[i].strip().lower()
+            if ingredients_list[i] == "":
                 continue
             try:
-                ingredient = Ingredient.objects.get(name=ingredientName)
+                ingredient = Ingredient.objects.get(name=ingredients_list[i].capitalize())
             except:
-                ingredient = Ingredient(name = ingredientName)
+                ingredient = Ingredient(name = ingredients_list[i].capitalize())
                 ingredient.save()
-        print(ingredients_list)
-        #Pau bhaji - lime, coriander, 
+        #ingredients_list = set(ingredients_list)
+        line_number = 10 # line number 
         for dumb_line in dumb_ingredients_list:
-            #print(dumb_line)
-            dumb_line = dumb_line.lower()
             for ingredient_name in ingredients_list:
-                #print(ingredient_name)
-            
-                if ingredient_name.strip().lower() in dumb_line:
-                    #ingredients_list.remove(ingredient_name)  # remove matched item from B to avoid redundant matches
+                if ingredient_name in dumb_line:
+                    alternative = False
                     if " and " in dumb_line:
-                        pass
-                        #Special handlign to check for 2 (or more??) ingredients in a line
-                        #loop through 
+                        #Special handling to check for 2 (or more??) ingredients in a line
+                        for ingredient_name_2 in ingredients_list: # searches for the second ingredient in the line
+                            if ingredient_name_2 == ingredient_name:
+                                continue
+                            if ingredient_name_2 in dumb_line:
+                                #ingredients_list.remove(ingredient_name_2)
+                                dumb_line_2 = dumb_line.split(" and ")
+                                line_number -= 5
+                                for line in dumb_line_2: #Figures out which line is which
+                                    if ingredient_name_2 in line:
+                                        recipe_ingredient = RecipeIngredient.parse_dumb_ingredient(recipe=self, ingredient=ingredient,ingredient_dumb=line)
+                                        print(recipe_ingredient)
+                                    else:
+                                        dumb_line = line
+                                    line_number += 10
+                                line_number += -15
+                                break #END SPECIAL "AND" HANDLING
+
                     elif " or " in dumb_line:
-                        #Special handlign to check for 2 (or more??) ingredients in a line
+                        #Special handling to check for 2 ingredients in a line
                         #loop through 
-                        #Add "optional=True" to each instance
-                        pass
-                        #special handling in case of "this or that"
+                        #Add "alternative=True" to each instance
+                        for ingredient_name_2 in ingredients_list:
+                            if ingredient_name_2 == ingredient_name:
+                                continue
+                            if ingredient_name_2 in dumb_line:
+                                #ingredients_list.remove(ingredient_name_2)
+                                dumb_line_2 = dumb_line.split(" or ")
+                                alt_ingred = dumb_line
+                                first_loop = True
+                                for line in dumb_line_2:
+                                    if ingredient_name_2 in line:
+                                        #print("OR " + line)
+                                        alt_ingred = alt_ingred.replace(" or ", " ")
+                                        alt_ingred = alt_ingred.replace(ingredient_name + " ", "")
+                                        ingredient=Ingredient.objects.get(name=ingredient_name_2.strip().capitalize())
+                                        recipe_ingredient = RecipeIngredient.parse_dumb_ingredient(recipe=self, ingredient=ingredient,ingredient_dumb=alt_ingred)
+                                        recipe_ingredient.alternative = first_loop
+                                        alternative = not first_loop
+                                        #add line number incremented in 5
+                                        print(recipe_ingredient)
+                                    else:
+                                        dumb_line = dumb_line.replace(" or ", " ")
+                                        dumb_line = dumb_line.replace(ingredient_name_2 + " ", "")
+                                    first_loop = False
+                                break #END SPECIAL "OR" HANDLING
+
                     #Parse recipe ingredient from line
                     ingredient=Ingredient.objects.get(name=ingredient_name.strip().capitalize())
                     recipe_ingredient = RecipeIngredient.parse_dumb_ingredient(recipe=self, ingredient=ingredient,ingredient_dumb=dumb_line)
+                    recipe_ingredient.alternative = alternative
                     print(recipe_ingredient)
+                    line_number += 10
+                    break
                     #recipe_ingredient.save()
+            
             #ingredient.referenced_by_profile.add(active_user.profile)
             #ingredient.save()
 
@@ -115,16 +154,20 @@ class RecipeIngredient(models.Model):
     local_name = models.CharField(max_length=100)
     position_in_list = models.IntegerField(null=True, blank=True)
     optional = models.BooleanField(default = False)
+    alternative = models.BooleanField(default = False)
     
-    class Meta:
-        unique_together = ('recipe', 'ingredient',)
+    # class Meta:
+    #     unique_together = ('recipe', 'ingredient',)
         
     def __str__(self):
         output = ""
         if self.optional:
             output = "(Optional) "
-        if self.quantity:
-            output += str(self.quantity) + " "
+        if self.alternative:
+            output = "(Alternative) "
+        if self.quantity: #removes unnecessary decimals from float
+            qty =str(self.quantity).rstrip('0').rstrip('.') if '.' in str(self.quantity) else str(self.quantity)
+            output += qty + " "
         if self.measurement_unit:
             output += self.measurement_unit + " "
         output += self.local_name
@@ -154,7 +197,6 @@ class RecipeIngredient(models.Model):
             quantity = float(L[posn])
         
         posn += 1
-        
         #Checks for import error on quantity (99.9% chance this is import error)
         if recipe.from_photo:
             if quantity > 100 and quantity % 10 == 9:
@@ -169,7 +211,7 @@ class RecipeIngredient(models.Model):
                 L[posn] = "o" + L[posn]
         
         units = {"grams","g","tbsp","tablespoon","tsp","teaspoon","kg","l","ml","liters","milliliters","oz", 
-                 "ounce","ounces","lb","pound","pounds","cup","cups",}
+                 "ounce","ounces","lb","pound","pounds","cup","cups","pint","quart","floz"}
         #gets what's left of string after quantity removed
         remaining_string = "".join(L[posn:]).lower().strip()
 

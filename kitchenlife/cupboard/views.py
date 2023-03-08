@@ -48,8 +48,8 @@ def ingredient_detail(request, ingredient_id):
             profile.ingredients_owned.remove(ingredient)
         profile.save()
         owned_by_user = profile.ingredients_owned.filter(id=ingredient.id)
-    response = sendPrompt("Answer yes or no. Is "+ ingredient.name + " a fruit, a vegetable or a meat?", request.user.profile)
-    print(response)
+    #response = sendPrompt("Answer yes or no. Is "+ ingredient.name + " a fruit, a vegetable or a meat?", request.user.profile)
+    #print(response)
     recipes = ingredient.ingredient_uses.filter(owner = request.user)
     context = {'ingredient': ingredient, 'recipes': recipes, 'owned_by_user': owned_by_user, 'form': EmptyForm}
     return render(request, 'cupboard/ingredient_detail.html', context)

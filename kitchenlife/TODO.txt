@@ -8,6 +8,10 @@ Features:
         -Link each line of the ai with a line of the original to make it clearer.
         -Edit recipes page needs to properly link with ingredients
         -(When ingredients are removed they should be unlinked from recipe)
+    -New ingredient handling:
+        -Implement RecipeIngredient Ordering
+        -Implement save RecipeIngredient to recipe
+        -On modify ingredient string, delete all RecipeIngredients and regenerate
         
 -Create cupboards which show which ingredients are stocked
     -New ingredient model variables:
@@ -17,7 +21,6 @@ Features:
     -Info about ingredients (eg seasonality, substitutes, shelf life)
     -Edit ingredient screen
 -Generate recipes based on cupboard contents
-
      
 
 Big things:
