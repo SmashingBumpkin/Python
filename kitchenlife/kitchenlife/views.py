@@ -10,7 +10,8 @@ from recipes.models import Profile
 #     return HttpResponse("Hello, world. You're at the kitchen life homepage")
 
 def index(request):
-    return render(request, 'kitchenlife\index.html')
+    money = round(0.002*request.user.profile.ai_credits_used/1000,2)
+    return render(request, 'kitchenlife\index.html',{'money': money})
 
 def register(request):
     if request.method == "GET":
