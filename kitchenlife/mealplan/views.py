@@ -3,6 +3,8 @@ from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+
+from cupboard.models import Ingredient
 from .models import MealPlan
 from .forms import MealPlanForm, AddItemForm
 from recipes.forms import SearchForm
@@ -68,9 +70,12 @@ def edit_meal_plan(request, id):
                 print("Empty item name")
 
         elif "save_list" in request.POST:
-            ingredients_owned = set(ingredient for recipe in meal_plan.recipes.all() 
-                                    for ingredient in 
-                                    recipe.uses_ingredient.exclude(id__in=meal_plan.ingredients.all()) )
+            ingredients_owned = set()
+            for recipe in meal_plan.recipes.all():
+                recipe_ingredients = recipe.recipe_ingredient.all()
+                ingredients = Ingredient.objects.filter(recipe_ingredient__in=recipe_ingredients)\
+                                                .exclude(id__in=meal_plan.ingredients.all())
+                ingredients_owned.update(ingredients)
             profile = request.user.profile
             profile.ingredients_owned.add(*ingredients_owned)
             profile.save()

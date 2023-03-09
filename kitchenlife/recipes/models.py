@@ -12,7 +12,7 @@ class Recipe(models.Model):
     method = models.TextField(max_length=5000, null = True, blank = True)
     ingredients_string = models.TextField(max_length=1000, null = True, blank = True)#Plain text of ingredients
     simplified_ingredients = models.TextField(max_length=1000, null = True, blank = True)#Ingredients data
-    uses_ingredient = models.ManyToManyField(Ingredient, related_name="ingredient_uses")
+    # uses_ingredient = models.ManyToManyField(Ingredient, related_name="ingredient_uses")
     book = models.CharField(max_length=200, null = True, blank = True)
     page = models.CharField(max_length=5, null = True, blank = True)
     serves = models.CharField(max_length=5, null = True, blank = True)
