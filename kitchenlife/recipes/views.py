@@ -35,21 +35,9 @@ def detail(request, recipe_id):
     recipe = get_object_or_404(Recipe, pk=recipe_id)
     if recipe.owner != request.user:
         return redirect('recipes:index')
+    # recipe.simplified_to_ingredients(request.user)
     method_as_list = recipe.method_as_list()
-    recipe.simplified_to_ingredients(request.user)
-    try:
-        dumb_ingredients = recipe.ingredients_string.split('\n')
-        ingredients = list(recipe.uses_ingredient.all())
-        combined_ingredients = []
-        for dumb_ingredient in dumb_ingredients:
-            for ingredient in ingredients:
-                if ingredient.name.lower() in dumb_ingredient.lower():
-                    combined_ingredients.append((dumb_ingredient, ingredient))
-                    break
-    except:
-        combined_ingredients = None
-    #print(recipe.ingredients_string)
-    context = {'recipe': recipe, 'method_as_list': method_as_list, 'combined_ingredients': combined_ingredients}
+    context = {'recipe': recipe, 'method_as_list': method_as_list}
     return render(request, 'recipes/detail.html', context)
 
 
@@ -59,7 +47,6 @@ def upload_file(request):
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
             img = Image.open(request.FILES['img'])
-            #text = new_recipe_processing.image_to_string(img, active_user = request.user.profile)
             recipe = new_recipe_processing.image_to_recipe(img, user = request.user)
             recipe.save()
             # recipe.from_photo = True
@@ -98,6 +85,7 @@ def edit_recipe(request, recipe_id):
             old_ingred_str = recipe.simplified_ingredients
             form.save()
             if old_ingred_str != new_ingr_str: 
+                recipe.recipe_ingredient.all().delete()
                 recipe.simplify_ingredients(request.user)
                 recipe.save()
             return redirect('recipes:edit_ingredients', recipe_id=recipe.id)

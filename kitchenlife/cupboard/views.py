@@ -5,6 +5,7 @@ from django.urls import reverse
 
 from cupboard.forms import EmptyForm
 from kitchenlife.openai_link import sendPrompt
+from recipes.models import Recipe
 from .models import Ingredient
 from recipes.forms import SearchForm
 
@@ -50,7 +51,7 @@ def ingredient_detail(request, ingredient_id):
         owned_by_user = profile.ingredients_owned.filter(id=ingredient.id)
     #response = sendPrompt("Answer yes or no. Is "+ ingredient.name + " a fruit, a vegetable or a meat?", request.user.profile)
     #print(response)
-    recipes = ingredient.ingredient_uses.filter(owner = request.user)
+    recipes = set(Recipe.objects.filter(recipe_ingredient__ingredient__name=ingredient.name, owner = request.user))
     context = {'ingredient': ingredient, 'recipes': recipes, 'owned_by_user': owned_by_user, 'form': EmptyForm}
     return render(request, 'cupboard/ingredient_detail.html', context)
 

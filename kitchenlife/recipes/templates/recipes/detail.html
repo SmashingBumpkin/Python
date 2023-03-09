@@ -25,13 +25,13 @@ Page: {{ recipe.page }}
             {% endif %}
         </div>
         <div class="column">
-            {% if recipe.uses_ingredient.all %}
-    {% for combined_ingredient in combined_ingredients %}
-    <p><a href="{% url 'cupboard:ingredient_detail' combined_ingredient.1.id %}">{{ combined_ingredient.0 }}</a><br></p>
-    {% endfor %}
-{% else %}
-    <p>This recipe isn't properly linked with it's ingredients.</p>
-{% endif %}
+            {% if recipe.recipe_ingredient.all %}
+            {% for recipe_ingredient in recipe.recipe_ingredient.all|dictsort:'position_in_list' %}
+<p><a href="{% url 'cupboard:ingredient_detail' recipe_ingredient.ingredient.id %}">{{ recipe_ingredient }}</a><br></p>
+            {% endfor %}
+        {% else %}
+            <p>This recipe isn't properly linked with its ingredients.</p>
+        {% endif %}
             <!-- <pre>
 {{recipe.ingredients_string}}</pre> -->
         </div>

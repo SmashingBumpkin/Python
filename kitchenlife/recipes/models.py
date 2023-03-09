@@ -45,8 +45,9 @@ class Recipe(models.Model):
 
     def simplified_to_ingredients(self, active_user):
         #Function that generates a the RecipeIngredients that link this recipe to the ingredients
+        self.recipe_ingredient.all().delete()
         ingredients_list = list(resplit("\n|,", self.simplified_ingredients))
-        print(ingredients_list)
+        #print(ingredients_list)
         dumb_ingredients_list = self.ingredients_string.lower().split('\n')
         #TODO:
         #If the number of dumb ingredient lines matches the number of simplified ingredients:
@@ -72,7 +73,8 @@ class Recipe(models.Model):
             for ingredient_name in ingredients_list:
                 if ingredient_name in dumb_line:
                     alternative = False #Used for when an alternative ingredient is suggested
-
+                    ingredients_list.remove(ingredient_name)
+                    ingredients_list.append(ingredient_name)
                     if " and " in dumb_line:
                         #Special handling to check for 2 (or more??) ingredients in a line
                         for ingredient_name_2 in ingredients_list: # searches for the second ingredient in the line
@@ -84,10 +86,10 @@ class Recipe(models.Model):
                                 line_number -= 3
                                 for line in dumb_line_2: #Figures out which line is which
                                     if ingredient_name_2 in line:
+                                        ingredient=Ingredient.objects.get(name=ingredient_name_2.strip().capitalize())
                                         recipe_ingredient = RecipeIngredient.parse_dumb_ingredient(recipe=self, ingredient=ingredient,ingredient_dumb=line)
                                         recipe_ingredient.position_in_list = line_number
-                                        #recipe_ingredient.save()
-                                        print(line_number, recipe_ingredient)
+                                        recipe_ingredient.save()
                                     else:
                                         dumb_line = line
                                     line_number += 6
@@ -109,16 +111,17 @@ class Recipe(models.Model):
                                         #print("OR " + line)
                                         alt_ingred = alt_ingred.replace(" or ", " ")
                                         alt_ingred = alt_ingred.replace(ingredient_name + " ", "")
+                                        alt_ingred = alt_ingred.replace(" " + ingredient_name, "")
                                         ingredient=Ingredient.objects.get(name=ingredient_name_2.strip().capitalize())
                                         recipe_ingredient = RecipeIngredient.parse_dumb_ingredient(recipe=self, ingredient=ingredient,ingredient_dumb=alt_ingred)
                                         recipe_ingredient.alternative = not first_loop
                                         recipe_ingredient.position_in_list = line_number
-                                        #recipe_ingredient.save()
-                                        print(line_number, recipe_ingredient)
+                                        recipe_ingredient.save()
                                         alternative = first_loop
                                     else:
                                         dumb_line = dumb_line.replace(" or ", " ")
                                         dumb_line = dumb_line.replace(ingredient_name_2 + " ", "")
+                                        dumb_line = dumb_line.replace(" " + ingredient_name_2, "")
                                     first_loop = False
                                     line_number += 6
                                 line_number -= 9
@@ -130,8 +133,7 @@ class Recipe(models.Model):
                     recipe_ingredient = RecipeIngredient.parse_dumb_ingredient(recipe=self, ingredient=ingredient,ingredient_dumb=dumb_line)
                     recipe_ingredient.alternative = alternative
                     recipe_ingredient.position_in_list = line_number
-                    print(line_number, recipe_ingredient)
-                    #recipe_ingredient.save()
+                    recipe_ingredient.save()
                     line_number += 10
                     break
             
@@ -163,9 +165,6 @@ class RecipeIngredient(models.Model):
     optional = models.BooleanField(default = False)
     alternative = models.BooleanField(default = False)
     
-    # class Meta:
-    #     unique_together = ('recipe', 'ingredient',)
-        
     def __str__(self):
         output = ""
         if self.optional:
@@ -176,9 +175,10 @@ class RecipeIngredient(models.Model):
             qty =str(self.quantity).rstrip('0').rstrip('.') if '.' in str(self.quantity) else str(self.quantity)
             output += qty + " "
         if self.measurement_unit:
+            output = output[:-1]
             output += self.measurement_unit + " "
         output += self.local_name
-        return output
+        return output.capitalize()
 
 
     def parse_dumb_ingredient(recipe, ingredient, ingredient_dumb,):
