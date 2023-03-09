@@ -5,11 +5,18 @@
   <form method="post">
     {% csrf_token %}
     <ul>
-    {% for ingredient in ingredients %}
+    <!-- {% for ingredient in ingredients %}
       <li>
         <input type="checkbox" id="ingredient-{{ forloop.counter }}" name="ingredients" value="{{ ingredient.1.id }}"
         {% if ingredient.1 in selected_ingredients %}checked{% endif %}>
         <label for="ingredient-{{ forloop.counter }}"> {{ ingredient.2 }} - {{ ingredient.1 }} ({{ ingredient.0}}) </label>
+      </li>
+    {% endfor %} -->
+    {% for ingredient in ingredient_list %}
+      <li>
+        <input type="checkbox" id="ingredient-{{ forloop.counter }}" name="ingredients" value="{{ ingredient.ingredient.id }}"
+        {% if ingredient.ingredient in selected_ingredients %}checked{% endif %}>
+        <label for="ingredient-{{ forloop.counter }}"> {{ ingredient.recipe }} - {{ ingredient }} </label>
       </li>
     {% endfor %}
     {% for misc_item in misc_items %}

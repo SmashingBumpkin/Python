@@ -77,20 +77,17 @@ def edit_meal_plan(request, id):
             return redirect('mealplan:meal_plan_detail', meal_plan_id=id)
     
     selected_ingredients = set(meal_plan.ingredients.all())
-    combined_ingredients = []
+    
+    ingredient_list = []
     for recipe in meal_plan.recipes.all():
-        dumb_ingredients = recipe.ingredients_string.split('\n')
-        ingredients = list(recipe.uses_ingredient.all())
-        for dumb_ingredient in dumb_ingredients:
-            for ingredient in ingredients:
-                if ingredient.name.lower() in dumb_ingredient.lower():
-                    combined_ingredients.append((dumb_ingredient, ingredient, recipe))
+        for recipe_ingredient in recipe.recipe_ingredient.all().order_by("position_in_list"):
+            ingredient_list.append(recipe_ingredient)
 
     context = {
         'meal_plan': meal_plan,
-        'ingredients': combined_ingredients,
         'selected_ingredients': selected_ingredients,
         'misc_items': set(meal_plan.misc_item.all()),
         'form': AddItemForm(),
+        'ingredient_list':ingredient_list,
     }
     return render(request, 'mealplan/edit_meal_plan.html', context)

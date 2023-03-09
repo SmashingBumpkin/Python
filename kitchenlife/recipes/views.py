@@ -49,9 +49,6 @@ def upload_file(request):
             img = Image.open(request.FILES['img'])
             recipe = new_recipe_processing.image_to_recipe(img, user = request.user)
             recipe.save()
-            # recipe.from_photo = True
-            # recipe.owner = request.user
-            # recipe.save()
             return redirect('recipes:edit_recipe', recipe_id = recipe.id)
 
     form = UploadFileForm()
