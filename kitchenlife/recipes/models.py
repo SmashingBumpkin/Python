@@ -65,12 +65,14 @@ class Recipe(models.Model):
             except:
                 ingredient = Ingredient(name = ingredients_list[i].capitalize())
                 ingredient.save()
+        
         #ingredients_list = set(ingredients_list)
         line_number = 10 # line number 
         for dumb_line in dumb_ingredients_list:
             for ingredient_name in ingredients_list:
                 if ingredient_name in dumb_line:
-                    alternative = False
+                    alternative = False #Used for when an alternative ingredient is suggested
+
                     if " and " in dumb_line:
                         #Special handling to check for 2 (or more??) ingredients in a line
                         for ingredient_name_2 in ingredients_list: # searches for the second ingredient in the line
@@ -79,26 +81,26 @@ class Recipe(models.Model):
                             if ingredient_name_2 in dumb_line:
                                 #ingredients_list.remove(ingredient_name_2)
                                 dumb_line_2 = dumb_line.split(" and ")
-                                line_number -= 5
+                                line_number -= 3
                                 for line in dumb_line_2: #Figures out which line is which
                                     if ingredient_name_2 in line:
                                         recipe_ingredient = RecipeIngredient.parse_dumb_ingredient(recipe=self, ingredient=ingredient,ingredient_dumb=line)
-                                        print(recipe_ingredient)
+                                        recipe_ingredient.position_in_list = line_number
+                                        #recipe_ingredient.save()
+                                        print(line_number, recipe_ingredient)
                                     else:
                                         dumb_line = line
-                                    line_number += 10
-                                line_number += -15
+                                    line_number += 6
+                                line_number -= 9
                                 break #END SPECIAL "AND" HANDLING
 
                     elif " or " in dumb_line:
                         #Special handling to check for 2 ingredients in a line
-                        #loop through 
-                        #Add "alternative=True" to each instance
                         for ingredient_name_2 in ingredients_list:
                             if ingredient_name_2 == ingredient_name:
                                 continue
                             if ingredient_name_2 in dumb_line:
-                                #ingredients_list.remove(ingredient_name_2)
+                                line_number -= 3
                                 dumb_line_2 = dumb_line.split(" or ")
                                 alt_ingred = dumb_line
                                 first_loop = True
@@ -109,24 +111,29 @@ class Recipe(models.Model):
                                         alt_ingred = alt_ingred.replace(ingredient_name + " ", "")
                                         ingredient=Ingredient.objects.get(name=ingredient_name_2.strip().capitalize())
                                         recipe_ingredient = RecipeIngredient.parse_dumb_ingredient(recipe=self, ingredient=ingredient,ingredient_dumb=alt_ingred)
-                                        recipe_ingredient.alternative = first_loop
-                                        alternative = not first_loop
-                                        #add line number incremented in 5
-                                        print(recipe_ingredient)
+                                        recipe_ingredient.alternative = not first_loop
+                                        recipe_ingredient.position_in_list = line_number
+                                        #recipe_ingredient.save()
+                                        print(line_number, recipe_ingredient)
+                                        alternative = first_loop
                                     else:
                                         dumb_line = dumb_line.replace(" or ", " ")
                                         dumb_line = dumb_line.replace(ingredient_name_2 + " ", "")
                                     first_loop = False
-                                break #END SPECIAL "OR" HANDLING
+                                    line_number += 6
+                                line_number -= 9
+                                break 
+                        #END SPECIAL "OR" HANDLING
 
                     #Parse recipe ingredient from line
                     ingredient=Ingredient.objects.get(name=ingredient_name.strip().capitalize())
                     recipe_ingredient = RecipeIngredient.parse_dumb_ingredient(recipe=self, ingredient=ingredient,ingredient_dumb=dumb_line)
                     recipe_ingredient.alternative = alternative
-                    print(recipe_ingredient)
+                    recipe_ingredient.position_in_list = line_number
+                    print(line_number, recipe_ingredient)
+                    #recipe_ingredient.save()
                     line_number += 10
                     break
-                    #recipe_ingredient.save()
             
             #ingredient.referenced_by_profile.add(active_user.profile)
             #ingredient.save()
