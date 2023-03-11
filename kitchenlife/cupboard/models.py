@@ -50,7 +50,11 @@ class Ingredient(models.Model):
                     if decimal_point_count > 1:
                         return None
                     result += char
+                elif result != '':
+                    print("number extracter returns: "+result)
+                    break
             if result:
+                print(result)
                 return float(result)
             else:
                 return 0
@@ -111,23 +115,3 @@ class Ingredient(models.Model):
                 number = extract_number(detail_lower)
                 self.fibre = number
         self.save()
-        
-
-        def extract_number(string):
-            """
-            This function takes a string as input and returns a number contained within the string, if it exists.
-            The number can be an integer or a float.
-            """
-            result = ''
-            decimal_point_count = 0
-            for char in string:
-                if char.isdigit() or char == '.':
-                    if char == '.':
-                        decimal_point_count += 1
-                    if decimal_point_count > 1:
-                        return None
-                    result += char
-            if result:
-                return float(result)
-            else:
-                return 0

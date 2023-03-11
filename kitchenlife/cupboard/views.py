@@ -3,7 +3,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 
 from cupboard.forms import EmptyForm
-from kitchenlife.openai_link import sendPrompt, sendPromptForgottenDetails, sendPromptIngredientDetails
+from kitchenlife.openai_link import sendPrompt, sendPromptForgottenDetails, sendPromptIngredientDetails, sendPromptTypicalShelfLife, sendPromptTypicalWeight
 from recipes.models import Recipe
 from .models import Ingredient
 from recipes.forms import SearchForm
@@ -20,14 +20,13 @@ def ingredients_index(request):
         form = SearchForm()
         ingredient_list = profile.ingredients_referenced.filter().order_by("name")
 
-    ingredients = Ingredient.objects.filter()
+    # ingredients = Ingredient.objects.filter().order_by("name")
     # for ingred in ingredients:
-    #     jeff = sendPromptForgottenDetails(ingred.name, request.user)
-    #     ingred.category = jeff.strip()
-    #     ingred.save()
-    categories = list(set(ingredient.category for ingredient in ingredients))
-    for cat in categories:
-        print(cat)
+        # if ingred.name[0].lower() == "s": 
+        #     if ingred.name[1] > "a": 
+                # jeff = sendPromptTypicalShelfLife(ingred.name, request.user)
+                # ingred.shelf_life = extract_number(jeff.strip())
+                # ingred.save()
     context = {'ingredient_list': ingredient_list, 'form': form}
     return render(request, 'cupboard/ingredients_index.html', context)
 
@@ -48,7 +47,9 @@ def cupboard_index(request):
 @login_required
 def ingredient_detail(request, ingredient_id):
     ingredient = get_object_or_404(Ingredient, pk=ingredient_id)
-    ingredient.print_variables()
+    # ingredient.print_variables()
+    # ingredient.ai_response_parser(sendPromptIngredientDetails(ingredient.name, request.user))
+    #ingredient.print_variables()
     profile = request.user.profile
     owned_by_user = profile.ingredients_owned.filter(id=ingredient.id)
     if request.method == 'POST':

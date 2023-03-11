@@ -12,10 +12,10 @@ class Recipe(models.Model):
     method = models.TextField(max_length=5000, null = True, blank = True)
     ingredients_string = models.TextField(max_length=1000, null = True, blank = True)#Plain text of ingredients
     simplified_ingredients = models.TextField(max_length=1000, null = True, blank = True)#Ingredients data
-    # uses_ingredient = models.ManyToManyField(Ingredient, related_name="ingredient_uses")
     book = models.CharField(max_length=200, null = True, blank = True)
     page = models.CharField(max_length=5, null = True, blank = True)
     serves = models.CharField(max_length=5, null = True, blank = True)
+    serves_int = models.IntegerField(null = True, blank = True)
     description = models.TextField(max_length=500, null = True, blank = True)
     url = models.URLField(null = True, blank = True)
     jumbled_input = models.TextField(max_length=8000, null = True, blank = True)
@@ -25,8 +25,6 @@ class Recipe(models.Model):
     def __str__(self):
         return self.name
     
-    
-            
     def return_dict(self):
         return {
                         'name': self.name,
@@ -153,9 +151,6 @@ class Recipe(models.Model):
         return method_as_list
     
     
-    def caps_remover(self):
-        #TODO: makea function to reformat stuff to not be all caps
-        pass
     #TODO: Implement a function to rate recipes
 
 class RecipeIngredient(models.Model):
@@ -175,7 +170,24 @@ class RecipeIngredient(models.Model):
         if self.alternative:
             output = "(Alternative) "
         if self.quantity: #removes unnecessary decimals from float
-            qty =str(self.quantity).rstrip('0').rstrip('.') if '.' in str(self.quantity) else str(self.quantity)
+            qty = str(self.quantity)
+            qty =qty.rstrip('0').rstrip('.') if '.' in qty else qty
+            output += qty + " "
+        if self.measurement_unit:
+            output = output[:-1]
+            output += self.measurement_unit + " "
+        output += self.local_name
+        return output.capitalize()
+    
+    def scaled_string(self, scale):
+        output = ""
+        if self.optional:
+            output = "(Optional) "
+        if self.alternative:
+            output = "(Alternative) "
+        if self.quantity: #removes unnecessary decimals from float
+            scaled_qty = str(round(self.quantity*scale, 2))
+            qty = scaled_qty.rstrip('0').rstrip('.') if '.' in scaled_qty else scaled_qty
             output += qty + " "
         if self.measurement_unit:
             output = output[:-1]

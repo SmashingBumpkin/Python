@@ -99,8 +99,10 @@ def sendPromptIngredientDetails(ingredient, user):
       model="gpt-3.5-turbo",
       messages=[
         {"role": "user", "content": """Provide details of a typical example of this ingredient: Onion
-Provide details under the headings: substitutes, long life, typical shelf life (days),
-Category, typical weight, Nutritional information per 100g/ml (Calories, Carbohydrates, Sugar, Fat, Protein, Fibre)"""},
+Provide details under the headings: substitutes, long life, typical shelf life (this should be how 
+long the item can be expected to last if stored appropriately at home), Category, typical weight 
+(this should be the typical weight of an individual unit of the item, if not applicable, return 0),
+Nutritional information per 100g/ml (Calories, Carbohydrates, Sugar, Fat, Protein, Fibre)"""},
         {"role": "assistant", "content": """Substitutes: Shallots, red onion, leek, garlic, spring onion
 Long life: No
 Typical shelf life: 10
@@ -114,8 +116,8 @@ Fat: 0.1g
 Protein: 1.1g
 Fibre: 1.7g"""},
         {"role": "user", "content": """Provide details of a typical example of this ingredient: Milk
-Provide details under the headings: substitutes, long life, typical shelf life (days),
-Category, typical weight, Nutritional information per 100g/ml (Calories, Carbohydrates, Sugar, Fat, Protein, Fibre)"""},
+Provide details under the headings: substitutes, long life, typical shelf life, Category, 
+typical weight, Nutritional information per 100g/ml (Calories, Carbohydrates, Sugar, Fat, Protein, Fibre)"""},
         {"role": "assistant", "content": """Substitutes: Water, cream, butter
 Long life: No
 Typical shelf life: 7
@@ -154,6 +156,57 @@ def sendPromptForgottenDetails(ingredient, user):
         {"role": "user", "content": """Categorize this ingredient into a typical food category: Cumin"""},
         {"role": "assistant", "content": """Spice"""},
         {"role": "user", "content": "Categorize this ingredient into a typical food category: "+ingredient}
+    ]
+    )
+    user.profile.ai_credits_used += response["usage"]["total_tokens"]
+    user.profile.save()
+    print(ingredient.capitalize() + "\n\n")
+    print(response["choices"][0]["message"]["content"])
+    return response["choices"][0]["message"]["content"]
+
+def sendPromptTypicalWeight(ingredient, user):
+    #https://platform.openai.com/docs/guides/chat
+    #cont = input("\n____\n\n\nPlease type 1 to continue ingredient detailer (will spend openai credits) ")
+    # if cont != "1":
+    #     print("\nYou have terminated the program, cheapskate.\n")
+    #     sysexit()
+    openai.api_key = "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"
+    response = openai.ChatCompletion.create(
+      model="gpt-3.5-turbo",
+      messages=[
+        {"role": "user", "content": """Provide a typical weight in grams of an individual unit of garlic"""},
+        {"role": "assistant", "content": """3"""},
+        {"role": "user", "content": """Provide a typical weight in grams of an individual unit of apple"""},
+        {"role": "assistant", "content": """120"""},
+        {"role": "user", "content": """Provide a typical weight in grams of an individual unit of flour"""},
+        {"role": "assistant", "content": """0"""},
+        {"role": "user", "content": "Provide a typical weight in grams of an individual unit of "+ingredient
+         + "\nIf this doesn't apply to the ingredient in question, reply with 0"}
+    ]
+    )
+    user.profile.ai_credits_used += response["usage"]["total_tokens"]
+    user.profile.save()
+    print(ingredient.capitalize() + "\n\n")
+    print(response["choices"][0]["message"]["content"])
+    return response["choices"][0]["message"]["content"]
+
+def sendPromptTypicalShelfLife(ingredient, user):
+    #https://platform.openai.com/docs/guides/chat
+    #cont = input("\n____\n\n\nPlease type 1 to continue ingredient detailer (will spend openai credits) ")
+    # if cont != "1":
+    #     print("\nYou have terminated the program, cheapskate.\n")
+    #     sysexit()
+    openai.api_key = "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"
+    response = openai.ChatCompletion.create(
+      model="gpt-3.5-turbo",
+      messages=[
+        {"role": "user", "content": """Provide the typical shelflife in days of garlic"""},
+        {"role": "assistant", "content": """12"""},
+        {"role": "user", "content": """Provide the typical shelflife in days of apple"""},
+        {"role": "assistant", "content": """8"""},
+        {"role": "user", "content": """Provide the typical shelflife in days of flour"""},
+        {"role": "assistant", "content": """365"""},
+        {"role": "user", "content": "Provide the typical shelflife in days of "+ingredient}
     ]
     )
     user.profile.ai_credits_used += response["usage"]["total_tokens"]
