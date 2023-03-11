@@ -8,6 +8,9 @@ class UploadFileForm(forms.Form):
 class SearchForm(forms.Form):
     search_term = forms.CharField(max_length=50)
 
+class QuantityForm(forms.Form):
+    quantity = forms.IntegerField()
+
 class EditIngredientsForm(forms.ModelForm):
     class Meta:
         model = Recipe

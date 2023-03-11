@@ -62,11 +62,13 @@
                         <ul>
                             <a href="{% url 'cupboard:cupboard_index' %}" class="{% is_active request 'cupboard:cupboard_index' %}">In stock</a>
                             <a href="{% url 'cupboard:edit_cupboard' %}" class="{% is_active request 'cupboard:edit_cupboard' %}">Edit cupboard</a>
+                            <a href="{% url 'cupboard:edit_cupboard' %}" class="{% is_active request 'cupboard:edit_cupboard' %}">Update cupboard from receipt</a>
                         </ul>
                         <a href="{% url 'mealplan:meal_plan_index' %}" class="{% is_active request 'mealplan:meal_plan_index' %}">Meal plan</a>
                         <ul>
                             <a href="{% url 'mealplan:add_meal_plan' %}" class="{% is_active request 'mealplan:add_meal_plan' %}">Create meal plan</a>
-                        </ul>                  
+                        </ul>
+                        <a href="{% url 'mealplan:add_meal_plan' %}" class="{% is_active request 'mealplan:add_meal_plan' %}">About KitchenLife</a>
                     </li>
                   </ul>     
                 </aside>

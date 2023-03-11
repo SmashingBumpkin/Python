@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load custom_filters %}
 {% block content %}
 <section class="section">
     <h1 class="title">{{ recipe.name }}</h1>
@@ -7,27 +8,25 @@
             <h2 class="subtitle">
                 {{ recipe.description }}
             </h2>
-            {% if recipe.serves %}
-                <p>
-Serves: {{ recipe.serves }}
-                </p>
+            {% if recipe.serves_int %}
+                <p>Serves: {{ recipe.serves_int }}</p>
+                <form method="post">
+                    {% csrf_token %}
+                     {{ form.as_p }}
+                    <button type="submit">Show recipe for x people</button>
+                </form>
             {% endif %}
             {% if recipe.book %}
-                <p>
-Book: {{ recipe.book }} <br>
-Page: {{ recipe.page }}
-                </p>
+                <p>Book: {{ recipe.book }} <br>Page: {{ recipe.page }}</p>
             {% endif %}
             {% if recipe.url %}
-                <p>
-<a href={{recipe.url}}>Click here to go to website</a>
-                </p>
+                <p><a href={{recipe.url}}>Click here to go to website</a></p>
             {% endif %}
         </div>
         <div class="column">
             {% if recipe.recipe_ingredient.all %}
             {% for recipe_ingredient in recipe.recipe_ingredient.all|dictsort:'position_in_list' %}
-<p><a href="{% url 'cupboard:ingredient_detail' recipe_ingredient.ingredient.id %}">{{ recipe_ingredient }}</a><br></p>
+            <p><a href="{% url 'cupboard:ingredient_detail' recipe_ingredient.ingredient.id %}">{{ recipe_ingredient|scaled_string_with_arg:scale    }}</a><br></p>
             {% endfor %}
         {% else %}
             <p>This recipe isn't properly linked with its ingredients.</p>

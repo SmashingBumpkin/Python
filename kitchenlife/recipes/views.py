@@ -9,7 +9,7 @@ from re import findall as refindall
 
 from kitchenlife.openai_link import sendPrompt, sendPromptIngredients
 from .models import Recipe, RecipeIngredient
-from .forms import UploadFileForm, EditRecipeForm, SearchForm, UploadURLForm, EditIngredientsForm
+from .forms import QuantityForm, UploadFileForm, EditRecipeForm, SearchForm, UploadURLForm, EditIngredientsForm
 from PIL import Image
 from . import new_recipe_processing
 
@@ -36,8 +36,15 @@ def detail(request, recipe_id):
     if recipe.owner != request.user:
         return redirect('recipes:index')
     # recipe.simplified_to_ingredients(request.user)
+    if request.method == 'POST':
+        form = form = QuantityForm(request.POST)
+        if form.is_valid():
+            scale = int(form.cleaned_data['quantity'])/recipe.serves_int
+    else:
+        form = QuantityForm()
+        scale = 1
     method_as_list = recipe.method_as_list()
-    context = {'recipe': recipe, 'method_as_list': method_as_list}
+    context = {'recipe': recipe, 'method_as_list': method_as_list, 'scale': scale, 'form': form}
     return render(request, 'recipes/detail.html', context)
 
 
