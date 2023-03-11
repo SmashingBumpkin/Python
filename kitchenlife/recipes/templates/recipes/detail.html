@@ -5,22 +5,20 @@
     <h1 class="title">{{ recipe.name }}</h1>
     <div class="columns">
         <div class="column is-one-third">
-            <h2 class="subtitle">
-                {{ recipe.description }}
-            </h2>
+            <h2 class="subtitle">{{ recipe.description }}</h2>
             {% if recipe.serves_int %}
                 <p>Serves: {{ recipe.serves_int }}</p>
                 <form method="post">
                     {% csrf_token %}
-                     {{ form.as_p }}
-                    <button type="submit">Show recipe for x people</button>
+                    {{ form.as_p }}
+                    <button type="submit">Show recipe for X servings</button>
                 </form>
             {% endif %}
             {% if recipe.book %}
                 <p>Book: {{ recipe.book }} <br>Page: {{ recipe.page }}</p>
             {% endif %}
             {% if recipe.url %}
-                <p><a href={{recipe.url}}>Click here to go to website</a></p>
+                <p><a href={{recipe.url}} target="_blank">Click here to go to website</a></p>
             {% endif %}
         </div>
         <div class="column">
@@ -31,8 +29,6 @@
         {% else %}
             <p>This recipe isn't properly linked with its ingredients.</p>
         {% endif %}
-            <!-- <pre>
-{{recipe.ingredients_string}}</pre> -->
         </div>
       </div>
     
@@ -40,7 +36,7 @@
 
 
     {% for step in method_as_list %}
-    <p> {{ step }} <br><br></p>
+    <p>{{ step }}<br><br></p>
     {% endfor %}
     <ul><a href="{% url 'recipes:edit_recipe' recipe.id %}">Edit recipe</a></ul>
     <ul><a href="{% url 'recipes:delete_recipe' recipe.id %}">Delete recipe</a></ul>

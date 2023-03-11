@@ -39,7 +39,7 @@ def detail(request, recipe_id):
     if request.method == 'POST':
         form = form = QuantityForm(request.POST)
         if form.is_valid():
-            scale = int(form.cleaned_data['quantity'])/recipe.serves_int
+            scale = int(form.cleaned_data['serving'])/recipe.serves_int
     else:
         form = QuantityForm()
         scale = 1
@@ -87,12 +87,10 @@ def edit_recipe(request, recipe_id):
         form = EditRecipeForm(request.POST, instance= recipe)
         if form.is_valid():
             new_ingred_str = form.cleaned_data['ingredients_string'].strip()
-            print("old:\n\n" + old_ingred_str)
-            print("new:\n\n" + new_ingred_str)
             form.save()
-            print("test1")
-            if old_ingred_str != new_ingred_str: 
-                print("test2")
+            recipe.serves_to_int()
+            recipe.save()
+            if old_ingred_str != new_ingred_str:
                 #recipe.recipe_ingredient.all().delete()
                 recipe.simplify_ingredients(request.user)
                 recipe.save()

@@ -140,6 +140,20 @@ class Recipe(models.Model):
             
             #ingredient.referenced_by_profile.add(active_user.profile)
             #ingredient.save()
+    
+    def serves_to_int(self):
+        """
+        This function takes a string as input and returns a number contained within the string, if it exists.
+        The number can be an integer or a float.
+        """
+        result = ''
+        for char in self.serves:
+            if char.isdigit():
+                result += char
+            elif result != '':
+                break
+        if result:
+            self.serves_int = int(result)
 
     def method_as_list(self):
         try:
