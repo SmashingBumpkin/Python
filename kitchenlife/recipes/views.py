@@ -79,10 +79,10 @@ def edit_recipe(request, recipe_id):
         form = EditRecipeForm(request.POST, instance= recipe)
         if form.is_valid():
             new_ingr_str = form.cleaned_data['ingredients_string'].strip()
-            old_ingred_str = recipe.simplified_ingredients
+            old_ingred_str = recipe.ingredients_string
             form.save()
             if old_ingred_str != new_ingr_str: 
-                recipe.recipe_ingredient.all().delete()
+                #recipe.recipe_ingredient.all().delete()
                 recipe.simplify_ingredients(request.user)
                 recipe.save()
             return redirect('recipes:edit_ingredients', recipe_id=recipe.id)
@@ -97,9 +97,12 @@ def edit_ingredients(request, recipe_id):
     if request.method == 'POST':
         form = EditIngredientsForm(request.POST, instance=recipe)
         if form.is_valid():
+            new_ingr_str = form.cleaned_data['simplified_ingredients'].strip()
+            old_ingred_str = recipe.simplified_ingredients
             form.save()
-            recipe.simplified_to_ingredients(request.user)
-            recipe.save()
+            if old_ingred_str != new_ingr_str: 
+                recipe.simplified_to_ingredients(request.user)
+                recipe.save()
             return redirect('recipes:detail', recipe_id=recipe.id)
     else:
         form = EditIngredientsForm(instance=recipe)

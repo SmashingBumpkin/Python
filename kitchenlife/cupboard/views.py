@@ -1,10 +1,9 @@
-from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 
 from cupboard.forms import EmptyForm
-from kitchenlife.openai_link import sendPrompt
+from kitchenlife.openai_link import sendPrompt, sendPromptForgottenDetails, sendPromptIngredientDetails
 from recipes.models import Recipe
 from .models import Ingredient
 from recipes.forms import SearchForm
@@ -20,6 +19,15 @@ def ingredients_index(request):
     else:
         form = SearchForm()
         ingredient_list = profile.ingredients_referenced.filter().order_by("name")
+
+    ingredients = Ingredient.objects.filter()
+    # for ingred in ingredients:
+    #     jeff = sendPromptForgottenDetails(ingred.name, request.user)
+    #     ingred.category = jeff.strip()
+    #     ingred.save()
+    categories = list(set(ingredient.category for ingredient in ingredients))
+    for cat in categories:
+        print(cat)
     context = {'ingredient_list': ingredient_list, 'form': form}
     return render(request, 'cupboard/ingredients_index.html', context)
 
@@ -40,6 +48,7 @@ def cupboard_index(request):
 @login_required
 def ingredient_detail(request, ingredient_id):
     ingredient = get_object_or_404(Ingredient, pk=ingredient_id)
+    ingredient.print_variables()
     profile = request.user.profile
     owned_by_user = profile.ingredients_owned.filter(id=ingredient.id)
     if request.method == 'POST':
@@ -49,8 +58,6 @@ def ingredient_detail(request, ingredient_id):
             profile.ingredients_owned.remove(ingredient)
         profile.save()
         owned_by_user = profile.ingredients_owned.filter(id=ingredient.id)
-    #response = sendPrompt("Answer yes or no. Is "+ ingredient.name + " a fruit, a vegetable or a meat?", request.user.profile)
-    #print(response)
     recipes = set(Recipe.objects.filter(recipe_ingredient__ingredient__name=ingredient.name, owner = request.user))
     context = {'ingredient': ingredient, 'recipes': recipes, 'owned_by_user': owned_by_user, 'form': EmptyForm}
     return render(request, 'cupboard/ingredient_detail.html', context)

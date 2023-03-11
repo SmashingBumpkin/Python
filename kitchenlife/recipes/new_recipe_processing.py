@@ -19,12 +19,6 @@ def url_to_recipe(url, owner):
         name = "Enter details manually"
         return Recipe(name = name, owner = owner)
 
-# def image_to_string(img, active_user):
-#     text = pytesseract.image_to_string(img)
-#     print(text)
-#     return openai_link.sendPromptJumbled(text, active_user)
-    
-
 def image_to_recipe(img, user):
         #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         #

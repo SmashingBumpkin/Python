@@ -44,6 +44,7 @@ class Recipe(models.Model):
         self.simplified_ingredients = openai_link.sendPromptIngredients(self.ingredients_string, active_user = active_user.profile)
 
     def simplified_to_ingredients(self, active_user):
+        print("UPDATING INGREDIENTS LINK")
         #Function that generates a the RecipeIngredients that link this recipe to the ingredients
         self.recipe_ingredient.all().delete()
         ingredients_list = list(resplit("\n|,", self.simplified_ingredients))
@@ -66,6 +67,8 @@ class Recipe(models.Model):
             except:
                 ingredient = Ingredient(name = ingredients_list[i].capitalize())
                 ingredient.save()
+                response = openai_link.sendPromptIngredientDetails(ingredient.name, active_user)
+                ingredient.ai_response_parser(response)
         
         #ingredients_list = set(ingredients_list)
         line_number = 10 # line number 
@@ -189,7 +192,7 @@ class RecipeIngredient(models.Model):
         
         #gets posn of first int
         posn = next((i for i, x in enumerate(L) if x.isdigit()), None)
-        #tried to parse quantity
+        #tries to parse quantity
         if posn+2 < len(L) and (L[posn+1] in {".",","}):
             quantity = float("".join(L[posn:posn+3]))
             posn += 2

@@ -9,9 +9,7 @@ Features:
         -Edit recipes page needs to properly link with ingredients
         -(When ingredients are removed they should be unlinked from recipe)
     -New ingredient handling:
-        -Implement RecipeIngredient Ordering
-        -Implement save RecipeIngredient to recipe
-        -On modify ingredient string, delete all RecipeIngredients and regenerate
+        -Implement scaling of 
         
 -Create cupboards which show which ingredients are stocked
     -New ingredient model variables:
