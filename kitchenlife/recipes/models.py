@@ -142,10 +142,8 @@ class Recipe(models.Model):
             #ingredient.save()
     
     def serves_to_int(self):
-        """
-        This function takes a string as input and returns a number contained within the string, if it exists.
-        The number can be an integer or a float.
-        """
+        """This function takes a string as input and returns a number contained within the string, if it exists.
+        The number can be an integer or a float."""
         result = ''
         for char in self.serves:
             if char.isdigit():
@@ -164,6 +162,34 @@ class Recipe(models.Model):
             method_as_list = []
         return method_as_list
     
+    def return_nutritional_info(self):
+        #Returns the nutritional info of a recipe as a dictionary
+        output = {"calories": 0,
+                  "carbohydrates": 0,
+                  "sugar": 0,
+                  "fat": 0,
+                  "protein": 0,
+                  "fibre": 0,}
+        
+        for recipe_ingredient in self.recipe_ingredient.filter(alternative = False):
+            qty = recipe_ingredient.quantity
+            if not qty:
+                continue
+            ingredient = recipe_ingredient.ingredient
+            if recipe_ingredient.measurement_unit:
+                unit = recipe_ingredient.measurement_unit
+            else:
+                unit = "g"
+                qty = qty*ingredient.typical_weight
+            nutrients = ingredient.return_nutrition(qty, unit)
+            print("\n")
+            print(ingredient)
+            print(nutrients)
+            for nutrient, amount in nutrients.items():
+                output[nutrient] += amount/self.serves_int
+        for nutrient, amount in output.items():
+                output[nutrient] = round(amount,1)
+        return output
     
     #TODO: Implement a function to rate recipes
 

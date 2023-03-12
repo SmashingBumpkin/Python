@@ -1,5 +1,7 @@
 Features:
 -Recipes
+    -Add plaintext import of recipes
+    -Return nutritional information about recipe
     -Make recipe import from photo less fragile
     -Rate recipes
     -Add/edit recipe:
@@ -8,8 +10,11 @@ Features:
         -Link each line of the ai with a line of the original to make it clearer.
         -Edit recipes page needs to properly link with ingredients
         -(When ingredients are removed they should be unlinked from recipe)
-    -New ingredient handling:
-        -Implement scaling of 
+-Ingredients:
+    -Add function to return nutrition of ingredient based on quantity being used
+-Nutrition:
+    -Implement calory counting
+    
         
 -Create cupboards which show which ingredients are stocked
     -New ingredient model variables:

@@ -44,7 +44,9 @@ def detail(request, recipe_id):
         form = QuantityForm()
         scale = 1
     method_as_list = recipe.method_as_list()
-    context = {'recipe': recipe, 'method_as_list': method_as_list, 'scale': scale, 'form': form}
+    nutrients = recipe.return_nutritional_info()
+    print(nutrients)
+    context = {'recipe': recipe, 'method_as_list': method_as_list, 'scale': scale, 'form': form, 'nutrients': nutrients}
     return render(request, 'recipes/detail.html', context)
 
 

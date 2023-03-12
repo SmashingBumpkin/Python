@@ -23,12 +23,25 @@
         </div>
         <div class="column">
             {% if recipe.recipe_ingredient.all %}
-            {% for recipe_ingredient in recipe.recipe_ingredient.all|dictsort:'position_in_list' %}
-            <p><a href="{% url 'cupboard:ingredient_detail' recipe_ingredient.ingredient.id %}">{{ recipe_ingredient|scaled_string_with_arg:scale    }}</a><br></p>
-            {% endfor %}
-        {% else %}
-            <p>This recipe isn't properly linked with its ingredients.</p>
-        {% endif %}
+                {% for recipe_ingredient in recipe.recipe_ingredient.all|dictsort:'position_in_list' %}
+                    <p><a href="{% url 'cupboard:ingredient_detail' recipe_ingredient.ingredient.id %}">{{ recipe_ingredient|scaled_string_with_arg:scale }}</a><br></p>
+                {% endfor %}
+            {% else %}
+                <p>This recipe isn't properly linked with its ingredients.</p>
+            {% endif %}
+        </div>
+        <div class="column">
+            {% if nutrients %}
+            <p><b>Estimated nutritional values:</b></p>
+            <ul><p>Calories: {{nutrients.calories}}</p>
+            <p>Carbohydrates: {{nutrients.carbohydrates}}g</p>
+            <p>Sugar: {{nutrients.sugar}}g</p>
+            <p>Fat: {{nutrients.fat}}g</p>
+            <p>Protein: {{nutrients.protein}}g</p>
+            <p>Fibre: {{nutrients.fibre}}g</p></ul>
+            {% else %}
+                <p>This recipe isn't properly linked with its ingredients.</p>
+            {% endif %}
         </div>
       </div>
     

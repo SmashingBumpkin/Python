@@ -1,6 +1,8 @@
 from django.db import models
 from re import split as resplit
 
+from kitchenlife.unit_and_number_handling import convert_to_grams
+
 # Create your models here.
 class Ingredient(models.Model):
     name = models.CharField(max_length=50)
@@ -8,12 +10,12 @@ class Ingredient(models.Model):
     long_life = models.BooleanField(null= True, blank=True)
     shelf_life = models.IntegerField(null= True, blank=True)
     category = models.CharField(max_length=60, null= True, blank=True)
-    calories = models.IntegerField(null= True, blank=True)
-    carbohydrates = models.FloatField(null= True, blank=True)
-    sugar = models.FloatField(null= True, blank=True)
-    fat = models.FloatField(null= True, blank=True)
-    protein = models.FloatField(null= True, blank=True)
-    fibre = models.FloatField(null= True, blank=True)
+    calories = models.IntegerField(default = 0)
+    carbohydrates = models.FloatField(default = 0)
+    sugar = models.FloatField(default = 0)
+    fat = models.FloatField(default = 0)
+    protein = models.FloatField(default = 0)
+    fibre = models.FloatField(default = 0)
     typical_weight = models.IntegerField(null= True, blank=True)
 
     def __str__(self):
@@ -115,3 +117,18 @@ class Ingredient(models.Model):
                 number = extract_number(detail_lower)
                 self.fibre = number
         self.save()
+    
+    def return_nutrition(self, quantity, unit):
+        quantity = convert_to_grams(quantity, unit) # returns 
+        scale = quantity/100
+        jeff = [self.calories,self.carbohydrates,self.sugar,self.fat,self.protein, self.fibre]
+        for jef in jeff:
+            if jef == None:
+                jef = 0
+        output = {"calories": scale*jeff[0],
+                  "carbohydrates": scale*jeff[1],
+                  "sugar": scale*jeff[2],
+                  "fat": scale*jeff[3],
+                  "protein": scale*jeff[4],
+                  "fibre": scale*jeff[5],}
+        return output
