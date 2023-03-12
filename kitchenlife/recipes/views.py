@@ -9,7 +9,7 @@ from re import findall as refindall
 
 from kitchenlife.openai_link import sendPrompt, sendPromptIngredients
 from .models import Recipe, RecipeIngredient
-from .forms import QuantityForm, UploadFileForm, EditRecipeForm, SearchForm, UploadURLForm, EditIngredientsForm
+from .forms import PlaintextForm, QuantityForm, UploadFileForm, EditRecipeForm, SearchForm, UploadURLForm, EditIngredientsForm
 from PIL import Image
 from . import new_recipe_processing
 
@@ -76,6 +76,18 @@ def upload_url(request):
     form = UploadURLForm()
     return render(request, 'recipes/upload.html', {'form': form})
 
+@login_required
+def upload_text(request):
+    if request.method == 'POST':
+        uploadForm = PlaintextForm(request.POST.copy())
+        if uploadForm.is_valid():
+            text = uploadForm.cleaned_data['text']
+            recipe = new_recipe_processing.text_to_recipe(text, request.user)
+            recipe.save()
+            return redirect('recipes:edit_recipe', recipe_id = recipe.id)
+
+    form = PlaintextForm()
+    return render(request, 'recipes/upload.html', {'form': form})
 
 @login_required
 def edit_recipe(request, recipe_id):

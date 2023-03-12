@@ -53,10 +53,10 @@ class Ingredient(models.Model):
                         return None
                     result += char
                 elif result != '':
-                    print("number extracter returns: "+result)
+                    # print("number extracter returns: "+result)
                     break
             if result:
-                print(result)
+                # print(result)
                 return float(result)
             else:
                 return 0

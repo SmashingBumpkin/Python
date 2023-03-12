@@ -56,7 +56,7 @@
                         <ul>
                             <a href="{% url 'recipes:upload_photo' %}" class="{% is_active request 'recipes:upload_photo' %}">Upload from Photo</a>
                             <a href="{% url 'recipes:upload_url' %}" class="{% is_active request 'recipes:upload_url' %}">Upload from URL</a>
-                            <a href="{% url 'recipes:upload_url' %}" class="{% is_active request 'recipes:upload_url' %}">Upload from plaintext</a>
+                            <a href="{% url 'recipes:upload_text' %}" class="{% is_active request 'recipes:upload_text' %}">Upload from plaintext</a>
                             <a href="{% url 'recipes:generate_recipe_suggestion' %}" class="{% is_active request 'recipes:generate_recipe_suggestion' %}">Generate recipe suggestions</a>     
                         </ul>
                         <a  href="{% url 'cupboard:ingredients_index' %}" class="{% is_active request 'cupboard:ingredients_index' %}">Ingredients</a>
@@ -69,7 +69,7 @@
                         <ul>
                             <a href="{% url 'mealplan:add_meal_plan' %}" class="{% is_active request 'mealplan:add_meal_plan' %}">Create meal plan</a>
                         </ul>
-                        <a href="{% url 'mealplan:add_meal_plan' %}" class="{% is_active request 'mealplan:add_meal_plan' %}">About KitchenLife</a>
+                        <a href="{% url 'about' %} " class="{% is_active request 'about' %}">About KitchenLife</a>
                     </li>
                   </ul>     
                 </aside>

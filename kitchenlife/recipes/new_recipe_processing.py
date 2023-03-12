@@ -20,22 +20,25 @@ def url_to_recipe(url, owner):
         return Recipe(name = name, owner = owner)
 
 def image_to_recipe(img, user):
-        #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        #
-        #
-        #
-        #TODO: THIS IS NOT AT ALL ROBUST!!!!!!!!!!!!!!!!
-        #
-        #
-        #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        text = pytesseract.image_to_string(img)
-        text = openai_link.sendPromptJumbled(text, user.profile)
-        [_,name,description, serves, ingredients, method] = textlist= resplit(r"Name:|Description:|Serves:|Ingredients:|Method:",text)
-        # method = method.replace('\n\n','\n')
-        ingredients_string = list_cleaner(ingredients).strip()
-        method = list_cleaner(method.replace('\n\n','\n')).strip()
-        return Recipe(name = name.strip(), ingredients_string = ingredients_string , method = method, serves = serves.strip(),
-                        description = description.strip(), owner = user, from_photo = True)
+    #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    #
+    #
+    #
+    #TODO: THIS IS NOT AT ALL ROBUST!!!!!!!!!!!!!!!!
+    #
+    #
+    #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    text = pytesseract.image_to_string(img)
+    return text_to_recipe(text, user)
+
+def text_to_recipe(text, user):
+    text = openai_link.sendPromptJumbled(text, user.profile)
+    [_,name,description, serves, ingredients, method] = textlist= resplit(r"Name:|Description:|Serves:|Ingredients:|Method:",text)
+    # method = method.replace('\n\n','\n')
+    ingredients_string = list_cleaner(ingredients).strip()
+    method = list_cleaner(method.replace('\n\n','\n')).strip()
+    return Recipe(name = name.strip(), ingredients_string = ingredients_string , method = method, serves = serves.strip(),
+                    description = description.strip(), owner = user, from_photo = True)
 
 def list_cleaner(ingredients): #Removes any dashes or weird formatting from the start of each item
     return "\n".join([resub(r'^\W+', '', ingedient_line) for ingedient_line in ingredients.split('\n')])

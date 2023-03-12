@@ -25,6 +25,7 @@ Features:
      
 
 Big things:
+-1 click timer
 -Actually host properly
 -Collect comparison data for unformatted recipes and formatted recipes
 -Collect comparison data for ingredients string and ingredients lists

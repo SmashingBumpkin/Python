@@ -11,7 +11,10 @@ from recipes.models import Profile
 
 def index(request):
     money = round(0.002*request.user.profile.ai_credits_used/1000,2)
-    return render(request, 'kitchenlife\index.html',{'money': money})
+    return render(request, 'kitchenlife/index.html',{'money': money})
+
+def about(request):
+    return render(request, 'kitchenlife/about.html')
 
 def register(request):
     if request.method == "GET":

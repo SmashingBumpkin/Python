@@ -91,6 +91,8 @@ class Recipe(models.Model):
                                         recipe_ingredient = RecipeIngredient.parse_dumb_ingredient(recipe=self, ingredient=ingredient,ingredient_dumb=line)
                                         recipe_ingredient.position_in_list = line_number
                                         recipe_ingredient.save()
+                                        self.owner.profile.ingredients_referenced.add(ingredient)
+                                        self.save()
                                     else:
                                         dumb_line = line
                                     line_number += 6
@@ -118,6 +120,8 @@ class Recipe(models.Model):
                                         recipe_ingredient.alternative = not first_loop
                                         recipe_ingredient.position_in_list = line_number
                                         recipe_ingredient.save()
+                                        self.owner.profile.ingredients_referenced.add(ingredient)
+                                        self.save()
                                         alternative = first_loop
                                     else:
                                         dumb_line = dumb_line.replace(" or ", " ")
@@ -135,6 +139,8 @@ class Recipe(models.Model):
                     recipe_ingredient.alternative = alternative
                     recipe_ingredient.position_in_list = line_number
                     recipe_ingredient.save()
+                    self.owner.profile.ingredients_referenced.add(ingredient)
+                    self.save()
                     line_number += 10
                     break
     
@@ -153,8 +159,8 @@ class Recipe(models.Model):
     def method_as_list(self):
         try:
             method_as_list = self.method.split('\n')
-            if method_as_list[0][0] != "1":
-                method_as_list = [str(i+1) + ". " + step for i, step in enumerate(method_as_list)]
+            if method_as_list[0][0] not in {"1", "0"}:
+                method_as_list = [str(i+1) + ". " + step.strip() for i, step in enumerate(method_as_list)]
         except:
             method_as_list = []
         return method_as_list
@@ -181,6 +187,7 @@ class Recipe(models.Model):
             nutrients = ingredient.return_nutrition(qty, unit)
             # print("\n")
             # print(ingredient)
+            # print("Typical weight: " + str(ingredient.typical_weight) + "g")
             # print(nutrients)
             for nutrient, amount in nutrients.items():
                 output[nutrient] += amount/self.serves_int
