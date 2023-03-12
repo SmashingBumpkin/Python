@@ -137,9 +137,6 @@ class Recipe(models.Model):
                     recipe_ingredient.save()
                     line_number += 10
                     break
-            
-            #ingredient.referenced_by_profile.add(active_user.profile)
-            #ingredient.save()
     
     def serves_to_int(self):
         """This function takes a string as input and returns a number contained within the string, if it exists.
@@ -182,9 +179,9 @@ class Recipe(models.Model):
                 unit = "g"
                 qty = qty*ingredient.typical_weight
             nutrients = ingredient.return_nutrition(qty, unit)
-            print("\n")
-            print(ingredient)
-            print(nutrients)
+            # print("\n")
+            # print(ingredient)
+            # print(nutrients)
             for nutrient, amount in nutrients.items():
                 output[nutrient] += amount/self.serves_int
         for nutrient, amount in output.items():
@@ -305,3 +302,11 @@ class Profile(models.Model):
     
     def ingredients_owned_list(self):
         return [ingredient.name for ingredient in self.ingredients_owned.all()]
+    
+class ProfileIngredient(models.Model):
+    ingredient = models.OneToOneField(Ingredient, on_delete= models.CASCADE, related_name="profile_ingredient")
+    profile = models.OneToOneField(Profile, on_delete= models.CASCADE, related_name="profile_ingredient")
+    date_added = models.DateField()
+    expiry_date = models.DateField()
+    pass
+    #Class linked to Ingredient field on 

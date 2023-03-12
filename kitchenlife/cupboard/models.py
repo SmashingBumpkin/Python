@@ -6,9 +6,9 @@ from kitchenlife.unit_and_number_handling import convert_to_grams
 # Create your models here.
 class Ingredient(models.Model):
     name = models.CharField(max_length=50)
-    substitutes = models.CharField(max_length = 200, null = True, blank= True)
     long_life = models.BooleanField(null= True, blank=True)
     shelf_life = models.IntegerField(null= True, blank=True)
+    substitutes = models.CharField(max_length = 200, null = True, blank= True)
     category = models.CharField(max_length=60, null= True, blank=True)
     calories = models.IntegerField(default = 0)
     carbohydrates = models.FloatField(default = 0)
@@ -65,57 +65,60 @@ class Ingredient(models.Model):
         for detail in details_list:
             detail = detail.strip()
             detail_lower = detail.lower()
-            if detail == "":
-                continue
-            elif "substitutes" in detail_lower:
-                self.substitutes = detail.split(":")[1].strip()
-            elif "long life" in detail_lower:
-                detail_lower = detail_lower.split(":")[1].strip()
-                if "yes" in detail_lower:
-                    self.long_life = True
-                elif "no" in detail_lower:
-                    self.long_life = False
-            elif "shelf life" in detail_lower:
-                detail_lower = detail_lower.split(":")[1].strip()
-                number = extract_number(detail_lower)
-                if "year" in detail_lower:
-                    self.shelf_life = int(number*365)
-                elif "month" in detail_lower:
-                    self.shelf_life = int(number*30)
-                elif "week" in detail_lower:
-                    self.shelf_life = int(number*7)
-                elif number:
-                    self.shelf_life = int(number)
-            elif "category" in detail_lower:
-                self.category = detail.split(":")[1].strip()
-            elif "typical weight" in detail_lower:
-                detail_lower= detail_lower.split(":")[1].strip()
-                number = extract_number(detail_lower)
-                self.typical_weight = int(number)
-            elif "calories" in detail_lower:
-                detail_lower= detail_lower.split(":")[1].strip()
-                number = extract_number(detail_lower)
-                self.calories = int(number)
-            elif "carbohydrates" in detail_lower:
-                detail_lower= detail_lower.split(":")[1].strip()
-                number = extract_number(detail_lower)
-                self.carbohydrates = number
-            elif "sugar" in detail_lower:
-                detail_lower= detail_lower.split(":")[1].strip()
-                number = extract_number(detail_lower)
-                self.sugar = number
-            elif "fat" in detail_lower:
-                detail_lower= detail_lower.split(":")[1].strip()
-                number = extract_number(detail_lower)
-                self.fat = number
-            elif "protein" in detail_lower:
-                detail_lower= detail_lower.split(":")[1].strip()
-                number = extract_number(detail_lower)
-                self.protein = number
-            elif "fibre" in detail_lower:
-                detail_lower= detail_lower.split(":")[1].strip()
-                number = extract_number(detail_lower)
-                self.fibre = number
+            try:
+                if detail == "":
+                    continue
+                elif "substitutes" in detail_lower:
+                    self.substitutes = detail.split(":")[1].strip()
+                elif "long life" in detail_lower:
+                    detail_lower = detail_lower.split(":")[1].strip()
+                    if "yes" in detail_lower:
+                        self.long_life = True
+                    elif "no" in detail_lower:
+                        self.long_life = False
+                elif "shelf life" in detail_lower:
+                    detail_lower = detail_lower.split(":")[1].strip()
+                    number = extract_number(detail_lower)
+                    if "year" in detail_lower:
+                        self.shelf_life = int(number*365)
+                    elif "month" in detail_lower:
+                        self.shelf_life = int(number*30)
+                    elif "week" in detail_lower:
+                        self.shelf_life = int(number*7)
+                    elif number:
+                        self.shelf_life = int(number)
+                elif "category" in detail_lower:
+                    self.category = detail.split(":")[1].strip()
+                elif "typical weight" in detail_lower:
+                    detail_lower= detail_lower.split(":")[1].strip()
+                    number = extract_number(detail_lower)
+                    self.typical_weight = int(number)
+                elif "calories" in detail_lower:
+                    detail_lower= detail_lower.split(":")[1].strip()
+                    number = extract_number(detail_lower)
+                    self.calories = int(number)
+                elif "carbohydrates" in detail_lower:
+                    detail_lower= detail_lower.split(":")[1].strip()
+                    number = extract_number(detail_lower)
+                    self.carbohydrates = number
+                elif "sugar" in detail_lower:
+                    detail_lower= detail_lower.split(":")[1].strip()
+                    number = extract_number(detail_lower)
+                    self.sugar = number
+                elif "fat" in detail_lower:
+                    detail_lower= detail_lower.split(":")[1].strip()
+                    number = extract_number(detail_lower)
+                    self.fat = number
+                elif "protein" in detail_lower:
+                    detail_lower= detail_lower.split(":")[1].strip()
+                    number = extract_number(detail_lower)
+                    self.protein = number
+                elif "fibre" in detail_lower:
+                    detail_lower= detail_lower.split(":")[1].strip()
+                    number = extract_number(detail_lower)
+                    self.fibre = number
+            except:
+                pass
         self.save()
     
     def return_nutrition(self, quantity, unit):

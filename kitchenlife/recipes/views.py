@@ -24,8 +24,6 @@ def index(request):
     else:
         form = SearchForm()
         recipe_list = Recipe.objects.filter(owner=request.user).order_by("name")
-        if not recipe_list:
-            print("hi")
     context = {'recipe_list': recipe_list, 'form': form}
     return render(request, 'recipes/index.html', context)
 
@@ -45,7 +43,7 @@ def detail(request, recipe_id):
         scale = 1
     method_as_list = recipe.method_as_list()
     nutrients = recipe.return_nutritional_info()
-    print(nutrients)
+    #print(nutrients)
     context = {'recipe': recipe, 'method_as_list': method_as_list, 'scale': scale, 'form': form, 'nutrients': nutrients}
     return render(request, 'recipes/detail.html', context)
 

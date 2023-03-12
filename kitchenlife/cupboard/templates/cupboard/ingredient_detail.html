@@ -13,9 +13,14 @@
 <div class="columns">
     <div class="column is-half">
         {% if ingredient.category %}
-        <h1 class="heading"><b>{{ ingredient.category }}</b></h1>
-    {% endif %}
-        <p>Possible substitutes include: <br>{{ ingredient.substitutes }}</p><br>
+            <h1 class="heading"><b>{{ ingredient.category }}</b></h1>
+        {% endif %}
+        {% if ingredient.long_life %}
+            <p>This is a long life ingredient and won't expire from your cupboard</p>
+        {% else %}
+            <p>This ingredient is saved as "perishable" and will expire.</p>
+        {% endif %}
+        <br><p>Possible substitutes include: <br>{{ ingredient.substitutes }}</p><br>
         {% if not ingredient.long_life %}
             <p>
 Expected shelf life: {{ ingredient.shelf_life }} days
