@@ -7,9 +7,9 @@
         <button type="submit">Search</button>
     </form>
     <br>
-{% if ingredient_list %}
-    {% for ingredient in ingredient_list %}
-    <li><a href="{% url 'cupboard:ingredient_detail' ingredient.id %}">{{ ingredient.name }}</a></li>
+{% if profile_ingredient_list %}
+    {% for profile_ingredient in profile_ingredient_list %}
+    <li><a href="{% url 'cupboard:ingredient_detail' profile_ingredient.ingredient.id %}">{{ profile_ingredient.ingredient.name }}</a></li>
     {% endfor %}
 {% else %}
     <p>No ingredients are available.</p>

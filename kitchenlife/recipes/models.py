@@ -1,3 +1,5 @@
+from datetime import timedelta
+from django.utils import timezone
 from django.db import models
 from django.contrib.auth.models import User
 from kitchenlife import openai_link
@@ -62,11 +64,18 @@ class Recipe(models.Model):
                 continue
             try:
                 ingredient = Ingredient.objects.get(name=ingredients_list[i].capitalize())
+                try:
+                    profile_ingredient = ProfileIngredient.objects.get(ingredient=ingredient, profile = active_user.profile)
+                except:
+                    profile_ingredient = ProfileIngredient(profile = active_user.profile, ingredient = ingredient)
+                    profile_ingredient.save()
             except:
                 ingredient = Ingredient(name = ingredients_list[i].capitalize())
                 ingredient.save()
                 response = openai_link.sendPromptIngredientDetails(ingredient.name, active_user)
                 ingredient.ai_response_parser(response)
+                profile_ingredient = ProfileIngredient(profile = active_user.profile, ingredient = ingredient)
+                profile_ingredient.save()
         
         #ingredients_list = set(ingredients_list)
         line_number = 10 # line number 
@@ -88,11 +97,11 @@ class Recipe(models.Model):
                                 for line in dumb_line_2: #Figures out which line is which
                                     if ingredient_name_2 in line:
                                         ingredient=Ingredient.objects.get(name=ingredient_name_2.strip().capitalize())
-                                        recipe_ingredient = RecipeIngredient.parse_dumb_ingredient(recipe=self, ingredient=ingredient,ingredient_dumb=line)
+                                        recipe_ingredient = RecipeIngredient.parse_dumb_ingredient(recipe=self, ingredient=ingredient,ingredient_dumb=line, profile = active_user.profile)
                                         recipe_ingredient.position_in_list = line_number
                                         recipe_ingredient.save()
-                                        self.owner.profile.ingredients_referenced.add(ingredient)
-                                        self.save()
+                                        # self.owner.profile.ingredients_referenced.add(ingredient)
+                                        # self.save()
                                     else:
                                         dumb_line = line
                                     line_number += 6
@@ -116,12 +125,12 @@ class Recipe(models.Model):
                                         alt_ingred = alt_ingred.replace(ingredient_name + " ", "")
                                         alt_ingred = alt_ingred.replace(" " + ingredient_name, "")
                                         ingredient=Ingredient.objects.get(name=ingredient_name_2.strip().capitalize())
-                                        recipe_ingredient = RecipeIngredient.parse_dumb_ingredient(recipe=self, ingredient=ingredient,ingredient_dumb=alt_ingred)
+                                        recipe_ingredient = RecipeIngredient.parse_dumb_ingredient(recipe=self, ingredient=ingredient,ingredient_dumb=alt_ingred, profile = active_user.profile)
                                         recipe_ingredient.alternative = not first_loop
                                         recipe_ingredient.position_in_list = line_number
                                         recipe_ingredient.save()
-                                        self.owner.profile.ingredients_referenced.add(ingredient)
-                                        self.save()
+                                        # self.owner.profile.ingredients_referenced.add(ingredient)
+                                        # self.save()
                                         alternative = first_loop
                                     else:
                                         dumb_line = dumb_line.replace(" or ", " ")
@@ -135,12 +144,12 @@ class Recipe(models.Model):
 
                     #Parse recipe ingredient from line
                     ingredient=Ingredient.objects.get(name=ingredient_name.strip().capitalize())
-                    recipe_ingredient = RecipeIngredient.parse_dumb_ingredient(recipe=self, ingredient=ingredient,ingredient_dumb=dumb_line)
+                    recipe_ingredient = RecipeIngredient.parse_dumb_ingredient(recipe=self, ingredient=ingredient,ingredient_dumb=dumb_line, profile = active_user.profile)
                     recipe_ingredient.alternative = alternative
                     recipe_ingredient.position_in_list = line_number
                     recipe_ingredient.save()
-                    self.owner.profile.ingredients_referenced.add(ingredient)
-                    self.save()
+                    # self.owner.profile.ingredients_referenced.add(ingredient)
+                    # self.save()
                     line_number += 10
                     break
     
@@ -148,6 +157,8 @@ class Recipe(models.Model):
         """This function takes a string as input and returns a number contained within the string, if it exists.
         The number can be an integer or a float."""
         result = ''
+        if not self.serves:
+            return
         for char in self.serves:
             if char.isdigit():
                 result += char
@@ -174,17 +185,17 @@ class Recipe(models.Model):
                   "protein": 0,
                   "fibre": 0,}
         
-        for recipe_ingredient in self.recipe_ingredient.filter(alternative = False):
+        for recipe_ingredient in self.recipe_ingredient.filter(alternative=False):
             qty = recipe_ingredient.quantity
             if not qty:
                 continue
-            ingredient = recipe_ingredient.ingredient
+            profile_ingredient = recipe_ingredient.ingredient
             if recipe_ingredient.measurement_unit:
                 unit = recipe_ingredient.measurement_unit
             else:
                 unit = "g"
-                qty = qty*ingredient.typical_weight
-            nutrients = ingredient.return_nutrition(qty, unit)
+                qty = qty*profile_ingredient.ingredient.typical_weight
+            nutrients = profile_ingredient.ingredient.return_nutrition(qty, unit)
             # print("\n")
             # print(ingredient)
             # print("Typical weight: " + str(ingredient.typical_weight) + "g")
@@ -197,9 +208,58 @@ class Recipe(models.Model):
     
     #TODO: Implement a function to rate recipes
 
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete= models.CASCADE, related_name="profile")
+    last_20_expired_items = models.ManyToManyField(Ingredient, related_name="last_20_expired_items", blank=True)
+    ai_credits_used = models.IntegerField(default=0)
+
+    def __str__(self):
+        return self.user.username
+    
+    def ingredients_owned_list(self):
+        return [ingredient.name for ingredient in self.ingredients_owned.all()]
+    
+    def in_stock_string(self):
+        return ", ".join([profile_ingredient.ingredient.name for profile_ingredient in self.profile_ingredient.filter(in_stock = True)])
+            
+
+    def remove_expired_items(self):
+        expired_items = self.profile_ingredient.filter(
+            in_stock=True,
+            ingredient__long_life=False,
+            expiry_date__lt=timezone.now()
+        )
+        for item in expired_items:
+            item.in_stock = False
+            item.save()
+        #TODO: Correct this since it's not going to work properly, get the last items from last_20 first.
+        last_20_expired_items = expired_items.order_by('-expiry_date')[:20]
+        self.last_20_expired_items.set(last_20_expired_items)
+    
+class ProfileIngredient(models.Model):
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name="profile_ingredient")
+    ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE, related_name="profile_ingredient")
+    in_stock = models.BooleanField(default = False)
+    date_added = models.DateTimeField(default=timezone.now)
+    expiry_date = models.DateField(null=True, blank=True)
+
+    def __str__(self):
+        return ("Profile Ingredient: " + self.ingredient.name + " " + str(self.id))
+
+    def save(self, *args, **kwargs):
+        if not self.expiry_date and not self.ingredient.long_life:
+            shelf_life = self.ingredient.shelf_life or 0
+            self.expiry_date = timezone.now().date() + timezone.timedelta(days=shelf_life)
+        super().save(*args, **kwargs)
+    
+    class Meta:
+        unique_together = ('profile', 'ingredient',)
+        ordering = ['-expiry_date']
+        get_latest_by = 'expiry_date'
+
 class RecipeIngredient(models.Model):
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name="recipe_ingredient")
-    ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE, related_name="recipe_ingredient")
+    ingredient = models.ForeignKey(ProfileIngredient, on_delete=models.CASCADE, related_name="recipe_ingredient")
     quantity = models.FloatField(null=True, blank=True)
     measurement_unit = models.CharField(max_length=50, null=True, blank=True)
     local_name = models.CharField(max_length=100)
@@ -240,11 +300,12 @@ class RecipeIngredient(models.Model):
         return output.capitalize()
 
 
-    def parse_dumb_ingredient(recipe, ingredient, ingredient_dumb,):
+    def parse_dumb_ingredient(recipe, ingredient, ingredient_dumb, profile):
         #TODO Check for import errors, eg Y = 1/, % = 1/2 or 1/3
+        profile_ingredient = profile_ingredient = ProfileIngredient.objects.get(ingredient=ingredient, profile = profile)
         L = refindall(r'\d+|\D+',  ingredient_dumb) #Splits string into list of ints+strings
         if len(L) == 1:
-            return RecipeIngredient(recipe=recipe,ingredient=ingredient,local_name=ingredient_dumb)
+            return RecipeIngredient(recipe=recipe,ingredient=profile_ingredient,local_name=ingredient_dumb)
         
         #gets posn of first int
         posn = next((i for i, x in enumerate(L) if x.isdigit()), None)
@@ -290,30 +351,9 @@ class RecipeIngredient(models.Model):
         if first_word in units:
             unit = first_word.strip()
             remaining_string = remaining_string[remaining_string.index(unit) + len(unit):].strip().capitalize()
-            return RecipeIngredient(recipe=recipe,ingredient=ingredient,local_name=remaining_string,
+            return RecipeIngredient(recipe=recipe,ingredient=profile_ingredient,local_name=remaining_string,
                                     quantity=quantity,measurement_unit=unit)
         else:
             unit = ""
-            return RecipeIngredient(recipe=recipe,ingredient=ingredient,local_name=remaining_string,
+            return RecipeIngredient(recipe=recipe,ingredient=profile_ingredient,local_name=remaining_string,
                                     quantity=quantity)
-
-
-class Profile(models.Model):
-    user = models.OneToOneField(User, on_delete= models.CASCADE, related_name="profile")
-    ingredients_referenced = models.ManyToManyField(Ingredient, related_name="referenced_by_profile", blank=True) # every ingredient ever used by this user
-    ingredients_owned = models.ManyToManyField(Ingredient,related_name="owned_by_profile", blank=True) # ingredients currently available to this user
-    ai_credits_used = models.IntegerField(default=0)
-
-    def __str__(self):
-        return self.user.username
-    
-    def ingredients_owned_list(self):
-        return [ingredient.name for ingredient in self.ingredients_owned.all()]
-    
-class ProfileIngredient(models.Model):
-    ingredient = models.OneToOneField(Ingredient, on_delete= models.CASCADE, related_name="profile_ingredient")
-    profile = models.OneToOneField(Profile, on_delete= models.CASCADE, related_name="profile_ingredient")
-    date_added = models.DateField()
-    expiry_date = models.DateField()
-    pass
-    #Class linked to Ingredient field on 

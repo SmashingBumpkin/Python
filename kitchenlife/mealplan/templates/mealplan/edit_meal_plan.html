@@ -12,11 +12,11 @@
         <label for="ingredient-{{ forloop.counter }}"> {{ ingredient.2 }} - {{ ingredient.1 }} ({{ ingredient.0}}) </label>
       </li>
     {% endfor %} -->
-    {% for ingredient in ingredient_list %}
+    {% for recipe_ingredient in ingredient_list %}
       <li>
-        <input type="checkbox" id="ingredient-{{ forloop.counter }}" name="ingredients" value="{{ ingredient.ingredient.id }}"
-        {% if ingredient.ingredient in selected_ingredients %}checked{% endif %}>
-        <label for="ingredient-{{ forloop.counter }}"> {{ ingredient.recipe }} - {{ ingredient }} </label>
+        <input type="checkbox" id="ingredient-{{ forloop.counter }}" name="ingredients" value="{{ recipe_ingredient.ingredient.ingredient.id }}"
+        {% if recipe_ingredient.ingredient.ingredient in selected_ingredients %}checked{% endif %}>
+        <label for="ingredient-{{ forloop.counter }}"> {{ recipe_ingredient.recipe }} - {{ recipe_ingredient }} </label>
       </li>
     {% endfor %}
     {% for misc_item in misc_items %}

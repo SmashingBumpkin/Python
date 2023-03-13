@@ -1,15 +1,15 @@
 from django.http import HttpResponse
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.contrib.auth import login
 from recipes.forms import CustomUserCreationForm
 from recipes.models import Profile
 
-
-# def index(request):
-#     return HttpResponse("Hello, world. You're at the kitchen life homepage")
-
+@login_required
 def index(request):
+    # profile = Profile.objects.create(user=request.user)
+    # profile.save() #ONLY USED WHEN STARTING A NEW DB
     money = round(0.002*request.user.profile.ai_credits_used/1000,2)
     return render(request, 'kitchenlife/index.html',{'money': money})
 

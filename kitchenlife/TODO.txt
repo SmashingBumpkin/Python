@@ -16,6 +16,7 @@ Features:
         -Expiry
         -Availability
             -Automatically update availability to make unavailable if they expire
+                -Update last_20_items code, will not work properly currently
     -Info about ingredients
         -seasonality
         -Link alternatives to the alternative

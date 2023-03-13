@@ -8,7 +8,7 @@ from re import split as resplit
 from re import findall as refindall
 
 from kitchenlife.openai_link import sendPrompt, sendPromptIngredients
-from .models import Recipe, RecipeIngredient
+from .models import Profile, Recipe, RecipeIngredient
 from .forms import PlaintextForm, QuantityForm, UploadFileForm, EditRecipeForm, SearchForm, UploadURLForm, EditIngredientsForm
 from PIL import Image
 from . import new_recipe_processing
@@ -142,9 +142,10 @@ def delete_recipe(request, recipe_id):
     return render(request, 'recipes/delete.html')
 
 def generate_recipe_suggestion(request):
-    ingredients = ", ".join(request.user.profile.ingredients_owned_list())
-    myprompt = ("Provide 5 varied recipe briefs that use any combination of these ingredients:\n\n\n "+
-                ingredients)
+    ingredients = request.user.profile.in_stock_string()
+    #ingredients = ", ".join(ingredients_list)
+    myprompt = ("Provide 5 varied recipe briefs that use any combination of these ingredients:\n\n\n "
+                + ingredients)
     
     response = sendPrompt(myprompt, request.user.profile, temperature=0.5)
     print(response)

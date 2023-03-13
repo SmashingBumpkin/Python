@@ -5,10 +5,10 @@
   <form method="post">
     {% csrf_token %}
     <ul>
-    {% for ingredient in ingredients %}
+    {% for profile_ingredient in profile_ingredients %}
       <li>
-        <input type="checkbox" id="ingredient-{{ forloop.counter }}" name="ingredients" value="{{ ingredient.id }}" checked>
-        <label for="ingredient-{{ forloop.counter }}"> {{ ingredient.name }} </label>
+        <input type="checkbox" id="ingredient-{{ forloop.counter }}" name="ingredients" value="{{ profile_ingredient.ingredient.id }}" checked>
+        <label for="ingredient-{{ forloop.counter }}"> {{ profile_ingredient.ingredient.name }} </label>
       </li>
     {% endfor %}
     </ul>

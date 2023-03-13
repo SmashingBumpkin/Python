@@ -24,7 +24,7 @@
         <div class="column">
             {% if recipe.recipe_ingredient.all %}
                 {% for recipe_ingredient in recipe.recipe_ingredient.all|dictsort:'position_in_list' %}
-                    <p><a href="{% url 'cupboard:ingredient_detail' recipe_ingredient.ingredient.id %}">{{ recipe_ingredient|scaled_string_with_arg:scale }}</a><br></p>
+                    <p><a href="{% url 'cupboard:ingredient_detail' recipe_ingredient.ingredient.ingredient.id %}">{{ recipe_ingredient|scaled_string_with_arg:scale }}</a><br></p>
                 {% endfor %}
             {% else %}
                 <p>This recipe isn't properly linked with its ingredients.</p>

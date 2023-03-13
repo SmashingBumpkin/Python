@@ -5,6 +5,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 
 from cupboard.models import Ingredient
+from recipes.models import ProfileIngredient
 from .models import MealPlan
 from .forms import MealPlanForm, AddItemForm
 from recipes.forms import SearchForm
@@ -73,14 +74,16 @@ def edit_meal_plan(request, id):
             ingredients_owned = set()
             for recipe in meal_plan.recipes.all():
                 recipe_ingredients = recipe.recipe_ingredient.all()
-                ingredients = Ingredient.objects.filter(recipe_ingredient__in=recipe_ingredients)\
-                                                .exclude(id__in=meal_plan.ingredients.all())
+                # ingredients = Ingredient.objects.filter(profile_ingredient__recipe_ingredient__in=recipe_ingredients)\
+                #                                 .exclude(id__in=meal_plan.ingredients.all())
+                ingredients = Ingredient.objects.filter(profile_ingredient__recipe_ingredient__in=recipe_ingredients)
                 ingredients_owned.update(ingredients)
             profile = request.user.profile
-            profile.ingredients_owned.add(*ingredients_owned)
-            profile.save()
+            for ingredient in ingredients_owned:
+                profile_ingredient = ProfileIngredient.objects.get(ingredient=ingredient, profile=profile)
+                profile_ingredient.in_stock = True
+                profile_ingredient.save()
             return redirect('mealplan:meal_plan_detail', meal_plan_id=id)
-    
     selected_ingredients = set(meal_plan.ingredients.all())
     
     ingredient_list = []

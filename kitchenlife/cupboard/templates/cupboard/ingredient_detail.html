@@ -29,34 +29,12 @@ Expected shelf life: {{ ingredient.shelf_life }} days
     </div>
     <div class="column is-half">
         <h1 class="heading"><b>Nutritional information per 100g/100ml:</b></h1>
-        {% if ingredient.calories %}
             <p>Calories: {{ ingredient.calories }}</p>
-        {% endif %}
-        {% if ingredient.carbohydrates %}
-        <p>
-Carbohydrates: {{ ingredient.carbohydrates }}g
-        </p>
-        {% endif %}
-        {% if ingredient.sugar %}
-        <p>
-Sugar: {{ ingredient.sugar }}g
-        </p>
-        {% endif %}
-        {% if ingredient.fat %}
-        <p>
-Fat: {{ ingredient.fat }}g
-        </p>
-        {% endif %}
-        {% if ingredient.protein %}
-        <p>
-Protein: {{ ingredient.protein }}g
-        </p>
-        {% endif %}
-        {% if ingredient.fibre %}
-        <p>
-Fibre: {{ ingredient.fibre }}g
-        </p>
-        {% endif %}
+        <p>Carbohydrates: {{ ingredient.carbohydrates }}g</p>
+        <p>Sugar: {{ ingredient.sugar }}g</p>
+        <p>Fat: {{ ingredient.fat }}g</p>
+        <p>Protein: {{ ingredient.protein }}g</p>
+        <p>Fibre: {{ ingredient.fibre }}g</p>
     </div>
 </div>
 {% if recipes %}
