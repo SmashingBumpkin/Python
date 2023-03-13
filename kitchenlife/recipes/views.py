@@ -141,6 +141,7 @@ def delete_recipe(request, recipe_id):
     
     return render(request, 'recipes/delete.html')
 
+@login_required
 def generate_recipe_suggestion(request):
     ingredients = request.user.profile.in_stock_string()
     #ingredients = ", ".join(ingredients_list)
