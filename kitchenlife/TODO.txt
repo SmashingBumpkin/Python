@@ -10,13 +10,15 @@ Features:
         -Link each line of the ai with a line of the original to make it clearer.
         -Edit recipes page needs to properly link with ingredients
 -Nutrition:
-    -Implement calory counting      
+    -Implement calory counting
 -Create cupboards which show which ingredients are stocked
     -New ingredient model variables:
         -Expiry
         -Availability
             -Automatically update availability to make unavailable if they expire
-    -Info about ingredients (eg seasonality, substitutes, shelf life)
+    -Info about ingredients
+        -seasonality
+        -Link alternatives to the alternative
     -Allow adjustment at the profile level of ingredients (ie turn on/off long life etc)
     -Edit ingredient screen
     -Button to add all ingredients from a recipe
