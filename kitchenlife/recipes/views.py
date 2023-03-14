@@ -16,11 +16,31 @@ from . import new_recipe_processing
 
 @login_required
 def index(request):
-    if request.method == 'POST':
+    if request.method == 'POST' and "filter_by_search" in request.POST:
         form = SearchForm(request.POST)
         if form.is_valid():
             filtered_recipe = form.cleaned_data['search_term']
             recipe_list = Recipe.objects.filter(name__contains=filtered_recipe, owner=request.user).order_by("name")
+    elif request.method == 'POST' and "sort_by_match" in request.POST:
+        form = SearchForm()
+        recipe_list = Recipe.objects.filter(owner=request.user)
+        profile = request.user.profile
+        profile_ingredient_set = set(profile.profile_ingredient.filter(in_stock = True).values_list('id', flat=True))
+        recipes_with_match_data = []
+        for recipe in recipe_list:
+            recipe_ingredient_set = set(recipe.recipe_ingredient.all().values_list('profile_ingredient', flat=True))
+            num_recipe_ingredients = len(recipe_ingredient_set)
+            recipe_ingredient_set.difference_update(recipe_ingredient_set- profile_ingredient_set)
+            try:
+                number_present = len(recipe_ingredient_set)
+            except:
+                number_present = 0
+            percentage_owned = int((number_present/num_recipe_ingredients)*100)
+            recipes_with_match_data.append((recipe, num_recipe_ingredients-number_present, percentage_owned))
+        recipes_with_match_data.sort(key=lambda x: x[2], reverse=True)
+        context = {'recipes_with_match_data': recipes_with_match_data, 'form': form}
+        return render(request, 'recipes/index.html', context)
+            
     else:
         form = SearchForm()
         recipe_list = Recipe.objects.filter(owner=request.user).order_by("name")
@@ -34,13 +54,16 @@ def detail(request, recipe_id):
     if recipe.owner != request.user:
         return redirect('recipes:index')
     # recipe.simplified_to_ingredients(request.user)
+    form = QuantityForm()
+    scale = 1
     if request.method == 'POST':
-        form = form = QuantityForm(request.POST)
-        if form.is_valid():
-            scale = int(form.cleaned_data['serving'])/recipe.serves_int
-    else:
-        form = QuantityForm()
-        scale = 1
+        if "scale_quantities" in request.POST:
+            form = form = QuantityForm(request.POST)
+            if form.is_valid():
+                scale = int(form.cleaned_data['serving'])/recipe.serves_int
+        elif "add_all_ingredients" in request.POST:
+            profile = request.user.profile
+            profile.add_items_from_recipe(recipe)
     method_as_list = recipe.method_as_list()
     nutrients = recipe.return_nutritional_info()
     #print(nutrients)
@@ -148,6 +171,13 @@ def generate_recipe_suggestion(request):
     myprompt = ("Provide 5 varied recipe briefs that use any combination of these ingredients:\n\n\n "
                 + ingredients)
     
-    response = sendPrompt(myprompt, request.user.profile, temperature=0.5)
-    print(response)
-    return redirect("recipes:index")
+    #response = sendPrompt(myprompt, request.user.profile, temperature=0.5)
+    responses = """1. Spicy Chickpea Curry: A comforting, warming curry with a kick of heat. Made with garlic, cumin, turmeric, chilli powder, chopped tomatoes, chickpeas, coconut milk, vegetable oil, pumpkin seeds and herbs. 
+2. Lemon and Vanilla Cake: A light and fluffy cake with a zesty lemon flavour and a hint of vanilla. Made with butter, caster sugar, self-raising flour, egg yolk, vanilla extract, lemon juice and zest. 
+3. Ginger and Coriander Chicken: A fragrant and flavourful dish with a hint of sweetness from the ginger. Made with chicken, ginger, coriander, garlic, light brown soft sugar, vegetable oil and black pepper. 
+4. Chocolate Chip and Pecorino Cookies: A sweet and savoury cookie with a hint of saltiness from the cheese. Made with butter, caster sugar, self-raising flour, egg yolk, chocolate chips, pecorino cheese and a pinch of salt. 
+5. Pumpkin and Herb Risotto: A creamy, comforting risotto with a hint of sweetness from the pumpkin and freshness from the herbs. Made with vegetable oil, garlic, pumpkin, herbs, risotto rice, vegetable stock and pecorino cheese."""
+    responses = responses.split('\n')
+    print(responses)
+    context = {'responses':responses}
+    return render(request, 'recipes/view_generated_recipes.html', context)

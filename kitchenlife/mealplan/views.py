@@ -71,18 +71,9 @@ def edit_meal_plan(request, id):
                 print("Empty item name")
 
         elif "save_list" in request.POST:
-            ingredients_owned = set()
-            for recipe in meal_plan.recipes.all():
-                recipe_ingredients = recipe.recipe_ingredient.all()
-                # ingredients = Ingredient.objects.filter(profile_ingredient__recipe_ingredient__in=recipe_ingredients)\
-                #                                 .exclude(id__in=meal_plan.ingredients.all())
-                ingredients = Ingredient.objects.filter(profile_ingredient__recipe_ingredient__in=recipe_ingredients)
-                ingredients_owned.update(ingredients)
             profile = request.user.profile
-            for ingredient in ingredients_owned:
-                profile_ingredient = ProfileIngredient.objects.get(ingredient=ingredient, profile=profile)
-                profile_ingredient.in_stock = True
-                profile_ingredient.save()
+            for recipe in meal_plan.recipes.all():
+                profile.add_items_from_recipe(recipe)
             return redirect('mealplan:meal_plan_detail', meal_plan_id=id)
     selected_ingredients = set(meal_plan.ingredients.all())
     

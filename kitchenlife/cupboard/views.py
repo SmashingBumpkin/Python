@@ -1,10 +1,10 @@
+from datetime import date
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
-
 from cupboard.forms import EmptyForm
 from kitchenlife.openai_link import sendPrompt, sendPromptForgottenDetails, sendPromptIngredientDetails, sendPromptTypicalShelfLife, sendPromptTypicalWeight
-from recipes.models import ProfileIngredient, Recipe
+from recipes.models import Recipe
 from .models import Ingredient
 from recipes.forms import SearchForm
 
@@ -52,17 +52,24 @@ def ingredient_detail(request, ingredient_id):
     #ingredient.print_variables()
     profile = request.user.profile
     profile_ingredient = profile.profile_ingredient.get(ingredient = ingredient)
-    owned_by_user = profile_ingredient.in_stock
+    profile_ingredient.check_and_remove_expired()
     if request.method == 'POST':
-        if not profile_ingredient.in_stock:
-            profile_ingredient.in_stock = True
-        else:
-            profile_ingredient.in_stock = False
+        profile_ingredient.in_stock = not profile_ingredient.in_stock
         profile_ingredient.save()
-        owned_by_user = profile_ingredient.in_stock
     # recipes = set(Recipe.objects.filter(recipe_ingredient__ingredient__profileingredient__profile__user=request.user, recipe_ingredient__ingredient__ingredient__name=ingredient.name))
-    recipes = Recipe.objects.filter(recipe_ingredient__ingredient=profile_ingredient)
-    context = {'ingredient': ingredient, 'recipes': recipes, 'owned_by_user': owned_by_user, 'form': EmptyForm}
+    
+
+    # Assuming "expiry_date" is a valid date object stored in a variable named "expiry_date"
+    try:
+        days_until_expiry = (profile_ingredient.expiry_date - date.today()).days
+    except:
+        days_until_expiry = 0
+    recipes = Recipe.objects.filter(recipe_ingredient__profile_ingredient=profile_ingredient)
+    context = {'ingredient': ingredient,
+               'recipes': recipes, 
+               'owned_by_user': profile_ingredient.in_stock, 
+               'form': EmptyForm,
+               'time_to_expiry': days_until_expiry}
     return render(request, 'cupboard/ingredient_detail.html', context)
 
 @login_required

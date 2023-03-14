@@ -18,7 +18,7 @@
         {% if ingredient.long_life %}
             <p>This is a long life ingredient and won't expire from your cupboard</p>
         {% else %}
-            <p>This ingredient is saved as "perishable" and will expire.</p>
+            <p>This ingredient is saved as "perishable" and will be auto-removed in <b>{{time_to_expiry}} days</b>.</p>
         {% endif %}
         <br><p>Possible substitutes include: <br>{{ ingredient.substitutes }}</p><br>
         {% if not ingredient.long_life %}
@@ -29,7 +29,7 @@ Expected shelf life: {{ ingredient.shelf_life }} days
     </div>
     <div class="column is-half">
         <h1 class="heading"><b>Nutritional information per 100g/100ml:</b></h1>
-            <p>Calories: {{ ingredient.calories }}</p>
+        <p>Calories: {{ ingredient.calories }}</p>
         <p>Carbohydrates: {{ ingredient.carbohydrates }}g</p>
         <p>Sugar: {{ ingredient.sugar }}g</p>
         <p>Fat: {{ ingredient.fat }}g</p>

@@ -1,4 +1,3 @@
-from datetime import timedelta
 from django.utils import timezone
 from django.db import models
 from django.contrib.auth.models import User
@@ -189,7 +188,7 @@ class Recipe(models.Model):
             qty = recipe_ingredient.quantity
             if not qty:
                 continue
-            profile_ingredient = recipe_ingredient.ingredient
+            profile_ingredient = recipe_ingredient.profile_ingredient
             if recipe_ingredient.measurement_unit:
                 unit = recipe_ingredient.measurement_unit
             else:
@@ -221,8 +220,7 @@ class Profile(models.Model):
     
     def in_stock_string(self):
         return ", ".join([profile_ingredient.ingredient.name for profile_ingredient in self.profile_ingredient.filter(in_stock = True)])
-            
-
+    
     def remove_expired_items(self):
         expired_items = self.profile_ingredient.filter(
             in_stock=True,
@@ -236,6 +234,14 @@ class Profile(models.Model):
         last_20_expired_items = expired_items.order_by('-expiry_date')[:20]
         self.last_20_expired_items.set(last_20_expired_items)
     
+    def add_items_from_recipe(self, recipe):
+        recipe_ingredients = recipe.recipe_ingredient.all()
+        ingredients = Ingredient.objects.filter(profile_ingredient__recipe_ingredient__in=recipe_ingredients)
+        for ingredient in ingredients:
+            profile_ingredient = ProfileIngredient.objects.get(ingredient=ingredient, profile=self)
+            profile_ingredient.in_stock = True
+            profile_ingredient.save()
+
 class ProfileIngredient(models.Model):
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name="profile_ingredient")
     ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE, related_name="profile_ingredient")
@@ -245,6 +251,12 @@ class ProfileIngredient(models.Model):
 
     def __str__(self):
         return ("Profile Ingredient: " + self.ingredient.name + " " + str(self.id))
+
+    def check_and_remove_expired(self):
+        if (self.in_stock == True 
+            and self.ingredient.long_life == False 
+            and self.expiry_date < timezone.now().date()):
+            self.in_stock = False
 
     def save(self, *args, **kwargs):
         if not self.expiry_date and not self.ingredient.long_life:
@@ -259,7 +271,7 @@ class ProfileIngredient(models.Model):
 
 class RecipeIngredient(models.Model):
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name="recipe_ingredient")
-    ingredient = models.ForeignKey(ProfileIngredient, on_delete=models.CASCADE, related_name="recipe_ingredient")
+    profile_ingredient = models.ForeignKey(ProfileIngredient, on_delete=models.CASCADE, related_name="recipe_ingredient")
     quantity = models.FloatField(null=True, blank=True)
     measurement_unit = models.CharField(max_length=50, null=True, blank=True)
     local_name = models.CharField(max_length=100)
@@ -302,10 +314,10 @@ class RecipeIngredient(models.Model):
 
     def parse_dumb_ingredient(recipe, ingredient, ingredient_dumb, profile):
         #TODO Check for import errors, eg Y = 1/, % = 1/2 or 1/3
-        profile_ingredient = profile_ingredient = ProfileIngredient.objects.get(ingredient=ingredient, profile = profile)
+        profile_ingredient = ProfileIngredient.objects.get(ingredient=ingredient, profile = profile)
         L = refindall(r'\d+|\D+',  ingredient_dumb) #Splits string into list of ints+strings
         if len(L) == 1:
-            return RecipeIngredient(recipe=recipe,ingredient=profile_ingredient,local_name=ingredient_dumb)
+            return RecipeIngredient(recipe=recipe,profile_ingredient=profile_ingredient,local_name=ingredient_dumb)
         
         #gets posn of first int
         posn = next((i for i, x in enumerate(L) if x.isdigit()), None)
@@ -351,9 +363,9 @@ class RecipeIngredient(models.Model):
         if first_word in units:
             unit = first_word.strip()
             remaining_string = remaining_string[remaining_string.index(unit) + len(unit):].strip().capitalize()
-            return RecipeIngredient(recipe=recipe,ingredient=profile_ingredient,local_name=remaining_string,
+            return RecipeIngredient(recipe=recipe,profile_ingredient=profile_ingredient,local_name=remaining_string,
                                     quantity=quantity,measurement_unit=unit)
         else:
             unit = ""
-            return RecipeIngredient(recipe=recipe,ingredient=profile_ingredient,local_name=remaining_string,
+            return RecipeIngredient(recipe=recipe,profile_ingredient=profile_ingredient,local_name=remaining_string,
                                     quantity=quantity)

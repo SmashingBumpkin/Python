@@ -1,8 +1,6 @@
 Features:
 -Recipes
-    -Change reciper ingredien ingredient variable to profile ingredient
     -Add plaintext import of recipes <- UNTESTED
-    -Match between current cupboard and recipes in recipebook (what is cookable)
     -Make recipe import from photo less fragile
     -Rate recipes
     -Add/edit recipe:
@@ -14,25 +12,22 @@ Features:
     -Implement calory counting
     -Scale nutrition of a portion
 -Create cupboards which show which ingredients are stocked
-    -New ingredient model variables:
-        -Expiry
-        -Availability
-            -Automatically update availability to make unavailable if they expire
-                -Update last_20_items code, will not work properly currently
+    -New ingredient model variables
+    -Update last_20_items code, will not work properly currently
     -Info about ingredients
         -seasonality
         -Link alternatives to the alternative
     -Allow adjustment at the profile level of ingredients (ie turn on/off long life etc)
     -Edit ingredient screen
-    -Button to add all ingredients from a recipe
     -Button to remove individual ingredients from your cupboard for a specific recipe
-
 -Generate recipes based on cupboard contents
-     
+-Meal plan
+    -Order ingredients by what's in stock (show stuff that is KNOWN to not be in stock at the top)
 
 Big things:
 -1 click timer
 -Actually host properly
+-Integrate with webflow
 -Collect comparison data for unformatted recipes and formatted recipes
 -Collect comparison data for ingredients string and ingredients lists
 -Change database to something appropriate for public implementation

@@ -11,7 +11,7 @@
                 <form method="post">
                     {% csrf_token %}
                     {{ form.as_p }}
-                    <button type="submit">Show recipe for X servings</button>
+                    <button type="submit" name="scale_quantities">Show recipe for X servings</button>
                 </form>
             {% endif %}
             {% if recipe.book %}
@@ -23,8 +23,12 @@
         </div>
         <div class="column">
             {% if recipe.recipe_ingredient.all %}
+                <form method="post">
+                    {% csrf_token %}
+                    <button type="submit" name="add_all_ingredients">Add all ingredients to your cupboard</button>
+                </form>
                 {% for recipe_ingredient in recipe.recipe_ingredient.all|dictsort:'position_in_list' %}
-                    <p><a href="{% url 'cupboard:ingredient_detail' recipe_ingredient.ingredient.ingredient.id %}">{{ recipe_ingredient|scaled_string_with_arg:scale }}</a><br></p>
+                    <p><a href="{% url 'cupboard:ingredient_detail' recipe_ingredient.profile_ingredient.ingredient.id %}">{{ recipe_ingredient|scaled_string_with_arg:scale }}</a><br></p>
                 {% endfor %}
             {% else %}
                 <p>This recipe isn't properly linked with its ingredients.</p>
