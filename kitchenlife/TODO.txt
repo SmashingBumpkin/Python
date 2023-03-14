@@ -1,5 +1,6 @@
 Features:
 -Recipes
+    -Change reciper ingredien ingredient variable to profile ingredient
     -Add plaintext import of recipes <- UNTESTED
     -Match between current cupboard and recipes in recipebook (what is cookable)
     -Make recipe import from photo less fragile
@@ -11,6 +12,7 @@ Features:
         -Edit recipes page needs to properly link with ingredients
 -Nutrition:
     -Implement calory counting
+    -Scale nutrition of a portion
 -Create cupboards which show which ingredients are stocked
     -New ingredient model variables:
         -Expiry
