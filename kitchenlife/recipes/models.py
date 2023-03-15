@@ -175,7 +175,7 @@ class Recipe(models.Model):
             method_as_list = []
         return method_as_list
     
-    def return_nutritional_info(self):
+    def return_nutritional_info(self, scale = 1):
         #Returns the nutritional info of a recipe as a dictionary
         output = {"calories": 0,
                   "carbohydrates": 0,
@@ -202,7 +202,7 @@ class Recipe(models.Model):
             for nutrient, amount in nutrients.items():
                 output[nutrient] += amount/self.serves_int
         for nutrient, amount in output.items():
-                output[nutrient] = round(amount,1)
+                output[nutrient] = round(scale*amount,1)
         return output
     
     #TODO: Implement a function to rate recipes

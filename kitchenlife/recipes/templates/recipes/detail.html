@@ -10,8 +10,13 @@
                 <p>Serves: {{ recipe.serves_int }}</p>
                 <form method="post">
                     {% csrf_token %}
-                    {{ form.as_p }}
+                    {{ formServing.as_p }}
                     <button type="submit" name="scale_quantities">Show recipe for X servings</button>
+                </form>
+                <form method="post">
+                    {% csrf_token %}
+                    {{ formNutrition.as_p }}
+                    <button type="submit" name="scale_nutrition">Scale nutrition by X%</button>
                 </form>
             {% endif %}
             {% if recipe.book %}

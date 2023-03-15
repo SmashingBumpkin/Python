@@ -34,8 +34,40 @@ def text_to_recipe(text, user):
     #
     #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     text = openai_link.sendPromptJumbled(text, user.profile)
-    [_,name,description, serves, ingredients, method] = textlist= resplit(r"Name:|Description:|Serves:|Ingredients:|Method:",text)
-    # method = method.replace('\n\n','\n')
+    # Define a list of possible headings and their corresponding variable names
+    headings = [("Name:", "name"),
+                ("Description:", "description"),
+                ("Serves:", "serves"),
+                ("Ingredients:", "ingredients"),
+                ("Method:", "method")]
+
+    # Initialize a dictionary to store the extracted information
+    info = {var_name: None for _, var_name in headings}
+
+    # Split the text using regular expressions to find the headings
+    parts = resplit(r"(" + "|".join([h for h, _ in headings]) + ")", text)
+
+    # Iterate through each section of the text and match it to the appropriate heading
+    for i, part in enumerate(parts):
+        if part.strip() == "":
+            continue
+        for heading, var_name in headings:
+            if part == heading:
+                info[var_name] = parts[i+1].strip()
+                break
+
+    # Remove the headings from the extracted information
+    for var_name in info:
+        if info[var_name] is not None:
+            info[var_name] = info[var_name].replace(var_name + " ", "", 1)
+
+    # Extract the information from the dictionary
+    name = info["name"] if info["name"] else ""
+    description = info["description"] if info["description"] else ""
+    serves = info["serves"] if info["serves"] else ""
+    ingredients = info["ingredients"] if info["ingredients"] else ""
+    method = info["method"] if info["method"] else ""
+    #[_,name,description, serves, ingredients, method] =  resplit(r"Name:|Description:|Serves:|Ingredients:|Method:",text)
     ingredients_string = string_cleaner(ingredients).strip()
     method = string_cleaner(method.replace('\n\n','\n')).strip()
     return Recipe(name = name.strip(), ingredients_string = ingredients_string , method = method, serves = serves.strip(),

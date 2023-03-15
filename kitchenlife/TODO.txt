@@ -1,7 +1,6 @@
 Features:
 -Recipes
     -Add plaintext import of recipes <- UNTESTED
-    -Make recipe import from photo less fragile
     -Rate recipes
     -Add/edit recipe:
         -If title can't successfully be extracted generic title is entered
@@ -10,7 +9,6 @@ Features:
         -Edit recipes page needs to properly link with ingredients
 -Nutrition:
     -Implement calory counting
-    -Scale nutrition of a portion
 -Create cupboards which show which ingredients are stocked
     -New ingredient model variables
     -Update last_20_items code, will not work properly currently
