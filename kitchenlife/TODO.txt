@@ -2,6 +2,7 @@ Features:
 -Recipes
     -Add plaintext import of recipes <- UNTESTED
     -Rate recipes
+    -Generate recipes that use particular ingredient(s)
     -Add/edit recipe:
         -If title can't successfully be extracted generic title is entered
         -Add hints to all the boxes telling the user what to do
@@ -12,6 +13,7 @@ Features:
 -Create cupboards which show which ingredients are stocked
     -New ingredient model variables
     -Update last_20_items code, will not work properly currently
+    -Add ingredient (without having recipe)
     -Info about ingredients
         -seasonality
         -Link alternatives to the alternative
