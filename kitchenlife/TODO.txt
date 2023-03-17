@@ -3,6 +3,7 @@ Features:
     -Add plaintext import of recipes <- UNTESTED
     -Rate recipes
     -Generate recipes that use particular ingredient(s)
+    -Check what happens if something doesn't have a serving and you try and scale nutrition.
     -Add/edit recipe:
         -If title can't successfully be extracted generic title is entered
         -Add hints to all the boxes telling the user what to do

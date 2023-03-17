@@ -11,7 +11,7 @@ def url_to_recipe(url, owner):
         
         scraper = scrape_me(url, wild_mode=True)
         name = scraper.title()
-        ingredients = scraper.ingredients()
+        ingredients = list_cleaner(scraper.ingredients())
         instructions = scraper.instructions()
         serves = scraper.yields()
         return Recipe(name = name, ingredients_string = '\n'.join(ingredients), 
@@ -25,14 +25,6 @@ def image_to_recipe(img, user):
     return text_to_recipe(text, user)
 
 def text_to_recipe(text, user):
-        #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    #
-    #
-    #
-    #TODO: THIS IS NOT AT ALL ROBUST!!!!!!!!!!!!!!!!
-    #
-    #
-    #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     text = openai_link.sendPromptJumbled(text, user.profile)
     # Define a list of possible headings and their corresponding variable names
     headings = [("Name:", "name"),
