@@ -27,7 +27,8 @@ def sendPromptIngredients(myprompt, active_user):
     response = openai.ChatCompletion.create(
       model="gpt-3.5-turbo",
       messages=[
-        {"role": "user", "content": """Modify this list to return each individual ingredient seperated by '\\n'
+        {"role": "user", "content": """This is a list of ingredients. Return a list "simple_ingredients", of names of the ingredient used, seperated by '\\n'. 
+The ingredients in simple_ingredients should all be an exact substring of the line they are taken from.
 \n100g parmesan
 300g mozzarella (2 balls)
 800g chopped tomatoes (2 tins)
@@ -40,7 +41,7 @@ chopped tomatoes
 spinach
 cumin
 red onion"""},
-        {"role": "user", "content": "Now repeat modify this list of ingredients, remove anything that isn't a basic ingredient, (if appropriate) make the ingredient singular, and seperate by '\\n' "+myprompt}
+        {"role": "user", "content": "Use the same process to modify this list of ingredients: \n\n' "+myprompt}
     ]
     )
     active_user.ai_credits_used += response["usage"]["total_tokens"]

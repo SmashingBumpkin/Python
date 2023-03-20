@@ -57,9 +57,12 @@ class Recipe(models.Model):
         #Order ingredients so they can be returned correctly
         #Find a pairing for each ingredient to each dumb ingredient
         #Save the info of quantity, unit and details to a local instance of the Ingredient variable
+        to_delete_from_list = 0
         for i in range(len(ingredients_list)):
             ingredients_list[i] = ingredients_list[i].strip().lower()
-            if ingredients_list[i] == "":
+            print(ingredients_list[i].capitalize())
+            if ingredients_list[i] == "": 
+                to_delete_from_list += 1
                 continue
             try:
                 ingredient = Ingredient.objects.get(name=ingredients_list[i].capitalize())
@@ -76,6 +79,9 @@ class Recipe(models.Model):
                 profile_ingredient = ProfileIngredient(profile = active_user.profile, ingredient = ingredient)
                 profile_ingredient.save()
         
+        #TODO: delete all instances of "" from list
+        [ingredients_list.remove("") for i in range(to_delete_from_list)]
+
         #ingredients_list = set(ingredients_list)
         line_number = 10 # line number 
         for dumb_line in dumb_ingredients_list:
@@ -142,6 +148,8 @@ class Recipe(models.Model):
                         #END SPECIAL "OR" HANDLING
 
                     #Parse recipe ingredient from line
+                    print(ingredient_name)
+                    print(ingredient_name.strip().capitalize())
                     ingredient=Ingredient.objects.get(name=ingredient_name.strip().capitalize())
                     recipe_ingredient = RecipeIngredient.parse_dumb_ingredient(recipe=self, ingredient=ingredient,ingredient_dumb=dumb_line, profile = active_user.profile)
                     recipe_ingredient.alternative = alternative
