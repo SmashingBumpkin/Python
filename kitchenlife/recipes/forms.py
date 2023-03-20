@@ -6,7 +6,12 @@ class PlaintextForm(forms.Form):
     text = forms.CharField(widget=forms.Textarea(attrs={'rows': 20, 'cols': 80, 
                                                         "placeholder":"Paste in an unformatted recipe, we'll handle the rest"}),
                                                         label="")
-    
+
+class IngredientTextForm(forms.Form):
+    text = forms.CharField(widget=forms.Textarea(attrs={'rows': 4, 'cols': 80, 
+                                                        "placeholder":"Write in any ingredients that you definitely want to use."}),
+                                                        label="")
+
 class UploadFileForm(forms.Form):
     img = forms.ImageField()
 

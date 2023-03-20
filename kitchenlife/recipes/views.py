@@ -82,42 +82,6 @@ def detail(request, recipe_id):
     return render(request, 'recipes/detail.html', context)
 
 @login_required
-def detailCUNT(request, recipe_id):
-    recipe = get_object_or_404(Recipe, pk=recipe_id)
-    if recipe.owner != request.user:
-        return redirect('recipes:index')
-    # recipe.simplified_to_ingredients(request.user)
-    form = QuantityForm()
-    formServings = QuantityForm()
-    formNutrition = QuantityForm()
-    scale = 1
-    scale_nutrition = 1
-    if request.method == 'POST':
-        if "scale_quantities" in request.POST:
-            print("hi")
-            formServings = QuantityForm(request.POST)
-            print(formServings)
-            if form.is_valid():
-                scale = int(form.cleaned_data['serving'])/recipe.serves_int
-        elif "scale_nutrition" in request.POST:
-            print("hi2")
-            formNutrition = QuantityForm(request.POST)
-            scale_nutrition = int(form.cleaned_data['serving'])/100
-        elif "add_all_ingredients" in request.POST:
-            profile = request.user.profile
-            profile.add_items_from_recipe(recipe)
-    method_as_list = recipe.method_as_list()
-    nutrients = recipe.return_nutritional_info(scale_nutrition)
-    #print(nutrients)
-    context = {'recipe': recipe, 
-               'method_as_list': method_as_list, 
-               'scale': scale,
-               'formServings': formServings, 
-               'formNutrition': formNutrition, 
-               'nutrients': nutrients}
-    return render(request, 'recipes/detail.html', context)
-
-@login_required
 def upload_file(request):
     if request.method == 'POST':
         form = UploadFileForm(request.POST, request.FILES)
