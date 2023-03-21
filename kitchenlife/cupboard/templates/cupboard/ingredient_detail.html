@@ -4,9 +4,9 @@
     <form method="post">
         {% csrf_token %}
         {% if owned_by_user %}
-        <button type="submit">Remove from cupboard</button>
+        <button type="submit" name="remove_ingredient">Remove from cupboard</button>
         {% else %}
-        <button type="submit">Add to cupboard</button>
+        <button type="submit" name="add_ingredient">Add to cupboard</button>
         {% endif %}
     </form>
 <br>
@@ -17,13 +17,14 @@
         {% endif %}
         {% if ingredient.long_life %}
             <p>This is a long life ingredient and won't expire from your cupboard</p>
+        {% elif owned_by_user %}
+            <p>This ingredient is saved as "perishable" and will be auto-removed in <b>{{time_to_expiry}} days</b>.<br>Expected shelf life: {{ ingredient.shelf_life }} days</p>
         {% else %}
-            <p>This ingredient is saved as "perishable" and will be auto-removed in <b>{{time_to_expiry}} days</b>.</p>
+            <p>This is a perishable item that will be auto-removed. <br>Expected shelf life: {{ ingredient.shelf_life }} days</p>
         {% endif %}
         <br><p>Possible substitutes include: <br>{{ ingredient.substitutes }}</p><br>
         {% if not ingredient.long_life %}
             <p>
-Expected shelf life: {{ ingredient.shelf_life }} days
             </p>
         {% endif %}
     </div>

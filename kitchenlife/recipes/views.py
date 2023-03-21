@@ -1,14 +1,7 @@
-from django.contrib.auth import login
-from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
-from django.urls import reverse
 
-from re import split as resplit
-from re import findall as refindall
-
-from kitchenlife.openai_link import sendPrompt, sendPromptIngredients
-from .models import Profile, Recipe, RecipeIngredient
+from .models import Recipe
 from .forms import PlaintextForm, QuantityForm, UploadFileForm, EditRecipeForm, SearchForm, UploadURLForm, EditIngredientsForm
 from PIL import Image
 from . import new_recipe_processing
@@ -25,12 +18,13 @@ def index(request):
         form = SearchForm()
         recipe_list = Recipe.objects.filter(owner=request.user)
         profile = request.user.profile
+        profile.remove_expired_items()
         profile_ingredient_set = set(profile.profile_ingredient.filter(in_stock = True).values_list('id', flat=True))
         recipes_with_match_data = []
         for recipe in recipe_list:
             recipe_ingredient_set = set(recipe.recipe_ingredient.all().values_list('profile_ingredient', flat=True))
             num_recipe_ingredients = len(recipe_ingredient_set)
-            recipe_ingredient_set.difference_update(recipe_ingredient_set- profile_ingredient_set)
+            recipe_ingredient_set.difference_update(recipe_ingredient_set - profile_ingredient_set)
             try:
                 number_present = len(recipe_ingredient_set)
             except:
@@ -61,7 +55,7 @@ def detail(request, recipe_id):
     if request.method == 'POST':
         if "scale_quantities" in request.POST:
             formServing = QuantityForm(request.POST)
-            if formServing.is_valid():
+            if formServing.is_valid() and recipe.serves_int:
                 scale = int(formServing.cleaned_data['serving'])/recipe.serves_int
         elif "scale_nutrition" in request.POST:
             formNutrition = QuantityForm(request.POST)
@@ -80,6 +74,34 @@ def detail(request, recipe_id):
                'formNutrition': formNutrition, 
                'nutrients': nutrients}
     return render(request, 'recipes/detail.html', context)
+
+@login_required
+def nutrition_detail(request, recipe_id):
+    recipe = get_object_or_404(Recipe, pk=recipe_id)
+    if recipe.owner != request.user:
+        return redirect('recipes:index')
+    formServing = QuantityForm()
+    formNutrition = QuantityForm()
+    scale = 1
+    scale_nutrition = 1
+    if request.method == 'POST':
+        if "scale_quantities" in request.POST:
+            formServing = QuantityForm(request.POST)
+            if formServing.is_valid() and recipe.serves_int:
+                scale = int(formServing.cleaned_data['serving'])/recipe.serves_int
+        elif "scale_nutrition" in request.POST:
+            formNutrition = QuantityForm(request.POST)
+            if formNutrition.is_valid():
+                scale_nutrition = int(formNutrition.cleaned_data['serving'])/100
+    nutrients = recipe.return_detailed_nutritional_info(scale_nutrition)
+    print(nutrients)
+    #print(nutrients)
+    context = {'recipe': recipe, 
+               'scale': scale, 
+               'formServing': formServing,
+               'formNutrition': formNutrition, 
+               'nutrients': nutrients}
+    return render(request, 'recipes/nutrition_detail.html', context)
 
 @login_required
 def upload_file(request):

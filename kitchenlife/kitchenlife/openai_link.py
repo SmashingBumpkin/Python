@@ -2,10 +2,10 @@ import openai
 from sys import exit as sysexit
 
 def sendPrompt(myprompt, active_user, temperature = 0.01, model = "text-davinci-003"):
-    cont = input("\n____\n\n\nPlease type 1 to continue (will spend openai credits) ")
-    if cont != "1":
-        print("\nYou have terminated the program, cheapskate.\n")
-        sysexit()
+    # cont = input("\n____\n\n\nPlease type 1 to continue (will spend openai credits) ")
+    # if cont != "1":
+    #     print("\nYou have terminated the program, cheapskate.\n")
+    #     sysexit()
     openai.api_key = "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"
     response = openai.Completion.create(
       model=model,
@@ -19,17 +19,18 @@ def sendPrompt(myprompt, active_user, temperature = 0.01, model = "text-davinci-
 
 def sendPromptIngredients(myprompt, active_user):
     #https://platform.openai.com/docs/guides/chat
-    cont = input("\n____\n\n\nPlease type 1 to continue ingredient simplifier (will spend openai credits) ")
-    if cont != "1":
-        print("\nYou have terminated the program, cheapskate.\n")
-        sysexit()
+    # cont = input("\n____\n\n\nPlease type 1 to continue ingredient simplifier (will spend openai credits) ")
+    # if cont != "1":
+    #     print("\nYou have terminated the program, cheapskate.\n")
+    #     sysexit()
     openai.api_key = "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"
     response = openai.ChatCompletion.create(
       model="gpt-3.5-turbo",
       messages=[
         {"role": "user", "content": """This is a list of ingredients. Return a list "simple_ingredients", of names of the ingredient used, seperated by '\\n'. 
-The ingredients in simple_ingredients should all be an exact substring of the line they are taken from.
-\n100g parmesan
+Each line in the returned content an exact substring of the line they are taken from, for example "350g whole (black) urad daal" must NOT return "Whole Urad Daal".
+
+100g parmesan
 300g mozzarella (2 balls)
 800g chopped tomatoes (2 tins)
 200g spinach
@@ -52,10 +53,10 @@ red onion"""},
 
 def sendPromptJumbled(myprompt, active_user):
     #https://platform.openai.com/docs/guides/chat
-    cont = input("\n____\n\n\nPlease type 1 to continue de-jumbler (will spend openai credits) ")
-    if cont != "1":
-        print("\nYou have terminated the program, cheapskate.\n")
-        sysexit()
+    # cont = input("\n____\n\n\nPlease type 1 to continue de-jumbler (will spend openai credits) ")
+    # if cont != "1":
+    #     print("\nYou have terminated the program, cheapskate.\n")
+    #     sysexit()
     openai.api_key = "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"
     response = openai.ChatCompletion.create(
       model="gpt-3.5-turbo",
@@ -163,8 +164,8 @@ def sendPromptIngredientDetails(ingredient, user):
       model="gpt-3.5-turbo",
       messages=[
         {"role": "user", "content": """Provide details of a typical example of this ingredient: Onion
-Provide details under the headings: substitutes, long life, typical shelf life (this should be how 
-long the item can be expected to last if stored appropriately at home), Category, typical weight 
+Provide details in a precise format under the headings: substitutes, long life, typical shelf life (this should be how 
+long many days the item can be expected to last if stored appropriately at home), Category, typical weight 
 (this should be the typical weight of an individual unit of the item, if not applicable, return 0),
 Nutritional information per 100g/ml (Calories, Carbohydrates, Sugar, Fat, Protein, Fibre)"""},
         {"role": "assistant", "content": """Substitutes: Shallots, red onion, leek, garlic, spring onion

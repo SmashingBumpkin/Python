@@ -1,8 +1,8 @@
 {% extends 'base.html' %}
 {% load custom_filters %}
 {% block content %}
+<h1 class="title">{{ recipe.name }}</h1>
 <section class="section">
-    <h1 class="title">{{ recipe.name }}</h1>
     <div class="columns">
         <div class="column is-one-third">
             <h2 class="subtitle">{{ recipe.description }}</h2>
@@ -48,6 +48,7 @@
             <p>Fat: {{nutrients.fat}}g</p>
             <p>Protein: {{nutrients.protein}}g</p>
             <p>Fibre: {{nutrients.fibre}}g</p></ul>
+            <ul><a href="{% url 'recipes:nutrition_detail' recipe.id %}">See nutritional details</a></ul>
             {% else %}
                 <p>This recipe isn't properly linked with its ingredients.</p>
             {% endif %}

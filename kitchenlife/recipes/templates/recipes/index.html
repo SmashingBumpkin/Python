@@ -11,17 +11,37 @@
     <button type="submit" name="sort_by_match">Filter based on current cupboard</button>
 </form>
 <br>
-{% if recipe_list %}
-    {% for recipe in recipe_list %}
-    <li><a href="{% url 'recipes:detail' recipe.id %}">{{ recipe.name }}</a></li>
-    {% endfor %}
-{% elif recipes_with_match_data %}
-    {% for recipe_with_data in recipes_with_match_data %}
-    <li><a href="{% url 'recipes:detail' recipe_with_data.0.id %}">{{ recipe_with_data.0 }} is  {{recipe_with_data.2 }}% complete, ingredients missing = {{recipe_with_data.1}}</a></li>
-    {% endfor %}
-{% else %}
-    <p>No recipes are available.</p>
-{% endif %}
-</ul>
+<table class="table is-narrow">
+    <thead>
+      <tr>
+        <th><abbr title="Recipe">Recipe</abbr></th>
+        {% if recipes_with_match_data %}
+        <th><abbr title="complete">% Complete</abbr></th>
+        <th><abbr title="missing"># Missing</abbr></th>
+        {% endif %}
+      </tr>
+    </thead>
+    <tbody>
+        {% if recipe_list %}
+            {% for recipe in recipe_list %}
+                <tr>
+                    <td><a href="{% url 'recipes:detail' recipe.id %}">{{ recipe.name }}</a></td>
+                </tr>
+            {% endfor %}
+        {% elif recipes_with_match_data %}
+            {% for recipe_with_data in recipes_with_match_data %}
+            <tr>
+                <td><a href="{% url 'recipes:detail' recipe_with_data.0.id %}">{{ recipe_with_data.0 }}</a></td>
+                <td>{{ recipe_with_data.2 }}</td>
+                <td>{{ recipe_with_data.1 }}</td>
+            </tr>
+            {% endfor %}
+        {% else %}
+            <tr>
+                <th>Add a recipe to get started</th>
+            </tr>
+        {% endif %}
+    </tbody>
+  </table>
 
 {% endblock content %}

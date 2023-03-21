@@ -1,11 +1,9 @@
 from django.shortcuts import render
-from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
-from django.urls import reverse
 
 from cupboard.models import Ingredient
-from recipes.models import ProfileIngredient
+
 from .models import MealPlan
 from .forms import MealPlanForm, AddItemForm
 from recipes.forms import SearchForm
@@ -75,13 +73,27 @@ def edit_meal_plan(request, id):
             for recipe in meal_plan.recipes.all():
                 profile.add_items_from_recipe(recipe)
             return redirect('mealplan:meal_plan_detail', meal_plan_id=id)
+        
     selected_ingredients = set(meal_plan.ingredients.all())
     
     ingredient_list = []
     for recipe in meal_plan.recipes.all():
-        for recipe_ingredient in recipe.recipe_ingredient.all().order_by("position_in_list"):
-            ingredient_list.append(recipe_ingredient)
+        ingredient_list.append(recipe)
+        for in_stock in [False, True]:
+            for recipe_ingredient in recipe.recipe_ingredient.filter(profile_ingredient__in_stock = in_stock).order_by("position_in_list"):
+                ingredient_list.append(recipe_ingredient)
 
+    # out_of_stock = []
+    # in_stock = []
+
+    # for recipe_ingredient in ingredient_list:
+    #     if type(recipe_ingredient) == Ingredient:
+    #         if recipe_ingredient.profile_ingredient.in_stock:
+    #             in_stock.append(recipe_ingredient)
+    #         else:
+    #             out_of_stock.append(recipe_ingredient)
+    # ingredient_list = out_of_stock
+    # ingredient_list.extend(in_stock)
     context = {
         'meal_plan': meal_plan,
         'selected_ingredients': selected_ingredients,

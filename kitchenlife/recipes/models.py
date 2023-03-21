@@ -3,8 +3,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from kitchenlife import openai_link
 from cupboard.models import Ingredient
-from re import split as resplit, findall as refindall, sub as resub
-from sys import exit as sysexit
+from re import split as resplit, findall as refindall
 from fractions import Fraction
 
 
@@ -60,7 +59,6 @@ class Recipe(models.Model):
         to_delete_from_list = 0
         for i in range(len(ingredients_list)):
             ingredients_list[i] = ingredients_list[i].strip().lower()
-            print(ingredients_list[i].capitalize())
             if ingredients_list[i] == "": 
                 to_delete_from_list += 1
                 continue
@@ -105,8 +103,6 @@ class Recipe(models.Model):
                                         recipe_ingredient = RecipeIngredient.parse_dumb_ingredient(recipe=self, ingredient=ingredient,ingredient_dumb=line, profile = active_user.profile)
                                         recipe_ingredient.position_in_list = line_number
                                         recipe_ingredient.save()
-                                        # self.owner.profile.ingredients_referenced.add(ingredient)
-                                        # self.save()
                                     else:
                                         dumb_line = line
                                     line_number += 6
@@ -134,8 +130,6 @@ class Recipe(models.Model):
                                         recipe_ingredient.alternative = not first_loop
                                         recipe_ingredient.position_in_list = line_number
                                         recipe_ingredient.save()
-                                        # self.owner.profile.ingredients_referenced.add(ingredient)
-                                        # self.save()
                                         alternative = first_loop
                                     else:
                                         dumb_line = dumb_line.replace(" or ", " ")
@@ -148,8 +142,6 @@ class Recipe(models.Model):
                         #END SPECIAL "OR" HANDLING
 
                     #Parse recipe ingredient from line
-                    print(ingredient_name)
-                    print(ingredient_name.strip().capitalize())
                     ingredient=Ingredient.objects.get(name=ingredient_name.strip().capitalize())
                     recipe_ingredient = RecipeIngredient.parse_dumb_ingredient(recipe=self, ingredient=ingredient,ingredient_dumb=dumb_line, profile = active_user.profile)
                     recipe_ingredient.alternative = alternative
@@ -191,7 +183,9 @@ class Recipe(models.Model):
                   "fat": 0,
                   "protein": 0,
                   "fibre": 0,}
-        
+        if self.serves_int == 0:
+            self.serves_int = 1
+
         for recipe_ingredient in self.recipe_ingredient.filter(alternative=False):
             qty = recipe_ingredient.quantity
             if not qty:
@@ -211,6 +205,26 @@ class Recipe(models.Model):
                 output[nutrient] += amount/self.serves_int
         for nutrient, amount in output.items():
                 output[nutrient] = round(scale*amount,1)
+        return output
+    
+    def return_detailed_nutritional_info(self, scale = 1):
+        #Returns the nutritional info of a recipe as a dictionary
+        if self.serves_int == 0:
+            self.serves_int = 1
+
+        output = []
+        for recipe_ingredient in self.recipe_ingredient.filter(alternative=False):
+            qty = recipe_ingredient.quantity
+            if not qty:
+                continue
+            profile_ingredient = recipe_ingredient.profile_ingredient
+            if recipe_ingredient.measurement_unit:
+                unit = recipe_ingredient.measurement_unit
+            else:
+                unit = "g"
+                qty = qty*profile_ingredient.ingredient.typical_weight
+            nutrients = profile_ingredient.ingredient.return_nutrition(int(qty*scale/self.serves_int), unit)
+            output.append((recipe_ingredient, nutrients))
         return output
     
     #TODO: Implement a function to rate recipes
@@ -235,6 +249,7 @@ class Profile(models.Model):
             ingredient__long_life=False,
             expiry_date__lt=timezone.now()
         )
+        print(expired_items)
         for item in expired_items:
             item.in_stock = False
             item.save()
@@ -260,14 +275,23 @@ class ProfileIngredient(models.Model):
     def __str__(self):
         return ("Profile Ingredient: " + self.ingredient.name + " " + str(self.id))
 
+    def add_to_cupboard(self):
+        if not self.in_stock:
+            shelf_life = self.ingredient.shelf_life
+            self.in_stock = not self.in_stock
+            self.date_added = timezone.now
+            self.expiry_date = timezone.now().date() + timezone.timedelta(days=shelf_life)
+            pass
+
     def check_and_remove_expired(self):
         if (self.in_stock == True 
             and self.ingredient.long_life == False 
             and self.expiry_date < timezone.now().date()):
+            print("Hi")
             self.in_stock = False
 
     def save(self, *args, **kwargs):
-        if not self.expiry_date and not self.ingredient.long_life:
+        if not self.ingredient.long_life:#not self.expiry_date and 
             shelf_life = self.ingredient.shelf_life or 0
             self.expiry_date = timezone.now().date() + timezone.timedelta(days=shelf_life)
         super().save(*args, **kwargs)
@@ -318,7 +342,6 @@ class RecipeIngredient(models.Model):
             output += self.measurement_unit + " "
         output += self.local_name
         return output.capitalize()
-
 
     def parse_dumb_ingredient(recipe, ingredient, ingredient_dumb, profile):
         #TODO Check for import errors, eg Y = 1/, % = 1/2 or 1/3
@@ -371,9 +394,13 @@ class RecipeIngredient(models.Model):
         if first_word in units:
             unit = first_word.strip()
             remaining_string = remaining_string[remaining_string.index(unit) + len(unit):].strip().capitalize()
+            if len(remaining_string) < len(L[0]):
+                remaining_string = L[0]
             return RecipeIngredient(recipe=recipe,profile_ingredient=profile_ingredient,local_name=remaining_string,
                                     quantity=quantity,measurement_unit=unit)
         else:
             unit = ""
+            if len(remaining_string) < len(L[0]):
+                remaining_string = L[0]
             return RecipeIngredient(recipe=recipe,profile_ingredient=profile_ingredient,local_name=remaining_string,
                                     quantity=quantity)

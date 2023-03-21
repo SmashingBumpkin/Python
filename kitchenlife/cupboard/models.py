@@ -128,10 +128,10 @@ class Ingredient(models.Model):
         for jef in jeff:
             if jef == None:
                 jef = 0
-        output = {"calories": scale*jeff[0],
-                  "carbohydrates": scale*jeff[1],
-                  "sugar": scale*jeff[2],
-                  "fat": scale*jeff[3],
-                  "protein": scale*jeff[4],
-                  "fibre": scale*jeff[5],}
+        output = {"calories": round(scale*jeff[0],0),
+                  "carbohydrates": round(scale*jeff[1],1),
+                  "sugar": round(scale*jeff[2],1),
+                  "fat": round(scale*jeff[3],1),
+                  "protein": round(scale*jeff[4],1),
+                  "fibre": round(scale*jeff[5],1),}
         return output
