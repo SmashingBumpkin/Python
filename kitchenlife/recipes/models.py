@@ -64,15 +64,25 @@ class Recipe(models.Model):
             if ingredients_list[i] == "": 
                 to_delete_from_list += 1
                 continue
+
+            ingredient_name = ingredients_list[i]
+            if ingredient_name[-1] == "s":
+                alt_ingredient_name = ingredient_name[:-1]
+            else:
+                alt_ingredient_name = ingredient_name + "s"
+
             try:
-                ingredient = Ingredient.objects.get(name=ingredients_list[i].capitalize())
                 try:
-                    profile_ingredient = ProfileIngredient.objects.get(ingredient=ingredient, profile = active_user.profile)
+                    ingredient = Ingredient.objects.get(name=ingredient_name.capitalize())
+                except:
+                    ingredient = Ingredient.objects.get(name=alt_ingredient_name.capitalize())
+                try:
+                    profile_ingredient = ProfileIngredient.objects.get(ingredient = ingredient, profile = active_user.profile)
                 except:
                     profile_ingredient = ProfileIngredient(profile = active_user.profile, ingredient = ingredient)
                     profile_ingredient.save()
             except:
-                ingredient = Ingredient(name = ingredients_list[i].capitalize())
+                ingredient = Ingredient(name = ingredient_name.capitalize())
                 ingredient.save()
                 response = openai_link.sendPromptIngredientDetails(ingredient.name, active_user)
                 ingredient.ai_response_parser(response)
@@ -231,10 +241,21 @@ class Profile(models.Model):
     user = models.OneToOneField(User, on_delete= models.CASCADE, related_name="profile")
     last_20_expired_items = models.ManyToManyField(Ingredient, related_name="last_20_expired_items", blank=True)
     ai_credits_used = models.IntegerField(default=0)
+    ai_credits = models.IntegerField(default=0)
 
     def __str__(self):
         return self.user.username
     
+    def successfully_pay_for_ai_credits(self, cost):
+        self.ai_credits_used += cost
+        self.save()
+        if cost > self.ai_credits:
+            return False
+        else:
+            self.ai_credits -= cost
+            self.save()
+            return True
+
     def ingredients_owned_list(self):
         return [ingredient.name for ingredient in self.ingredients_owned.all()]
     
@@ -247,7 +268,6 @@ class Profile(models.Model):
             ingredient__long_life=False,
             expiry_date__lt=timezone.now()
         )
-        print(expired_items)
         for item in expired_items:
             item.in_stock = False
             item.save()
@@ -411,6 +431,7 @@ class ProfileIngredient(models.Model):
         return { **self.get_generic_nutrition(),
                 **{
                 "name": self.ingredient.name,
+                "id": self.ingredient.id,
                 "long_life": self.get_long_life(),
                 "shelf_life": self.get_shelf_life(),
                 "substitutes": self.get_substitutes(),

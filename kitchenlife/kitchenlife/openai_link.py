@@ -1,6 +1,11 @@
 import openai
 from sys import exit as sysexit
 
+def sendOpenAIRequest(input_template, data, profile):
+    pass
+
+
+
 def sendPrompt(myprompt, active_user, temperature = 0.01, model = "text-davinci-003"):
     # cont = input("\n____\n\n\nPlease type 1 to continue (will spend openai credits) ")
     # if cont != "1":
@@ -198,6 +203,7 @@ Fibre: 0g"""},
         {"role": "user", "content": "Using the same headings, provide details of a typical example of this ingredient: "+ingredient}
     ]
     )
+    print(response)
     user.profile.ai_credits_used += response["usage"]["total_tokens"]
     user.profile.save()
     print(ingredient.capitalize() + "\n\n")

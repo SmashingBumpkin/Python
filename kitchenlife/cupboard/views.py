@@ -61,6 +61,7 @@ def ingredient_detail(request, ingredient_id):
         days_until_expiry = 0
     recipes = Recipe.objects.filter(recipe_ingredient__profile_ingredient=profile_ingredient)
     context = {'ingredient': ingredient,
+               'profile_ingredient': profile_ingredient,
                'recipes': recipes, 
                'owned_by_user': profile_ingredient.in_stock, 
                'form': EmptyForm,
@@ -75,7 +76,6 @@ def edit_ingredient(request, ingredient_id):
     profile_ingredient = profile.profile_ingredient.get(ingredient = ingredient)
     initial_ingredient = profile_ingredient.get_ingredient_info_as_profileingredient()
     if request.method == 'POST':
-        #TODO: Add a reset button
         modifications_have_been_made = False
         if "save_ingredient_updates" in request.POST:
             form = EditProfileIngredientForm(request.POST)
@@ -93,6 +93,8 @@ def edit_ingredient(request, ingredient_id):
             modifications_have_been_made = True
         if modifications_have_been_made:
             initial_ingredient = profile_ingredient.get_ingredient_info_as_profileingredient()
+        return redirect('cupboard:ingredient_detail', ingredient_id=ingredient_id)
+        
     form = EditProfileIngredientForm(initial = initial_ingredient)
     return render(request, 'cupboard/edit_ingredient.html', {'form':form})
 

@@ -12,18 +12,18 @@
 <br>
 <div class="columns">
     <div class="column is-half">
-        {% if ingredient.category %}
-            <h1 class="heading"><b>{{ ingredient.category }}</b></h1>
+        {% if profile_ingredient.get_category %}
+            <h1 class="heading"><b>{{ profile_ingredient.get_category }}</b></h1>
         {% endif %}
-        {% if ingredient.long_life %}
+        {% if profile_ingredient.get_long_life %}
             <p>This is a long life ingredient and won't expire from your cupboard</p>
         {% elif owned_by_user %}
-            <p>This ingredient is saved as "perishable" and will be auto-removed in <b>{{time_to_expiry}} days</b>.<br>Expected shelf life: {{ ingredient.shelf_life }} days</p>
+            <p>This ingredient is saved as "perishable" and will be auto-removed in <b>{{time_to_expiry}} days</b>.<br>Expected shelf life: {{ profile_ingredient.get_shelf_life }} days</p>
         {% else %}
-            <p>This is a perishable item that will be auto-removed. <br>Expected shelf life: {{ ingredient.shelf_life }} days</p>
+            <p>This is a perishable item that will be auto-removed. <br>Expected shelf life: {{ profile_ingredient.get_shelf_life }} days</p>
         {% endif %}
-        <br><p>Possible substitutes include: <br>{{ ingredient.substitutes }}</p><br>
-        {% if not ingredient.long_life %}
+        <br><p>Possible substitutes include: <br>{{ profile_ingredient.get_substitutes }}</p><br>
+        {% if not profile_ingredient.get_long_life %}
             <p>
             </p>
         {% endif %}

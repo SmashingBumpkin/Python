@@ -6,17 +6,17 @@ from kitchenlife.unit_and_number_handling import convert_to_grams
 # Create your models here.
 class Ingredient(models.Model):
     name = models.CharField(max_length=50)
-    long_life = models.BooleanField(default= True)
-    shelf_life = models.IntegerField(null= True, blank=True)
-    substitutes = models.CharField(max_length = 200, blank= True)
-    category = models.CharField(max_length=60, blank=True)
-    calories = models.IntegerField(default = 0)
-    carbohydrates = models.FloatField(default = 0)
-    sugar = models.FloatField(default = 0)
-    fat = models.FloatField(default = 0)
-    protein = models.FloatField(default = 0)
-    fibre = models.FloatField(default = 0)
-    typical_weight = models.IntegerField(null= True, blank=True)
+    long_life = models.BooleanField(default= True) #overwritable
+    shelf_life = models.IntegerField(null= True, blank=True) #overwritable
+    substitutes = models.CharField(max_length = 200, blank= True) #overwritable
+    category = models.CharField(max_length=60, blank=True) #overwritable
+    calories = models.IntegerField(default = 0) #overwritable
+    carbohydrates = models.FloatField(default = 0) #overwritable
+    sugar = models.FloatField(default = 0) #overwritable
+    fat = models.FloatField(default = 0)#overwritable
+    protein = models.FloatField(default = 0)#overwritable
+    fibre = models.FloatField(default = 0)#overwritable
+    typical_weight = models.IntegerField(null= True, blank=True)#overwritable
 
     def __str__(self):
         return self.name

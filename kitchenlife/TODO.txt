@@ -1,32 +1,68 @@
-Features:
--Recipes
-    -Rate recipes
-    -Generate recipes that use particular ingredient(s)
-    -Add/edit recipe:
-        -Link each line of the ai with a line of the original to make it clearer.
--Nutrition:
-    -Implement calory counting
--Create cupboards which show which ingredients are stocked
-    -Update last_20_items code, will not work properly currently
-    -Add ingredient (without having recipe)
+Things:
+-openai_link:
+    -Tidy up openai_link to DRY. Probably requires json
+    -keep track of user credits
+
+-Ingredients
+    -If a user modifies an ingredient, the expiry from their cupboard will not update
+    -Add ingredient or food items (without having recipe)
+    -When importing a new ingredient, check if there is anything else that is very similar and use that
     -Info about ingredients
-        -seasonality
+        -Scan nutrition from label
+        -Seasonality
         -Link alternatives to the alternative
 
+-Recipes
+    -Recipe "category" should actually be tags, eg dessert, baking, lunch, snack, dinner ????
+    -Add a rating field
+    -Add a time to cook field
+    -Add a prep time field
+    -Generate recipes that use particular ingredient(s)
+    -Generate description from recipe (if it's not already provided)
+    -Add/edit recipe:
+        -Link each line of the ai with a line of the original to make it clearer.
+
+-Profile
+    -Update last_20_items code, will not work properly currently
+    -Nutrition
+        -Implement calory counting
+            -Keep track of what's been cooked
+    
 -Button to remove individual ingredients from your cupboard for a specific recipe
 *-Generate recipes based on cupboard contents
 
-Big things:
--TESTINGGGGGG
--1 click timer
--Actually host properly
--Integrate with webflow
--Collect comparison data for unformatted recipes and formatted recipes
--Collect comparison data for ingredients string and ingredients lists
--Change database to something appropriate for public implementation
+
+
+
+
+Medium things:
+        
+-Implement tests
 -Multithreading
+-Change database to something appropriate for public implementation
+-Actually host properly
+
+Big things:
+
+-Scrape the internet for recipes
+-Implement a way to buy credits
+-Social media aspect (friends, feeds etc)
+-Do something with comparison data for unformatted recipes and formatted recipes
+-Do something with comparison data for ingredients string and ingredients lists
 -Call supermarket APIs to see what's in stock and how much it would be
 -Sister app
+
+
+-Integrate with webflow
+UI stuff:
+    -Recipe detail view
+        -1 click timer
+        -Add or remove ingredient from cupboard
+        -View ingredient details
+        -Seek clarification in the recipe (eg if you don't know what a technique is)
+
+
+
 
 https://realpython.com/django-social-forms-4/
 https://docs.djangoproject.com/en/4.1/intro/tutorial02/
