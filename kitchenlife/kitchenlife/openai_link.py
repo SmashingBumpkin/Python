@@ -1,37 +1,19 @@
 import openai
 from sys import exit as sysexit
 
-def sendOpenAIRequest(input_template, data, profile):
-    pass
-
-
-
-def sendPrompt(myprompt, active_user, temperature = 0.01, model = "text-davinci-003"):
-    # cont = input("\n____\n\n\nPlease type 1 to continue (will spend openai credits) ")
-    # if cont != "1":
-    #     print("\nYou have terminated the program, cheapskate.\n")
-    #     sysexit()
-    openai.api_key = "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"
-    response = openai.Completion.create(
-      model=model,
-      prompt=myprompt,
-      max_tokens=600,
-      temperature=temperature
-    )
-    active_user.ai_credits_used += response["usage"]["total_tokens"]
-    active_user.save()
-    return response["choices"][0]["text"]
-
-def sendPromptIngredients(myprompt, active_user):
-    #https://platform.openai.com/docs/guides/chat
-    # cont = input("\n____\n\n\nPlease type 1 to continue ingredient simplifier (will spend openai credits) ")
-    # if cont != "1":
-    #     print("\nYou have terminated the program, cheapskate.\n")
-    #     sysexit()
+def sendOpenAIRequest(messages, profile):
+    # replace with your OpenAI API key
     openai.api_key = "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"
     response = openai.ChatCompletion.create(
-      model="gpt-3.5-turbo",
-      messages=[
+        model="gpt-3.5-turbo",
+        messages = messages
+    )
+    profile.ai_credits_used += response["usage"]["total_tokens"]
+    profile.save()
+    return response["choices"][0]["message"]["content"].strip()
+
+def sendPromptIngredients(ingredients, profile):
+    messages=[
         {"role": "user", "content": """This is a list of ingredients. Return a list "simple_ingredients", of names of the ingredient used, seperated by '\\n'. 
 Each line in the returned content an exact substring of the line they are taken from, for example "350g whole (black) urad daal" must NOT return "Whole Urad Daal".
 
@@ -47,25 +29,13 @@ chopped tomatoes
 spinach
 cumin
 red onion"""},
-        {"role": "user", "content": "Use the same process to modify this list of ingredients: \n\n' "+myprompt}
+        {"role": "user", "content": "Use the same process to modify this list of ingredients: \n\n' "
+         +ingredients}
     ]
-    )
-    active_user.ai_credits_used += response["usage"]["total_tokens"]
-    active_user.save()
-    print(response["choices"][0]["message"]["content"])
-    return response["choices"][0]["message"]["content"]
+    return sendOpenAIRequest(messages, profile)
 
-
-def sendPromptJumbled(myprompt, active_user):
-    #https://platform.openai.com/docs/guides/chat
-    # cont = input("\n____\n\n\nPlease type 1 to continue de-jumbler (will spend openai credits) ")
-    # if cont != "1":
-    #     print("\nYou have terminated the program, cheapskate.\n")
-    #     sysexit()
-    openai.api_key = "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"
-    response = openai.ChatCompletion.create(
-      model="gpt-3.5-turbo",
-      messages=[
+def sendPromptJumbled(jumbled_recipe, profile):
+    messages = [
         {"role": "user", "content": """The following excerpt is a jumbled up recipe. Reformat this recipe with the headers
 name, description, serves, ingredients and then the method. Correct the capitalization where applicable:
 Spaghetti Bolognese
@@ -149,25 +119,13 @@ Method:
 4: Roll into walnut size balls, for a more homemade look, or roll into a long, thick sausage shape and slice to make neater looking cookies.
 5: Place on ungreased baking paper. If you want to have the real Millies experience then bake for just 7 minutes, till the cookies are just setting - the cookies will be really doughy and delicious. Otherwise cook for 10 minutes until just golden round the edges.
 6: Take out of the oven and leave to harden for a minute before transferring to a wire cooling rack. These are great warm, and they also store well, if they don't all get eaten straight away!"""},
-        {"role": "user", "content": "Using the same headings, correct this jumbled up recipe:"+myprompt}
+        {"role": "user", "content": "Using the same headings, correct this jumbled up recipe:"
+         + jumbled_recipe}
     ]
-    )
-    active_user.ai_credits_used += response["usage"]["total_tokens"]
-    active_user.save()
-    print(response["choices"][0]["message"]["content"])
-    return response["choices"][0]["message"]["content"]
+    return sendOpenAIRequest(messages, profile)
 
-
-def sendPromptIngredientDetails(ingredient, user):
-    #https://platform.openai.com/docs/guides/chat
-    #cont = input("\n____\n\n\nPlease type 1 to continue ingredient detailer (will spend openai credits) ")
-    # if cont != "1":
-    #     print("\nYou have terminated the program, cheapskate.\n")
-    #     sysexit()
-    openai.api_key = "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"
-    response = openai.ChatCompletion.create(
-      model="gpt-3.5-turbo",
-      messages=[
+def sendPromptIngredientDetails(ingredient, profile):
+    messages = [
         {"role": "user", "content": """Provide details of a typical example of this ingredient: Onion
 Provide details in a precise format under the headings: substitutes, long life, typical shelf life (this should be how 
 long many days the item can be expected to last if stored appropriately at home), Category, typical weight 
@@ -200,26 +158,13 @@ Sugar: 4.5g
 Fat: 1.8g
 Protein: 3.6g
 Fibre: 0g"""},
-        {"role": "user", "content": "Using the same headings, provide details of a typical example of this ingredient: "+ingredient}
+        {"role": "user", "content": "Using the same headings, provide details of a typical example of this ingredient: "
+         + ingredient}
     ]
-    )
-    print(response)
-    user.profile.ai_credits_used += response["usage"]["total_tokens"]
-    user.profile.save()
-    print(ingredient.capitalize() + "\n\n")
-    print(response["choices"][0]["message"]["content"])
-    return response["choices"][0]["message"]["content"]
+    return sendOpenAIRequest(messages, profile)
 
-def sendPromptForgottenDetails(ingredient, user):
-    #https://platform.openai.com/docs/guides/chat
-    #cont = input("\n____\n\n\nPlease type 1 to continue ingredient detailer (will spend openai credits) ")
-    # if cont != "1":
-    #     print("\nYou have terminated the program, cheapskate.\n")
-    #     sysexit()
-    openai.api_key = "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"
-    response = openai.ChatCompletion.create(
-      model="gpt-3.5-turbo",
-      messages=[
+def sendPromptForgottenDetails(myprompt, profile):
+    messages = [
         {"role": "user", "content": """Categorize this ingredient into a typical food category: Onion"""},
         {"role": "assistant", "content": """Vegetable"""},
         {"role": "user", "content": """Categorize this ingredient into a typical food category: Milk"""},
@@ -228,60 +173,4 @@ def sendPromptForgottenDetails(ingredient, user):
         {"role": "assistant", "content": """Spice"""},
         {"role": "user", "content": "Categorize this ingredient into a typical food category: "+ingredient}
     ]
-    )
-    user.profile.ai_credits_used += response["usage"]["total_tokens"]
-    user.profile.save()
-    print(ingredient.capitalize() + "\n\n")
-    print(response["choices"][0]["message"]["content"])
-    return response["choices"][0]["message"]["content"]
-
-def sendPromptTypicalWeight(ingredient, user):
-    #https://platform.openai.com/docs/guides/chat
-    #cont = input("\n____\n\n\nPlease type 1 to continue ingredient detailer (will spend openai credits) ")
-    # if cont != "1":
-    #     print("\nYou have terminated the program, cheapskate.\n")
-    #     sysexit()
-    openai.api_key = "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"
-    response = openai.ChatCompletion.create(
-      model="gpt-3.5-turbo",
-      messages=[
-        {"role": "user", "content": """Provide a typical weight in grams of an individual unit of garlic"""},
-        {"role": "assistant", "content": """3"""},
-        {"role": "user", "content": """Provide a typical weight in grams of an individual unit of apple"""},
-        {"role": "assistant", "content": """120"""},
-        {"role": "user", "content": """Provide a typical weight in grams of an individual unit of flour"""},
-        {"role": "assistant", "content": """0"""},
-        {"role": "user", "content": "Provide a typical weight in grams of an individual unit of "+ingredient
-         + "\nIf this doesn't apply to the ingredient in question, reply with 0"}
-    ]
-    )
-    user.profile.ai_credits_used += response["usage"]["total_tokens"]
-    user.profile.save()
-    print(ingredient.capitalize() + "\n\n")
-    print(response["choices"][0]["message"]["content"])
-    return response["choices"][0]["message"]["content"]
-
-def sendPromptTypicalShelfLife(ingredient, user):
-    #https://platform.openai.com/docs/guides/chat
-    #cont = input("\n____\n\n\nPlease type 1 to continue ingredient detailer (will spend openai credits) ")
-    # if cont != "1":
-    #     print("\nYou have terminated the program, cheapskate.\n")
-    #     sysexit()
-    openai.api_key = "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"
-    response = openai.ChatCompletion.create(
-      model="gpt-3.5-turbo",
-      messages=[
-        {"role": "user", "content": """Provide the typical shelflife in days of garlic"""},
-        {"role": "assistant", "content": """12"""},
-        {"role": "user", "content": """Provide the typical shelflife in days of apple"""},
-        {"role": "assistant", "content": """8"""},
-        {"role": "user", "content": """Provide the typical shelflife in days of flour"""},
-        {"role": "assistant", "content": """365"""},
-        {"role": "user", "content": "Provide the typical shelflife in days of "+ingredient}
-    ]
-    )
-    user.profile.ai_credits_used += response["usage"]["total_tokens"]
-    user.profile.save()
-    print(ingredient.capitalize() + "\n\n")
-    print(response["choices"][0]["message"]["content"])
-    return response["choices"][0]["message"]["content"]
+    return sendOpenAIRequest(messages, profile)

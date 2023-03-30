@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from cupboard.forms import EditProfileIngredientForm, EmptyForm
-from kitchenlife.openai_link import sendPrompt, sendPromptForgottenDetails, sendPromptIngredientDetails, sendPromptTypicalShelfLife, sendPromptTypicalWeight
+from kitchenlife.openai_link import sendPromptForgottenDetails, sendPromptIngredientDetails
 from recipes.models import Recipe
 from .models import Ingredient
 from recipes.forms import SearchForm

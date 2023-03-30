@@ -41,7 +41,7 @@ class Recipe(models.Model):
                     }
     
     def simplify_ingredients(self, active_user):
-        self.simplified_ingredients = openai_link.sendPromptIngredients(self.ingredients_string, active_user = active_user.profile)
+        self.simplified_ingredients = openai_link.sendPromptIngredients(self.ingredients_string, active_user.profile)
 
     def simplified_to_ingredients(self, active_user):
         print("UPDATING INGREDIENTS LINK")
