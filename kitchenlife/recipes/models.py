@@ -292,10 +292,9 @@ class ProfileIngredient(models.Model):
         pass
 
     def get_nutrition(self, quantity, unit):
-        print("Getting nutrition from profile")
         quantity = convert_to_grams(quantity, unit) # returns 
         scale = quantity/100 #because nutrition is stored as x per 100g
-        nutrients = self.get_ingredient_nutrition()
+        nutrients = self.get_generic_nutrition()
         for key in nutrients.keys():
             if nutrients[key] == None:
                 nutrients[key] = 0
@@ -329,7 +328,7 @@ class ProfileIngredient(models.Model):
             self.expiry_date = timezone.now().date() + timezone.timedelta(days=shelf_life)
         super().save(*args, **kwargs)
 
-    #Returns overriden values if they exist
+    #Logic for overriden values, if they exist
 
     def get_long_life(self):
         if self.long_life_override is not None:
@@ -398,7 +397,7 @@ class ProfileIngredient(models.Model):
         else:
             return self.ingredient.typical_weight
 
-    def get_ingredient_nutrition(self):
+    def get_generic_nutrition(self):
         return {
             "calories": self.get_calories(),
             "carbohydrates": self.get_carbohydrates(),
@@ -409,7 +408,7 @@ class ProfileIngredient(models.Model):
         }
     
     def get_ingredient_info(self):
-        return { **self.get_ingredient_nutrition(),
+        return { **self.get_generic_nutrition(),
                 **{
                 "name": self.ingredient.name,
                 "long_life": self.get_long_life(),
