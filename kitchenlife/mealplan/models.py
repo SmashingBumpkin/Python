@@ -12,7 +12,7 @@ class MealPlan(models.Model):
         return self.name
     
 class MiscItem(models.Model):
-    name = models.CharField(max_length=50, null= True, blank = True)
+    name = models.CharField(max_length=50, blank = True)
     quantity = models.IntegerField(null= True, blank = True)
     owner = models.ForeignKey(MealPlan, on_delete=models.CASCADE, blank=True, null=True, related_name = "misc_item")
 

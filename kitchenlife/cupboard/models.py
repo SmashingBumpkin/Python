@@ -6,10 +6,10 @@ from kitchenlife.unit_and_number_handling import convert_to_grams
 # Create your models here.
 class Ingredient(models.Model):
     name = models.CharField(max_length=50)
-    long_life = models.BooleanField(null= True, blank=True)
+    long_life = models.BooleanField(default= True)
     shelf_life = models.IntegerField(null= True, blank=True)
-    substitutes = models.CharField(max_length = 200, null = True, blank= True)
-    category = models.CharField(max_length=60, null= True, blank=True)
+    substitutes = models.CharField(max_length = 200, blank= True)
+    category = models.CharField(max_length=60, blank=True)
     calories = models.IntegerField(default = 0)
     carbohydrates = models.FloatField(default = 0)
     sugar = models.FloatField(default = 0)

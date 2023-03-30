@@ -8,13 +8,16 @@ pytesseract.pytesseract.tesseract_cmd = r'C:\\Program Files\\Tesseract-OCR\\tess
 
 def url_to_recipe(url, owner):
     try:
-        
         scraper = scrape_me(url, wild_mode=True)
         name = scraper.title()
-        ingredients = list_cleaner(scraper.ingredients())
+        ingredients = scraper.ingredients()
+        if type(ingredients) == list:
+            ingredients = list_cleaner(ingredients)
+        else:
+            ingredients = string_cleaner(ingredients)
         instructions = scraper.instructions()
         serves = scraper.yields()
-        return Recipe(name = name, ingredients_string = '\n'.join(ingredients), 
+        return Recipe(name = name, ingredients_string = ingredients, 
                     method = instructions, url = url, serves = serves, owner = owner)
     except:
         name = "Enter details manually"
@@ -59,7 +62,6 @@ def text_to_recipe(text, user):
     serves = info["serves"] if info["serves"] else ""
     ingredients = info["ingredients"] if info["ingredients"] else ""
     method = info["method"] if info["method"] else ""
-    #[_,name,description, serves, ingredients, method] =  resplit(r"Name:|Description:|Serves:|Ingredients:|Method:",text)
     ingredients_string = string_cleaner(ingredients).strip()
     method = string_cleaner(method.replace('\n\n','\n')).strip()
     return Recipe(name = name.strip(), ingredients_string = ingredients_string , method = method, serves = serves.strip(),

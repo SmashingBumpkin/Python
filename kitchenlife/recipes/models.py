@@ -11,16 +11,16 @@ from kitchenlife.unit_and_number_handling import convert_to_grams
 
 class Recipe(models.Model):
     name = models.CharField(max_length=200)
-    method = models.TextField(max_length=5000, null = True, blank = True)
-    ingredients_string = models.TextField(max_length=1000, null = True, blank = True)#Plain text of ingredients
-    simplified_ingredients = models.TextField(max_length=1000, null = True, blank = True)#Ingredients data
-    book = models.CharField(max_length=200, null = True, blank = True)
-    page = models.CharField(max_length=5, null = True, blank = True)
-    serves = models.CharField(max_length=5, null = True, blank = True)
+    method = models.TextField(max_length=5000, blank = True)
+    ingredients_string = models.TextField(max_length=1000, blank = True)#Plain text of ingredients
+    simplified_ingredients = models.TextField(max_length=1000, blank = True)#Ingredients data
+    book = models.CharField(max_length=200, blank = True)
+    page = models.CharField(max_length=5, blank = True)
+    serves = models.CharField(max_length=5, blank = True)
     serves_int = models.IntegerField(null = True, blank = True)
-    description = models.TextField(max_length=500, null = True, blank = True)
+    description = models.TextField(max_length=500, blank = True)
     url = models.URLField(null = True, blank = True)
-    jumbled_input = models.TextField(max_length=8000, null = True, blank = True)
+    jumbled_input = models.TextField(max_length=8000, blank = True)
     owner = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
     from_photo = models.BooleanField(default=False)
 
@@ -275,6 +275,10 @@ class ProfileIngredient(models.Model):
     def __str__(self):
         return ("Profile Ingredient: " + self.ingredient.name + " " + str(self.id))
     
+    def modify_locally(self):
+        #TODO: Implement
+        pass
+
     def get_nutrition(self, quantity, unit):
         quantity = convert_to_grams(quantity, unit) # returns 
         scale = quantity/100 #because nutrition is stored as x per 100g
@@ -331,7 +335,7 @@ class RecipeIngredient(models.Model):
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name="recipe_ingredient")
     profile_ingredient = models.ForeignKey(ProfileIngredient, on_delete=models.CASCADE, related_name="recipe_ingredient")
     quantity = models.FloatField(null=True, blank=True)
-    measurement_unit = models.CharField(max_length=50, null=True, blank=True)
+    measurement_unit = models.CharField(max_length=50, blank=True)
     local_name = models.CharField(max_length=100)
     position_in_list = models.IntegerField(null=True, blank=True)
     optional = models.BooleanField(default = False)
