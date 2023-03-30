@@ -8,8 +8,8 @@ def sendOpenAIRequest(messages, profile):
         model="gpt-3.5-turbo",
         messages = messages
     )
-    profile.ai_credits_used += response["usage"]["total_tokens"]
-    profile.save()
+    costs = response["usage"]
+    profile.pay_for_ai_credits(costs["total_tokens"])
     return response["choices"][0]["message"]["content"].strip()
 
 def sendPromptIngredients(ingredients, profile):

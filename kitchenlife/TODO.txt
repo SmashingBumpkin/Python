@@ -1,9 +1,9 @@
 Things:
 -openai_link:
-    -Tidy up openai_link to DRY. Probably requires json
     -keep track of user credits
 
 -Ingredients
+    -If import goes wrong, have a button to retry
     -If a user modifies an ingredient, the expiry from their cupboard will not update
     -Add ingredient or food items (without having recipe)
     -When importing a new ingredient, check if there is anything else that is very similar and use that
@@ -17,6 +17,7 @@ Things:
     -Add a rating field
     -Add a time to cook field
     -Add a prep time field
+    -Recipe import should check that "servings" is just a number
     -Generate recipes that use particular ingredient(s)
     -Generate description from recipe (if it's not already provided)
     -Add/edit recipe:

@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from cupboard.forms import EditProfileIngredientForm, EmptyForm
+from kitchenlife import openai_link
 from kitchenlife.openai_link import sendPromptForgottenDetails, sendPromptIngredientDetails
 from recipes.models import Recipe
 from .models import Ingredient
@@ -46,7 +47,11 @@ def cupboard_index(request):
 
 @login_required
 def ingredient_detail(request, ingredient_id):
+    
     ingredient = get_object_or_404(Ingredient, pk=ingredient_id)
+    #TODO: If user is admin, allow them to execute this code:
+    # response = openai_link.sendPromptIngredientDetails(ingredient.name, request.user.profile)
+    # ingredient.ai_response_parser(response)
     profile = request.user.profile
     profile_ingredient = profile.profile_ingredient.get(ingredient = ingredient)
     profile_ingredient.check_and_remove_expired()

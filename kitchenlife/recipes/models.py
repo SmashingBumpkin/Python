@@ -40,10 +40,10 @@ class Recipe(models.Model):
                         'url': self.url,
                     }
     
-    def simplify_ingredients(self, active_user):
-        self.simplified_ingredients = openai_link.sendPromptIngredients(self.ingredients_string, active_user.profile)
+    def simplify_ingredients(self, user):
+        self.simplified_ingredients = openai_link.sendPromptIngredients(self.ingredients_string, user.profile)
 
-    def simplified_to_ingredients(self, active_user):
+    def simplified_to_ingredients(self, user):
         print("UPDATING INGREDIENTS LINK")
         #Function that generates a the RecipeIngredients that link this recipe to the ingredients
         self.recipe_ingredient.all().delete()
@@ -77,16 +77,16 @@ class Recipe(models.Model):
                 except:
                     ingredient = Ingredient.objects.get(name=alt_ingredient_name.capitalize())
                 try:
-                    profile_ingredient = ProfileIngredient.objects.get(ingredient = ingredient, profile = active_user.profile)
+                    profile_ingredient = ProfileIngredient.objects.get(ingredient = ingredient, profile = user.profile)
                 except:
-                    profile_ingredient = ProfileIngredient(profile = active_user.profile, ingredient = ingredient)
+                    profile_ingredient = ProfileIngredient(profile = user.profile, ingredient = ingredient)
                     profile_ingredient.save()
             except:
                 ingredient = Ingredient(name = ingredient_name.capitalize())
                 ingredient.save()
-                response = openai_link.sendPromptIngredientDetails(ingredient.name, active_user)
+                response = openai_link.sendPromptIngredientDetails(ingredient.name, user.profile)
                 ingredient.ai_response_parser(response)
-                profile_ingredient = ProfileIngredient(profile = active_user.profile, ingredient = ingredient)
+                profile_ingredient = ProfileIngredient(profile = user.profile, ingredient = ingredient)
                 profile_ingredient.save()
         
         #TODO: delete all instances of "" from list
@@ -112,7 +112,7 @@ class Recipe(models.Model):
                                 for line in dumb_line_2: #Figures out which line is which
                                     if ingredient_name_2 in line:
                                         ingredient=Ingredient.objects.get(name=ingredient_name_2.strip().capitalize())
-                                        recipe_ingredient = RecipeIngredient.parse_dumb_ingredient(recipe=self, ingredient=ingredient,ingredient_dumb=line, profile = active_user.profile)
+                                        recipe_ingredient = RecipeIngredient.parse_dumb_ingredient(recipe=self, ingredient=ingredient,ingredient_dumb=line, profile = user.profile)
                                         recipe_ingredient.position_in_list = line_number
                                         recipe_ingredient.save()
                                     else:
@@ -138,7 +138,7 @@ class Recipe(models.Model):
                                         alt_ingred = alt_ingred.replace(ingredient_name + " ", "")
                                         alt_ingred = alt_ingred.replace(" " + ingredient_name, "")
                                         ingredient=Ingredient.objects.get(name=ingredient_name_2.strip().capitalize())
-                                        recipe_ingredient = RecipeIngredient.parse_dumb_ingredient(recipe=self, ingredient=ingredient,ingredient_dumb=alt_ingred, profile = active_user.profile)
+                                        recipe_ingredient = RecipeIngredient.parse_dumb_ingredient(recipe=self, ingredient=ingredient,ingredient_dumb=alt_ingred, profile = user.profile)
                                         recipe_ingredient.alternative = not first_loop
                                         recipe_ingredient.position_in_list = line_number
                                         recipe_ingredient.save()
@@ -155,7 +155,7 @@ class Recipe(models.Model):
 
                     #Parse recipe ingredient from line
                     ingredient=Ingredient.objects.get(name=ingredient_name.strip().capitalize())
-                    recipe_ingredient = RecipeIngredient.parse_dumb_ingredient(recipe=self, ingredient=ingredient,ingredient_dumb=dumb_line, profile = active_user.profile)
+                    recipe_ingredient = RecipeIngredient.parse_dumb_ingredient(recipe=self, ingredient=ingredient,ingredient_dumb=dumb_line, profile = user.profile)
                     recipe_ingredient.alternative = alternative
                     recipe_ingredient.position_in_list = line_number
                     recipe_ingredient.save()
@@ -246,7 +246,7 @@ class Profile(models.Model):
     def __str__(self):
         return self.user.username
     
-    def successfully_pay_for_ai_credits(self, cost):
+    def pay_for_ai_credits(self, cost):
         self.ai_credits_used += cost
         self.save()
         if cost > self.ai_credits:
