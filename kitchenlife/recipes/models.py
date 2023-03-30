@@ -269,6 +269,8 @@ class ProfileIngredient(models.Model):
     in_stock = models.BooleanField(default = False)
     date_added = models.DateTimeField(default=timezone.now)
     expiry_date = models.DateField(null=True, blank=True)
+    locally_modified = models.BooleanField(default = False)
+    
 
     def __str__(self):
         return ("Profile Ingredient: " + self.ingredient.name + " " + str(self.id))

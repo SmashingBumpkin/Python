@@ -12,7 +12,6 @@ Features:
             -Update the database 
                 -locally_modified boolean
                 -all nutrient floats
-                
         -Update last_20_items code, will not work properly currently
     -Add ingredient (without having recipe)
     -Info about ingredients
