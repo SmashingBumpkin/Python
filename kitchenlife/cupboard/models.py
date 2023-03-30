@@ -120,7 +120,3 @@ class Ingredient(models.Model):
             except:
                 pass
         self.save()
-    
-    
-    def get_generic_nutrition(self):
-        return [self.calories,self.carbohydrates,self.sugar,self.fat,self.protein, self.fibre]

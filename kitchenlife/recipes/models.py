@@ -269,7 +269,19 @@ class ProfileIngredient(models.Model):
     in_stock = models.BooleanField(default = False)
     date_added = models.DateTimeField(default=timezone.now)
     expiry_date = models.DateField(null=True, blank=True)
-    locally_modified = models.BooleanField(default = False)
+
+    #Values are not used unless they are individually overwritten
+    long_life_override = models.BooleanField(null=True, blank=True)
+    shelf_life_override = models.IntegerField(null=True, blank=True)
+    substitutes_override = models.CharField(max_length=200, blank=True)
+    category_override = models.CharField(max_length=60, blank=True)
+    calories_override = models.IntegerField(null=True, blank=True)
+    carbohydrates_override = models.FloatField(null=True, blank=True)
+    sugar_override = models.FloatField(null=True, blank=True)
+    fat_override = models.FloatField(null=True, blank=True)
+    protein_override = models.FloatField(null=True, blank=True)
+    fibre_override = models.FloatField(null=True, blank=True)
+    typical_weight_override = models.IntegerField(null=True, blank=True)
     
 
     def __str__(self):
@@ -280,30 +292,21 @@ class ProfileIngredient(models.Model):
         pass
 
     def get_nutrition(self, quantity, unit):
+        print("Getting nutrition from profile")
         quantity = convert_to_grams(quantity, unit) # returns 
         scale = quantity/100 #because nutrition is stored as x per 100g
-        if False: #TODO: Truth test for if the user has locally modified ingredients
-            #TODO: Implement locally modified ingredients
-            pass
-        else: #return values from universal ingredient
-            nutrients = self.ingredient.get_generic_nutrition()
-        for nutrient in nutrients:
-            if nutrient == None:
-                nutrient = 0
-        output = {"calories": round(scale*nutrients[0],0),
-                  "carbohydrates": round(scale*nutrients[1],1),
-                  "sugar": round(scale*nutrients[2],1),
-                  "fat": round(scale*nutrients[3],1),
-                  "protein": round(scale*nutrients[4],1),
-                  "fibre": round(scale*nutrients[5],1),}
+        nutrients = self.get_ingredient_nutrition()
+        for key in nutrients.keys():
+            if nutrients[key] == None:
+                nutrients[key] = 0
+            nutrients[key] = round(nutrients[key] * scale, 1)
+        output = {"calories": round(nutrients["calories"],0),
+                  "carbohydrates": nutrients["carbohydrates"],
+                  "sugar": nutrients["sugar"],
+                  "fat": nutrients["fat"],
+                  "protein": nutrients["protein"],
+                  "fibre": nutrients["fibre"],}
         return output
-
-    def get_typical_weight(self):
-        if False: #TODO: Truth test for if the user has locally modified ingredients
-            #TODO: Implement locally modified ingredients
-            pass
-        else: #return values from universal ingredient
-            return self.ingredient.typical_weight
 
     def add_to_cupboard(self):
         if not self.in_stock:
@@ -317,7 +320,7 @@ class ProfileIngredient(models.Model):
         if (self.in_stock == True 
             and self.ingredient.long_life == False 
             and self.expiry_date < timezone.now().date()):
-            print("Hi")
+            print("Models.recipes.profileingredient.checking and removing")
             self.in_stock = False
 
     def save(self, *args, **kwargs):
@@ -325,6 +328,96 @@ class ProfileIngredient(models.Model):
             shelf_life = self.ingredient.shelf_life or 0
             self.expiry_date = timezone.now().date() + timezone.timedelta(days=shelf_life)
         super().save(*args, **kwargs)
+
+    #Returns overriden values if they exist
+
+    def get_long_life(self):
+        if self.long_life_override is not None:
+            return self.long_life_override
+        else:
+            return self.ingredient.long_life
+
+    def get_shelf_life(self):
+        if self.shelf_life_override is not None:
+            return self.shelf_life_override
+        else:
+            return self.ingredient.shelf_life
+
+    def get_substitutes(self):
+        if self.substitutes_override:
+            return self.substitutes_override
+        else:
+            return self.ingredient.substitutes
+
+    def get_category(self):
+        if self.category_override:
+            return self.category_override
+        else:
+            return self.ingredient.category
+
+    def get_calories(self):
+        if self.calories_override is not None:
+            return self.calories_override
+        else:
+            return self.ingredient.calories
+
+    def get_carbohydrates(self):
+        if self.carbohydrates_override is not None:
+            return self.carbohydrates_override
+        else:
+            return self.ingredient.carbohydrates
+
+    def get_sugar(self):
+        if self.sugar_override is not None:
+            return self.sugar_override
+        else:
+            return self.ingredient.sugar
+
+    def get_fat(self):
+        if self.fat_override is not None:
+            return self.fat_override
+        else:
+            return self.ingredient.fat
+
+    def get_protein(self):
+        if self.protein_override is not None:
+            return self.protein_override
+        else:
+            return self.ingredient.protein
+
+    def get_fibre(self):
+        if self.fibre_override is not None:
+            return self.fibre_override
+        else:
+            return self.ingredient.fibre
+
+    def get_typical_weight(self):
+        if self.typical_weight_override is not None:
+            return self.typical_weight_override
+        else:
+            return self.ingredient.typical_weight
+
+    def get_ingredient_nutrition(self):
+        return {
+            "calories": self.get_calories(),
+            "carbohydrates": self.get_carbohydrates(),
+            "sugar": self.get_sugar(),
+            "fat": self.get_fat(),
+            "protein": self.get_protein(),
+            "fibre": self.get_fibre(),
+        }
+    
+    def get_ingredient_info(self):
+        return { **self.get_ingredient_nutrients(),
+                **{
+                "name": self.ingredient.name,
+                "long_life": self.get_long_life(),
+                "shelf_life": self.get_shelf_life(),
+                "substitutes": self.get_substitutes(),
+                "category": self.get_category(),
+                "typical_weight": self.get_typical_weight(),
+            }
+        }
     
     class Meta:
         unique_together = ('profile', 'ingredient',)
