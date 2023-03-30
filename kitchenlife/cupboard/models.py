@@ -121,17 +121,6 @@ class Ingredient(models.Model):
                 pass
         self.save()
     
-    def return_nutrition(self, quantity, unit):
-        quantity = convert_to_grams(quantity, unit) # returns 
-        scale = quantity/100
-        jeff = [self.calories,self.carbohydrates,self.sugar,self.fat,self.protein, self.fibre]
-        for jef in jeff:
-            if jef == None:
-                jef = 0
-        output = {"calories": round(scale*jeff[0],0),
-                  "carbohydrates": round(scale*jeff[1],1),
-                  "sugar": round(scale*jeff[2],1),
-                  "fat": round(scale*jeff[3],1),
-                  "protein": round(scale*jeff[4],1),
-                  "fibre": round(scale*jeff[5],1),}
-        return output
+    
+    def get_generic_nutrition(self):
+        return [self.calories,self.carbohydrates,self.sugar,self.fat,self.protein, self.fibre]

@@ -47,19 +47,14 @@ def cupboard_index(request):
 @login_required
 def ingredient_detail(request, ingredient_id):
     ingredient = get_object_or_404(Ingredient, pk=ingredient_id)
-    # ingredient.print_variables()
-    # ingredient.ai_response_parser(sendPromptIngredientDetails(ingredient.name, request.user))
-    #ingredient.print_variables()
     profile = request.user.profile
     profile_ingredient = profile.profile_ingredient.get(ingredient = ingredient)
     profile_ingredient.check_and_remove_expired()
+    nutrients = profile_ingredient.get_nutrition(100, "g")
     if request.method == 'POST':
         profile_ingredient.in_stock = not profile_ingredient.in_stock
         profile_ingredient.save()
-    # recipes = set(Recipe.objects.filter(recipe_ingredient__ingredient__profileingredient__profile__user=request.user, recipe_ingredient__ingredient__ingredient__name=ingredient.name))
     
-
-    # Assuming "expiry_date" is a valid date object stored in a variable named "expiry_date"
     try:
         days_until_expiry = (profile_ingredient.expiry_date - date.today()).days
     except:
@@ -69,7 +64,8 @@ def ingredient_detail(request, ingredient_id):
                'recipes': recipes, 
                'owned_by_user': profile_ingredient.in_stock, 
                'form': EmptyForm,
-               'time_to_expiry': days_until_expiry}
+               'time_to_expiry': days_until_expiry,
+               'nutrients': nutrients,}
     return render(request, 'cupboard/ingredient_detail.html', context)
 
 @login_required

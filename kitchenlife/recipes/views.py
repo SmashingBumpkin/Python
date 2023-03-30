@@ -65,7 +65,7 @@ def detail(request, recipe_id):
             profile = request.user.profile
             profile.add_items_from_recipe(recipe)
     method_as_list = recipe.method_as_list()
-    nutrients = recipe.return_nutritional_info(scale_nutrition)
+    nutrients = recipe.get_nutritional_info(scale_nutrition)
     #print(nutrients)
     context = {'recipe': recipe, 
                'method_as_list': method_as_list, 
@@ -93,9 +93,7 @@ def nutrition_detail(request, recipe_id):
             formNutrition = QuantityForm(request.POST)
             if formNutrition.is_valid():
                 scale_nutrition = int(formNutrition.cleaned_data['serving'])/100
-    nutrients = recipe.return_detailed_nutritional_info(scale_nutrition)
-    print(nutrients)
-    #print(nutrients)
+    nutrients = recipe.get_detailed_nutritional_info(scale_nutrition)
     context = {'recipe': recipe, 
                'scale': scale, 
                'formServing': formServing,

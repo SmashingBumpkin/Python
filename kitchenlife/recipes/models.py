@@ -6,6 +6,8 @@ from cupboard.models import Ingredient
 from re import split as resplit, findall as refindall
 from fractions import Fraction
 
+from kitchenlife.unit_and_number_handling import convert_to_grams
+
 
 class Recipe(models.Model):
     name = models.CharField(max_length=200)
@@ -175,7 +177,7 @@ class Recipe(models.Model):
             method_as_list = []
         return method_as_list
     
-    def return_nutritional_info(self, scale = 1):
+    def get_nutritional_info(self, scale = 1):
         #Returns the nutritional info of a recipe as a dictionary
         output = {"calories": 0,
                   "carbohydrates": 0,
@@ -195,19 +197,15 @@ class Recipe(models.Model):
                 unit = recipe_ingredient.measurement_unit
             else:
                 unit = "g"
-                qty = qty*profile_ingredient.ingredient.typical_weight
-            nutrients = profile_ingredient.ingredient.return_nutrition(qty, unit)
-            # print("\n")
-            # print(ingredient)
-            # print("Typical weight: " + str(ingredient.typical_weight) + "g")
-            # print(nutrients)
+                qty = qty*profile_ingredient.get_typical_weight()
+            nutrients = profile_ingredient.get_nutrition(qty, unit)
             for nutrient, amount in nutrients.items():
                 output[nutrient] += amount/self.serves_int
         for nutrient, amount in output.items():
                 output[nutrient] = round(scale*amount,1)
         return output
     
-    def return_detailed_nutritional_info(self, scale = 1):
+    def get_detailed_nutritional_info(self, scale = 1):
         #Returns the nutritional info of a recipe as a dictionary
         if self.serves_int == 0:
             self.serves_int = 1
@@ -222,8 +220,8 @@ class Recipe(models.Model):
                 unit = recipe_ingredient.measurement_unit
             else:
                 unit = "g"
-                qty = qty*profile_ingredient.ingredient.typical_weight
-            nutrients = profile_ingredient.ingredient.return_nutrition(int(qty*scale/self.serves_int), unit)
+                qty = qty*profile_ingredient.get_typical_weight()
+            nutrients = profile_ingredient.get_nutrition(int(qty*scale/self.serves_int), unit)
             output.append((recipe_ingredient, nutrients))
         return output
     
@@ -274,6 +272,32 @@ class ProfileIngredient(models.Model):
 
     def __str__(self):
         return ("Profile Ingredient: " + self.ingredient.name + " " + str(self.id))
+    
+    def get_nutrition(self, quantity, unit):
+        quantity = convert_to_grams(quantity, unit) # returns 
+        scale = quantity/100 #because nutrition is stored as x per 100g
+        if False: #TODO: Truth test for if the user has locally modified ingredients
+            #TODO: Implement locally modified ingredients
+            pass
+        else: #return values from universal ingredient
+            nutrients = self.ingredient.get_generic_nutrition()
+        for nutrient in nutrients:
+            if nutrient == None:
+                nutrient = 0
+        output = {"calories": round(scale*nutrients[0],0),
+                  "carbohydrates": round(scale*nutrients[1],1),
+                  "sugar": round(scale*nutrients[2],1),
+                  "fat": round(scale*nutrients[3],1),
+                  "protein": round(scale*nutrients[4],1),
+                  "fibre": round(scale*nutrients[5],1),}
+        return output
+
+    def get_typical_weight(self):
+        if False: #TODO: Truth test for if the user has locally modified ingredients
+            #TODO: Implement locally modified ingredients
+            pass
+        else: #return values from universal ingredient
+            return self.ingredient.typical_weight
 
     def add_to_cupboard(self):
         if not self.in_stock:
