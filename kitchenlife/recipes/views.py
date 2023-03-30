@@ -115,7 +115,6 @@ def upload_file(request):
 
     return render(request, 'recipes/upload.html', {'form': form})
 
-
 @login_required
 def upload_url(request):
     if request.method == 'POST':
@@ -156,7 +155,6 @@ def edit_recipe(request, recipe_id):
             recipe.serves_to_int()
             recipe.save()
             if old_ingred_str != new_ingred_str:
-                #recipe.recipe_ingredient.all().delete()
                 recipe.simplify_ingredients(request.user)
                 recipe.save()
             return redirect('recipes:edit_ingredients', recipe_id=recipe.id)

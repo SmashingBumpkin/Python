@@ -48,4 +48,5 @@ This ingredient is used in these recipes:
     <p>Add a recipe that uses {{ ingredient.name }} and it should show up here!</p>
 {% endif %}
 </ul>
+<ul><a href="{% url 'cupboard:edit_ingredient' ingredient.id %}">Edit ingredient</a></ul>
 {% endblock content %}

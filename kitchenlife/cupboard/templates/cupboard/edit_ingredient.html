@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block content %}
+<form method="post" enctype="multipart/form-data" class = "field">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" name="save_ingredient_updates">Save ingredient</button>
+    <button type="submit" name="reset_to_defaults">Reset to default values</button>
+</form>
+{% endblock content %}

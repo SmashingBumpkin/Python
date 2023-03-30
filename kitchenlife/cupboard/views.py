@@ -2,7 +2,7 @@ from datetime import date
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
-from cupboard.forms import EmptyForm
+from cupboard.forms import EditProfileIngredientForm, EmptyForm
 from kitchenlife.openai_link import sendPrompt, sendPromptForgottenDetails, sendPromptIngredientDetails, sendPromptTypicalShelfLife, sendPromptTypicalWeight
 from recipes.models import Recipe
 from .models import Ingredient
@@ -67,6 +67,34 @@ def ingredient_detail(request, ingredient_id):
                'time_to_expiry': days_until_expiry,
                'nutrients': nutrients,}
     return render(request, 'cupboard/ingredient_detail.html', context)
+
+@login_required
+def edit_ingredient(request, ingredient_id):
+    ingredient = get_object_or_404(Ingredient, pk=ingredient_id)
+    profile = request.user.profile
+    profile_ingredient = profile.profile_ingredient.get(ingredient = ingredient)
+    initial_ingredient = profile_ingredient.get_ingredient_info_as_profileingredient()
+    if request.method == 'POST':
+        #TODO: Add a reset button
+        modifications_have_been_made = False
+        if "save_ingredient_updates" in request.POST:
+            form = EditProfileIngredientForm(request.POST)
+            if form.is_valid():
+                for override_key in initial_ingredient.keys():
+                    form_value = form.cleaned_data[override_key]
+                    initial_value = initial_ingredient[override_key]
+                    if form_value != initial_value:
+                        setattr(profile_ingredient, override_key, form_value)
+                        modifications_have_been_made = True
+            if modifications_have_been_made:
+                profile_ingredient.save()
+        elif "reset_to_defaults" in request.POST:
+            profile_ingredient.reset_overrides()
+            modifications_have_been_made = True
+        if modifications_have_been_made:
+            initial_ingredient = profile_ingredient.get_ingredient_info_as_profileingredient()
+    form = EditProfileIngredientForm(initial = initial_ingredient)
+    return render(request, 'cupboard/edit_ingredient.html', {'form':form})
 
 @login_required
 def edit_cupboard(request):

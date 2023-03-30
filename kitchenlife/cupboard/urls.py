@@ -8,4 +8,5 @@ urlpatterns = [
     path('ingredients/<int:ingredient_id>/', views.ingredient_detail, name='ingredient_detail'),
     path('cupboard/', views.cupboard_index, name='cupboard_index'),
     path('editcupboard/', views.edit_cupboard, name='edit_cupboard'),
+    path('editingredient/<int:ingredient_id>/', views.edit_ingredient, name='edit_ingredient'),
 ]

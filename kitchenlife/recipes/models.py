@@ -270,7 +270,7 @@ class ProfileIngredient(models.Model):
     date_added = models.DateTimeField(default=timezone.now)
     expiry_date = models.DateField(null=True, blank=True)
 
-    #Values are not used unless they are individually overwritten
+    #Following values, when used, take precedent over original values from self.ingredient
     long_life_override = models.BooleanField(null=True, blank=True)
     shelf_life_override = models.IntegerField(null=True, blank=True)
     substitutes_override = models.CharField(max_length=200, blank=True)
@@ -375,6 +375,7 @@ class ProfileIngredient(models.Model):
 
     def get_fat(self):
         if self.fat_override is not None:
+            print("getting fat from override")
             return self.fat_override
         else:
             return self.ingredient.fat
@@ -408,7 +409,7 @@ class ProfileIngredient(models.Model):
         }
     
     def get_ingredient_info(self):
-        return { **self.get_ingredient_nutrients(),
+        return { **self.get_ingredient_nutrition(),
                 **{
                 "name": self.ingredient.name,
                 "long_life": self.get_long_life(),
@@ -418,6 +419,37 @@ class ProfileIngredient(models.Model):
                 "typical_weight": self.get_typical_weight(),
             }
         }
+    
+    def get_ingredient_info_as_profileingredient(self):
+        #returns the same info from ingredients with appropriate keys for ProfileIngredient
+        info = self.get_ingredient_info()
+        return {
+            "long_life_override": info["long_life"],
+            "shelf_life_override": info["shelf_life"],
+            "substitutes_override": info["substitutes"],
+            "category_override": info["category"],
+            "calories_override": info["calories"],
+            "carbohydrates_override": info["carbohydrates"],
+            "sugar_override": info["sugar"],
+            "fat_override": info["fat"],
+            "protein_override": info["protein"],
+            "fibre_override": info["fibre"],
+            "typical_weight_override": info["typical_weight"]
+        }
+
+    def reset_overrides(self):
+        self.long_life_override = None
+        self.shelf_life_override = None
+        self.substitutes_override = ''
+        self.category_override = ''
+        self.calories_override = None
+        self.carbohydrates_override = None
+        self.sugar_override = None
+        self.fat_override = None
+        self.protein_override = None
+        self.fibre_override = None
+        self.typical_weight_override = None
+        self.save()
     
     class Meta:
         unique_together = ('profile', 'ingredient',)

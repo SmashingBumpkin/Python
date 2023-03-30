@@ -7,12 +7,7 @@ Features:
 -Nutrition:
     -Implement calory counting
 -Create cupboards which show which ingredients are stocked
-    -New ingredient model variables
-        -Allow adjustment at the profile level of ingredients (ie turn on/off long life etc)*******************************
-            -Update the database 
-                -locally_modified boolean
-                -all nutrient floats
-        -Update last_20_items code, will not work properly currently
+    -Update last_20_items code, will not work properly currently
     -Add ingredient (without having recipe)
     -Info about ingredients
         -seasonality
@@ -22,6 +17,7 @@ Features:
 *-Generate recipes based on cupboard contents
 
 Big things:
+-TESTINGGGGGG
 -1 click timer
 -Actually host properly
 -Integrate with webflow
