@@ -66,22 +66,22 @@ class Recipe(models.Model):
                 continue
 
             ingredient_name = ingredients_list[i]
-            if ingredient_name[-1] == "s":
+            if ingredient_name[-1] == "s": #Creates a (non-)pluralized version of the ingredient name
                 alt_ingredient_name = ingredient_name[:-1]
             else:
                 alt_ingredient_name = ingredient_name + "s"
 
-            try:
+            try: #Checks if the high level ingredient exists
                 try:
                     ingredient = Ingredient.objects.get(name=ingredient_name.capitalize())
                 except:
                     ingredient = Ingredient.objects.get(name=alt_ingredient_name.capitalize())
-                try:
+                try: #checks if the profile_ingredient exists
                     profile_ingredient = ProfileIngredient.objects.get(ingredient = ingredient, profile = user.profile)
                 except:
                     profile_ingredient = ProfileIngredient(profile = user.profile, ingredient = ingredient)
                     profile_ingredient.save()
-            except:
+            except: #handles if profile ingredient does not exist
                 ingredient = Ingredient(name = ingredient_name.capitalize())
                 ingredient.save()
                 response = openai_link.sendPromptIngredientDetails(ingredient.name, user.profile)
@@ -98,10 +98,10 @@ class Recipe(models.Model):
             for ingredient_name in ingredients_list:
                 if ingredient_name in dumb_line:
                     alternative = False #Used for when an alternative ingredient is suggested
-                    ingredients_list.remove(ingredient_name)
+                    ingredients_list.remove(ingredient_name) #move ingredient to end of list
                     ingredients_list.append(ingredient_name)
                     if " and " in dumb_line:
-                        #Special handling to check for 2 (or more??) ingredients in a line
+                        #Special handling to check for 2 ingredients in a line
                         for ingredient_name_2 in ingredients_list: # searches for the second ingredient in the line
                             if ingredient_name_2 == ingredient_name:
                                 continue
@@ -280,8 +280,7 @@ class Profile(models.Model):
         ingredients = Ingredient.objects.filter(profile_ingredient__recipe_ingredient__in=recipe_ingredients)
         for ingredient in ingredients:
             profile_ingredient = ProfileIngredient.objects.get(ingredient=ingredient, profile=self)
-            profile_ingredient.in_stock = True
-            profile_ingredient.save()
+            profile_ingredient.add_to_cupboard()
 
 class ProfileIngredient(models.Model):
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name="profile_ingredient")
@@ -329,11 +328,13 @@ class ProfileIngredient(models.Model):
 
     def add_to_cupboard(self):
         if not self.in_stock:
-            shelf_life = self.ingredient.shelf_life
+            shelf_life = self.get_shelf_life()
+            print(shelf_life)
             self.in_stock = not self.in_stock
-            self.date_added = timezone.now
+            self.date_added = timezone.now()
             self.expiry_date = timezone.now().date() + timezone.timedelta(days=shelf_life)
-            pass
+            print(self.expiry_date)
+            self.save()
 
     def check_and_remove_expired(self):
         if (self.in_stock == True 

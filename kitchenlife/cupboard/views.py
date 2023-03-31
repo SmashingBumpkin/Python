@@ -57,11 +57,15 @@ def ingredient_detail(request, ingredient_id):
     profile_ingredient.check_and_remove_expired()
     nutrients = profile_ingredient.get_nutrition(100, "g")
     if request.method == 'POST':
-        profile_ingredient.in_stock = not profile_ingredient.in_stock
-        profile_ingredient.save()
+        if not profile_ingredient.in_stock:
+            profile_ingredient.add_to_cupboard()
+        else:
+            profile_ingredient.in_stock = False
+            profile_ingredient.save()
     
     try:
         days_until_expiry = (profile_ingredient.expiry_date - date.today()).days
+        print(profile_ingredient.expiry_date)
     except:
         days_until_expiry = 0
     recipes = Recipe.objects.filter(recipe_ingredient__profile_ingredient=profile_ingredient)
@@ -91,6 +95,9 @@ def edit_ingredient(request, ingredient_id):
                     if form_value != initial_value:
                         setattr(profile_ingredient, override_key, form_value)
                         modifications_have_been_made = True
+                        if override_key == "shelf_life_override" and profile_ingredient.in_stock:
+                                profile_ingredient.in_stock = False
+                                profile_ingredient.add_to_cupboard()
             if modifications_have_been_made:
                 profile_ingredient.save()
         elif "reset_to_defaults" in request.POST:

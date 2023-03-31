@@ -171,6 +171,6 @@ def sendPromptForgottenDetails(myprompt, profile):
         {"role": "assistant", "content": """Dairy"""},
         {"role": "user", "content": """Categorize this ingredient into a typical food category: Cumin"""},
         {"role": "assistant", "content": """Spice"""},
-        {"role": "user", "content": "Categorize this ingredient into a typical food category: "+ingredient}
+        {"role": "user", "content": "Categorize this ingredient into a typical food category: "+myprompt}
     ]
     return sendOpenAIRequest(messages, profile)

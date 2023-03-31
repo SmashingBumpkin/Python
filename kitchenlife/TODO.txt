@@ -61,6 +61,7 @@ UI stuff:
         -Add or remove ingredient from cupboard
         -View ingredient details
         -Seek clarification in the recipe (eg if you don't know what a technique is)
+        -View the original unlinked ingredients_string
 
 
 
