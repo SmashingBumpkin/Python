@@ -1,27 +1,32 @@
 Things:
 -openai_link:
-    -keep track of user credits
+    -Better handling of user credits
+
+-Multithreading
+    -Handling what to do with a user until the recipe is ready (upload from text and photo)
+
+
+-Recipes
+    -Plural of ingredient units seems to not work properly
+    -Sloppy importing from "2 yellow or red peppers"
+    -Recipe "category" - use tags; eg dessert, baking, lunch, snack, dinner
+    -Add a rating field
+    -Add a time to cook field
+    -Add a prep time field
+    -Generate recipes that use particular ingredient(s)
+    -Generate description from recipe (if it's not already provided)
+    -Add/edit recipe:
+        -Link each line of the ai with a line of the original to make it clearer.
 
 -Ingredients
-    -If import goes wrong, have a button to retry
-    -If a user modifies an ingredient, the expiry from their cupboard will not update
+    -Ingredient "category" should actually be tags
+    -If import of food goes wrong, have a button to retry
     -Add ingredient or food items (without having recipe)
     -When importing a new ingredient, check if there is anything else that is very similar and use that
     -Info about ingredients
         -Scan nutrition from label
         -Seasonality
         -Link alternatives to the alternative
-
--Recipes
-    -Recipe "category" should actually be tags, eg dessert, baking, lunch, snack, dinner ????
-    -Add a rating field
-    -Add a time to cook field
-    -Add a prep time field
-    -Recipe import should check that "servings" is just a number
-    -Generate recipes that use particular ingredient(s)
-    -Generate description from recipe (if it's not already provided)
-    -Add/edit recipe:
-        -Link each line of the ai with a line of the original to make it clearer.
 
 -Profile
     -Update last_20_items code, will not work properly currently
@@ -39,9 +44,10 @@ Things:
 Medium things:
         
 -Implement tests
--Multithreading
 -Change database to something appropriate for public implementation
 -Actually host properly
+
+
 
 Big things:
 
@@ -62,7 +68,7 @@ UI stuff:
         -View ingredient details
         -Seek clarification in the recipe (eg if you don't know what a technique is)
         -View the original unlinked ingredients_string
-
+    -When multithreading during recipe import, wait pop up should appear telling you the next bit is ready 
 
 
 

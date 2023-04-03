@@ -1,15 +1,19 @@
 import openai
 from sys import exit as sysexit
 
-def sendOpenAIRequest(messages, profile):
+def sendOpenAIRequest(messages, profile, typical_credits = 0):
     # replace with your OpenAI API key
     openai.api_key = "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"
+    if profile.ai_credits < typical_credits:
+        return False
+    print("calling ai")
     response = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
         messages = messages
     )
     costs = response["usage"]
-    profile.pay_for_ai_credits(costs["total_tokens"])
+    print(costs)
+    profile.use_ai_credits(costs["total_tokens"])
     return response["choices"][0]["message"]["content"].strip()
 
 def sendPromptIngredients(ingredients, profile):
@@ -22,7 +26,7 @@ Each line in the returned content an exact substring of the line they are taken 
 800g chopped tomatoes (2 tins)
 200g spinach
 1 1/2 tsp ground cumin
-Chopped red onion"""},
+1 Chopped red onion"""},
         {"role": "assistant", "content": """parmesan
 mozzarella
 chopped tomatoes
@@ -32,7 +36,8 @@ red onion"""},
         {"role": "user", "content": "Use the same process to modify this list of ingredients: \n\n' "
          +ingredients}
     ]
-    return sendOpenAIRequest(messages, profile)
+    typical_credits = 350
+    return sendOpenAIRequest(messages, profile, typical_credits)
 
 def sendPromptJumbled(jumbled_recipe, profile):
     messages = [
@@ -122,19 +127,44 @@ Method:
         {"role": "user", "content": "Using the same headings, correct this jumbled up recipe:"
          + jumbled_recipe}
     ]
-    return sendOpenAIRequest(messages, profile)
+    typical_credits = 500
+    return sendOpenAIRequest(messages, profile, typical_credits)
 
 def sendPromptIngredientDetails(ingredient, profile):
+    print(ingredient + " is being added")
     messages = [
         {"role": "user", "content": """Provide details of a typical example of this ingredient: Onion
+
 Provide details in a precise format under the headings: substitutes, long life, typical shelf life (this should be how 
-long many days the item can be expected to last if stored appropriately at home), Category, typical weight 
+long many days the item can be expected to last if stored appropriately at home), Categories, typical weight 
 (this should be the typical weight of an individual unit of the item, if not applicable, return 0),
-Nutritional information per 100g/ml (Calories, Carbohydrates, Sugar, Fat, Protein, Fibre)"""},
+Nutritional information per 100g/ml (Calories, Carbohydrates, Sugar, Fat, Protein, Fibre)
+
+The "Categories" line should exclusively use any number of appropriate tags from this list seperated by commas:
+Dairy
+Meat
+Poultry
+Seafood
+Vegetables
+Fruits
+Grains
+Legumes
+Nuts
+Seeds
+Spices
+Herbs
+Sweeteners
+Oils
+Vinegars
+Alcoholic beverages
+Non-alcoholic beverages
+Baking supplies
+Candy and sweets
+Snacks"""},
         {"role": "assistant", "content": """Substitutes: Shallots, red onion, leek, garlic, spring onion
 Long life: No
 Typical shelf life: 10
-Category: Vegetable
+Categories: Vegetables
 Typical weight: 150g
 Nutritional information:
 Calories: 40
@@ -143,13 +173,11 @@ Sugar: 4.2g
 Fat: 0.1g
 Protein: 1.1g
 Fibre: 1.7g"""},
-        {"role": "user", "content": """Provide details of a typical example of this ingredient: Milk
-Provide details under the headings: substitutes, long life, typical shelf life, Category, 
-typical weight, Nutritional information per 100g/ml (Calories, Carbohydrates, Sugar, Fat, Protein, Fibre)"""},
+        {"role": "user", "content": """Repeat the same instruction, with the exact same format, for: Milk"""},
         {"role": "assistant", "content": """Substitutes: Water, cream, butter
 Long life: No
 Typical shelf life: 7
-Category: Dairy
+Categories: Dairy, Non-alcoholic beverages
 Typical weight: N/A
 Nutritional information:
 Calories: 47
@@ -158,10 +186,11 @@ Sugar: 4.5g
 Fat: 1.8g
 Protein: 3.6g
 Fibre: 0g"""},
-        {"role": "user", "content": "Using the same headings, provide details of a typical example of this ingredient: "
+        {"role": "user", "content": "Repeat the same instruction, with the exact same format, for: "
          + ingredient}
     ]
-    return sendOpenAIRequest(messages, profile)
+    typical_credits = 520
+    return sendOpenAIRequest(messages, profile, typical_credits)
 
 def sendPromptForgottenDetails(myprompt, profile):
     messages = [
@@ -173,4 +202,72 @@ def sendPromptForgottenDetails(myprompt, profile):
         {"role": "assistant", "content": """Spice"""},
         {"role": "user", "content": "Categorize this ingredient into a typical food category: "+myprompt}
     ]
-    return sendOpenAIRequest(messages, profile)
+    typical_credits = 500
+    return sendOpenAIRequest(messages, profile, typical_credits)
+
+def sendPromptRecipeDescription(recipe, profile):
+    prompt_input  = recipe.name + "\n"
+    prompt_input += recipe.description
+    messages = [
+        {"role": "user", "content": """Provide a brief 1-2 sentence description of this recipe:
+
+Drain the ricotta in a sieve to get rid of any excess water, then into a large bowl. Toast the pumpkin seeds in a dry frying pan until they begin to pop. Set aside.
+Finely chop most of the herbs (stalks and all). Add the flour, egg yolks, and herbs to the ricotta. Finely grate in the lemon zest and the pecorino cheese. Season generously with salt and black pepper then mix everything together to form a dough.
+Bring a large saucepan of salted water to the boil.
+Tip the gnocchi dough onto a really well-floured surface. With floured hands knead briefly until smooth; the dough should feel light, sticky to touch but keep its shape well.
+Cut the dough into six, then, flouring your hands, roll one piece into a sausage around 2cm (0.8in) thick. Cut into bite-sized pieces. Transfer to a large, well-floured baking tray. Repeat with the remaining dough.
+Working in batches, drop the gnocchi into the boiling water. Cook for 1-2 minutes until they float. With a slotted spoon, transfer to a clean baking tray. Repeat until all the gnocchi has been cooked.
+Get a large frying pan over a medium heat. Add the butter and let it melt until it turns lightly brown and begins to smell nutty. Add the toasted pumpkin seeds, capers and gnocchi. Give everything a toss to warm the gnocchi back through. Cut the lemon in half and squeeze in some of the juice. Season to taste with salt and black pepper.
+Divide the gnocchi and brown butter sauce between four plates. Over some pecorino cheese and tear over the remaining herbs to serve."""},
+        {"role": "assistant", "content": """The lightest, most delicate pillows of pasta you could ask for, served in a brown butter sauce with capers and toasted pumpkin seeds, this dish is super-light yet still feels indulgently rich."""},
+        {"role": "user", "content": "Now generate a description for this recipe: "
+         + prompt_input}
+    ]
+    typical_credits = 500
+    return sendOpenAIRequest(messages, profile, typical_credits)
+
+def sendPromptMealTags(recipe, profile):
+    prompt_input  = recipe.name + "\n"
+    if recipe.description:
+        prompt_input += recipe.description
+    else:
+        prompt_input += recipe.method
+    messages = [
+        {"role": "user", "content": """This is a list of all possible tags.
+Your response should be a combination of any number of these exact tags, seperated by a comma:
+Breakfast
+Brunch
+Lunch
+Dinner
+Appetizer
+Main dish
+Side dish
+Salad
+Soup
+Snack
+Dessert
+Baked goods
+Vegetarian
+Vegan
+Gluten-free
+Dairy-free
+Quick and easy
+
+Apply these tags to this recipe:
+
+Veggie Lasagne
+Preheat the oven to 200C/180C Fan/Gas 6. Put the peppers, courgette and sweet potato into a large baking tray. Drizzle with 2 tablespoons of the oil, season with salt and pepper and toss together.
+Roast for 30 minutes, or until softened and lightly browned.
+While the vegetables are roasting, heat the remaining oil in a large saucepan and gently fry the onion for 5 minutes, stirring regularly.
+Add the chilli and garlic and cook for a few seconds more. Stir in the tomatoes, Italian seasoning (or dried oregano) and crumbled stock cube. Pour over the water and bring to a gentle simmer. Cook for 10 minutes, stirring regularly. Set aside.
+For the cheese sauce, put the flour, butter and milk in a large saucepan and place over a medium heat. Whisk constantly with a large metal whisk until the sauce is thickened and smooth. (Use a silicone covered whisk if cooking in a non-stick pan.) Stir in roughly two-thirds of the cheeses and season to taste.
+Take the vegetables out of the oven and add to the pan with the tomato sauce. Stir in the spinach and cook together for 3 minutes. Season with salt and lots of ground black pepper.
+Spoon a third of the vegetable mixture over the base of a 2½–3 litre/4½–5¼ pint ovenproof lasagne dish and cover with a single layer of lasagne. Top with another third of the vegetable mixture (don’t worry if it doesn’t cover evenly) and a second layer of lasagne.
+Pour over just under half of the cheese sauce and very gently top with the remaining vegetable mixture. Finish with a final layer of lasagne and the rest of the cheese sauce. Sprinkle the reserved cheese over the top.
+Bake for 35–40 minutes, or until the pasta has softened and the topping is golden brown and bubbling. Stand for 5 minutes before cutting to allow the filling to settle.
+"""     },
+        {"role": "assistant", "content": """Dinner, Main dish, Vegetarian """},
+        {"role": "user", "content": """Use the same list of tags for this recipe:\n\n"""
+         + prompt_input}]
+    typical_credits = 500
+    return sendOpenAIRequest(messages, profile, typical_credits)

@@ -26,3 +26,26 @@ def convert_to_grams(quantity, unit):
         return quantity * 29.57
     else:
         raise ValueError("Unknown unit: {}".format(unit))
+    
+def extract_number(string):
+    """
+    This function takes a string as input and returns a number contained within the string, if it exists.
+    The number can be an integer or a float.
+    """
+    result = ''
+    decimal_point_count = 0
+    for char in string:
+        if char.isdigit() or char == '.':
+            if char == '.':
+                decimal_point_count += 1
+            if decimal_point_count > 1:
+                return None
+            result += char
+        elif result != '':
+            # print("number extracter returns: "+result)
+            break
+    if result:
+        # print(result)
+        return float(result)
+    else:
+        return 0

@@ -1,5 +1,7 @@
+import time
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
+import threading
 
 from .models import Recipe
 from .forms import PlaintextForm, QuantityForm, UploadFileForm, EditRecipeForm, SearchForm, UploadURLForm, EditIngredientsForm
@@ -108,6 +110,9 @@ def upload_file(request):
         if form.is_valid():
             img = Image.open(request.FILES['img'])
             recipe = new_recipe_processing.image_to_recipe(img, user = request.user)
+            if not recipe:
+                #Insufficient credits
+                return redirect('home')
             recipe.save()
             return redirect('recipes:edit_recipe', recipe_id = recipe.id)
 
@@ -134,7 +139,12 @@ def upload_text(request):
         uploadForm = PlaintextForm(request.POST.copy())
         if uploadForm.is_valid():
             text = uploadForm.cleaned_data['text']
+            # t = threading.Thread(target=new_recipe_processing.text_to_recipe, args=(text, request.user))
+            # t.start()
             recipe = new_recipe_processing.text_to_recipe(text, request.user)
+            if not recipe:
+                #Insufficient credits
+                return redirect('home')
             recipe.save()
             return redirect('recipes:edit_recipe', recipe_id = recipe.id)
 
@@ -154,10 +164,18 @@ def edit_recipe(request, recipe_id):
             form.save()
             recipe.serves_to_int()
             recipe.save()
+
             if old_ingred_str != new_ingred_str:
-                recipe.simplify_ingredients(request.user)
-                recipe.save()
-            return redirect('recipes:edit_ingredients', recipe_id=recipe.id)
+                # Create a new thread to handle the recipe simplification
+                t = threading.Thread(target=Recipe.simplify_ingredients, args=(recipe, request.user))
+                t.start()
+                # Return redirect immediately
+                return redirect('recipes:detail', recipe_id=recipe.id)
+            else:
+                return redirect('recipes:edit_ingredients', recipe_id=recipe.id)
+            # if old_ingred_str != new_ingred_str:
+            #     recipe.simplify_ingredients(request.user)
+            # return redirect('recipes:edit_ingredients', recipe_id=recipe.id)
     form = EditRecipeForm(initial = recipe.return_dict())
     return render(request, 'recipes/edit_recipe.html', {'form':form})
 
@@ -173,7 +191,10 @@ def edit_ingredients(request, recipe_id):
             # old_ingred_str = recipe.simplified_ingredients
             form.save()
             #if old_ingred_str != new_ingr_str: 
-            recipe.simplified_to_ingredients(request.user)
+            success = recipe.simplified_to_ingredients(request.user)
+            if not success:
+                #Insufficient credits
+                return redirect('home')
             recipe.save()
             return redirect('recipes:detail', recipe_id=recipe.id)
     else:

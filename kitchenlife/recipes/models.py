@@ -1,3 +1,4 @@
+import threading
 from django.utils import timezone
 from django.db import models
 from django.contrib.auth.models import User
@@ -5,6 +6,7 @@ from kitchenlife import openai_link
 from cupboard.models import Ingredient
 from re import split as resplit, findall as refindall
 from fractions import Fraction
+import unicodedata
 
 from kitchenlife.unit_and_number_handling import convert_to_grams
 
@@ -40,12 +42,17 @@ class Recipe(models.Model):
                         'url': self.url,
                     }
     
-    def simplify_ingredients(self, user):
-        self.simplified_ingredients = openai_link.sendPromptIngredients(self.ingredients_string, user.profile)
+    def simplify_ingredients(recipe, user):
+        simplified_ingredients = openai_link.sendPromptIngredients(recipe.ingredients_string, user.profile)
+        print(simplified_ingredients)
+        if simplified_ingredients:
+            recipe.simplified_ingredients = simplified_ingredients
+            recipe.save()
 
     def simplified_to_ingredients(self, user):
         print("UPDATING INGREDIENTS LINK")
         #Function that generates a the RecipeIngredients that link this recipe to the ingredients
+        profile = user.profile
         self.recipe_ingredient.all().delete()
         ingredients_list = list(resplit("\n|,", self.simplified_ingredients))
         #print(ingredients_list)
@@ -59,6 +66,7 @@ class Recipe(models.Model):
         #Find a pairing for each ingredient to each dumb ingredient
         #Save the info of quantity, unit and details to a local instance of the Ingredient variable
         to_delete_from_list = 0
+        new_ingredients = []
         for i in range(len(ingredients_list)):
             ingredients_list[i] = ingredients_list[i].strip().lower()
             if ingredients_list[i] == "": 
@@ -77,23 +85,21 @@ class Recipe(models.Model):
                 except:
                     ingredient = Ingredient.objects.get(name=alt_ingredient_name.capitalize())
                 try: #checks if the profile_ingredient exists
-                    profile_ingredient = ProfileIngredient.objects.get(ingredient = ingredient, profile = user.profile)
+                    profile_ingredient = ProfileIngredient.objects.get(ingredient = ingredient, profile = profile)
                 except:
-                    profile_ingredient = ProfileIngredient(profile = user.profile, ingredient = ingredient)
+                    profile_ingredient = ProfileIngredient(profile = profile, ingredient = ingredient)
                     profile_ingredient.save()
             except: #handles if profile ingredient does not exist
                 ingredient = Ingredient(name = ingredient_name.capitalize())
                 ingredient.save()
-                response = openai_link.sendPromptIngredientDetails(ingredient.name, user.profile)
-                ingredient.ai_response_parser(response)
-                profile_ingredient = ProfileIngredient(profile = user.profile, ingredient = ingredient)
+                new_ingredients.append(ingredient)
+                profile_ingredient = ProfileIngredient(profile = profile, ingredient = ingredient)
                 profile_ingredient.save()
-        
-        #TODO: delete all instances of "" from list
         [ingredients_list.remove("") for i in range(to_delete_from_list)]
-
-        #ingredients_list = set(ingredients_list)
         line_number = 10 # line number 
+        if new_ingredients:
+            t = threading.Thread(target = Ingredient.generate_ingredient_details, args = (new_ingredients, profile))
+            t.start()
         for dumb_line in dumb_ingredients_list:
             for ingredient_name in ingredients_list:
                 if ingredient_name in dumb_line:
@@ -112,7 +118,7 @@ class Recipe(models.Model):
                                 for line in dumb_line_2: #Figures out which line is which
                                     if ingredient_name_2 in line:
                                         ingredient=Ingredient.objects.get(name=ingredient_name_2.strip().capitalize())
-                                        recipe_ingredient = RecipeIngredient.parse_dumb_ingredient(recipe=self, ingredient=ingredient,ingredient_dumb=line, profile = user.profile)
+                                        recipe_ingredient = RecipeIngredient.parse_dumb_ingredient(recipe=self, ingredient=ingredient,ingredient_dumb=line, profile = profile)
                                         recipe_ingredient.position_in_list = line_number
                                         recipe_ingredient.save()
                                     else:
@@ -138,7 +144,7 @@ class Recipe(models.Model):
                                         alt_ingred = alt_ingred.replace(ingredient_name + " ", "")
                                         alt_ingred = alt_ingred.replace(" " + ingredient_name, "")
                                         ingredient=Ingredient.objects.get(name=ingredient_name_2.strip().capitalize())
-                                        recipe_ingredient = RecipeIngredient.parse_dumb_ingredient(recipe=self, ingredient=ingredient,ingredient_dumb=alt_ingred, profile = user.profile)
+                                        recipe_ingredient = RecipeIngredient.parse_dumb_ingredient(recipe=self, ingredient=ingredient,ingredient_dumb=alt_ingred, profile = profile)
                                         recipe_ingredient.alternative = not first_loop
                                         recipe_ingredient.position_in_list = line_number
                                         recipe_ingredient.save()
@@ -155,7 +161,7 @@ class Recipe(models.Model):
 
                     #Parse recipe ingredient from line
                     ingredient=Ingredient.objects.get(name=ingredient_name.strip().capitalize())
-                    recipe_ingredient = RecipeIngredient.parse_dumb_ingredient(recipe=self, ingredient=ingredient,ingredient_dumb=dumb_line, profile = user.profile)
+                    recipe_ingredient = RecipeIngredient.parse_dumb_ingredient(recipe=self, ingredient=ingredient,ingredient_dumb=dumb_line, profile = profile)
                     recipe_ingredient.alternative = alternative
                     recipe_ingredient.position_in_list = line_number
                     recipe_ingredient.save()
@@ -163,6 +169,7 @@ class Recipe(models.Model):
                     # self.save()
                     line_number += 10
                     break
+        return True
     
     def serves_to_int(self):
         """This function takes a string as input and returns a number contained within the string, if it exists.
@@ -246,7 +253,7 @@ class Profile(models.Model):
     def __str__(self):
         return self.user.username
     
-    def pay_for_ai_credits(self, cost):
+    def use_ai_credits(self, cost):
         self.ai_credits_used += cost
         self.save()
         if cost > self.ai_credits:
@@ -329,11 +336,10 @@ class ProfileIngredient(models.Model):
     def add_to_cupboard(self):
         if not self.in_stock:
             shelf_life = self.get_shelf_life()
-            print(shelf_life)
             self.in_stock = not self.in_stock
             self.date_added = timezone.now()
-            self.expiry_date = timezone.now().date() + timezone.timedelta(days=shelf_life)
-            print(self.expiry_date)
+            if not self.get_long_life():
+                self.expiry_date = timezone.now().date() + timezone.timedelta(days=shelf_life)
             self.save()
 
     def check_and_remove_expired(self):
@@ -343,13 +349,15 @@ class ProfileIngredient(models.Model):
             print("Models.recipes.profileingredient.checking and removing")
             self.in_stock = False
 
-    def save(self, *args, **kwargs):
-        if not self.ingredient.long_life:#not self.expiry_date and 
-            shelf_life = self.ingredient.shelf_life or 0
-            self.expiry_date = timezone.now().date() + timezone.timedelta(days=shelf_life)
-        super().save(*args, **kwargs)
+    # def save(self, *args, **kwargs):
+    #     if not self.ingredient.long_life:#not self.expiry_date and 
+    #         shelf_life = self.ingredient.shelf_life or 0
+    #         self.expiry_date = timezone.now().date() + timezone.timedelta(days=shelf_life)
+    #     super().save(*args, **kwargs)
 
     #Logic for overriden values, if they exist
+    def get_name(self):
+        return self.ingredient.name
 
     def get_long_life(self):
         if self.long_life_override is not None:
@@ -523,26 +531,43 @@ class RecipeIngredient(models.Model):
         #TODO Check for import errors, eg Y = 1/, % = 1/2 or 1/3
         profile_ingredient = ProfileIngredient.objects.get(ingredient=ingredient, profile = profile)
         L = refindall(r'\d+|\D+',  ingredient_dumb) #Splits string into list of ints+strings
+        unicode_fractions = {"¼","½","¾","⅐","⅑","⅒","⅓","⅔","⅕","⅖","⅗","⅘","⅙","⅚","⅛","⅜","⅝","⅞"}
+        print(L)
         if len(L) == 1:
-            return RecipeIngredient(recipe=recipe,profile_ingredient=profile_ingredient,local_name=ingredient_dumb)
-        
-        #gets posn of first int
-        posn = next((i for i, x in enumerate(L) if x.isdigit()), None)
-        #tries to parse quantity
-        if posn+2 < len(L) and (L[posn+1] in {".",","}):
-            quantity = float("".join(L[posn:posn+3]))
-            posn += 2
-        elif L[posn+1] == "/":
-            quantity = float(Fraction("".join(L[posn:posn+3])))
-            posn += 2
-        elif L[posn+1] == " " and L[posn+3] == "/":
-            #TODO: Improve resiliance
-            quantity = float(int(L[posn])+Fraction("".join(L[posn+2:posn+5])))
-            posn += 4
+            L[0] = L[0].strip()
+            if L[0][0] in unicode_fractions:
+                quantity = unicodedata.numeric(L[0][0])
+                L[0] = L[0][1:]
+            elif L[0][1] in unicode_fractions:
+                quantity = unicodedata.numeric(L[0][1])
+                L[0] = L[0][2:]
+            else:
+                return RecipeIngredient(recipe=recipe,profile_ingredient=profile_ingredient,local_name=ingredient_dumb)
+            posn = -1
         else:
-            quantity = float(L[posn])
-        
+            posn = next((i for i, x in enumerate(L) if x.isdigit()), None)
+            #tries to parse quantity
+            if posn+2 < len(L) and (L[posn+1] in {".",","}): #Checks for decimal points
+                quantity = float("".join(L[posn:posn+3]))
+                posn += 2
+            elif L[posn+1] == "/": #Checks for fractions using / symbol
+                quantity = float(Fraction("".join(L[posn:posn+3])))
+                posn += 2
+            elif L[posn+1] == " " and L[posn+3] == "/": #checks for a fraction in the form 1 2/3 tbsp stuff
+                #TODO: Improve resiliance
+                quantity = float(int(L[posn])+Fraction("".join(L[posn+2:posn+5])))
+                posn += 4
+            elif L[posn][0] in unicode_fractions:
+                quantity = unicodedata.numeric(L[posn][0])
+            else:
+                quantity = float(L[posn])
         posn += 1
+        if unicodedata.numeric(L[posn][0],0):
+            quantity += unicodedata.numeric(L[posn][0])
+            L[posn] = L[posn][1:]
+        elif len(L[posn]) > 1 and unicodedata.numeric(L[posn][1],0):
+            quantity += unicodedata.numeric(L[posn][1])
+            L[posn] = L[posn][2:]
         #Checks for import error on quantity (99.9% chance this is import error)
         if recipe.from_photo:
             if quantity > 100 and quantity % 10 == 9:

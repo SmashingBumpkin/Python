@@ -2,7 +2,7 @@ from django.db import models
 from re import split as resplit
 from kitchenlife.openai_link import sendPromptIngredientDetails
 
-from kitchenlife.unit_and_number_handling import convert_to_grams
+from kitchenlife.unit_and_number_handling import extract_number
 
 # Create your models here.
 class Ingredient(models.Model):
@@ -40,30 +40,16 @@ class Ingredient(models.Model):
     def reimport_data(self, profile):
         sendPromptIngredientDetails(self.name, profile)
     
-    def ai_response_parser(self, response):
-        def extract_number(string):
-            """
-            This function takes a string as input and returns a number contained within the string, if it exists.
-            The number can be an integer or a float.
-            """
-            result = ''
-            decimal_point_count = 0
-            for char in string:
-                if char.isdigit() or char == '.':
-                    if char == '.':
-                        decimal_point_count += 1
-                    if decimal_point_count > 1:
-                        return None
-                    result += char
-                elif result != '':
-                    # print("number extracter returns: "+result)
-                    break
-            if result:
-                # print(result)
-                return float(result)
-            else:
-                return 0
+    def generate_ingredient_details(ingredients, profile):
+        #Generates and saves details for a new ingredient
+        for ingredient in ingredients:
+            response = sendPromptIngredientDetails(ingredient.name, profile)
+            if not response:
+                #Insufficient credits
+                return False
+            ingredient.ai_response_parser(response)
 
+    def ai_response_parser(self, response):
         details_list = list(resplit("\n", response))
         for detail in details_list:
             detail = detail.strip()
@@ -93,7 +79,7 @@ class Ingredient(models.Model):
                             self.shelf_life = int(number*7)
                         elif number:
                             self.shelf_life = int(number)
-                    elif "category" in detail_lower:
+                    elif "categories" in detail_lower:
                         self.category = detail_value
                     elif "typical weight" in detail_lower:
                         detail_lower= detail_lower_value

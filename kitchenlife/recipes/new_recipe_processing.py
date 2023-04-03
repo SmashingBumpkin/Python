@@ -1,5 +1,6 @@
 from re import split as resplit, sub as resub
 from kitchenlife import openai_link
+from kitchenlife.unit_and_number_handling import extract_number
 from .models import Recipe
 from recipe_scrapers import scrape_me #https://github.com/hhursev/recipe-scrapers
 
@@ -17,6 +18,9 @@ def url_to_recipe(url, owner):
             ingredients = string_cleaner(ingredients)
         instructions = scraper.instructions()
         serves = scraper.yields()
+        serves = str(int(extract_number(serves)))
+        if serves == "0":
+            serves = ""
         return Recipe(name = name, ingredients_string = ingredients, 
                     method = instructions, url = url, serves = serves, owner = owner)
     except:
@@ -29,6 +33,8 @@ def image_to_recipe(img, user):
 
 def text_to_recipe(text, user):
     text = openai_link.sendPromptJumbled(text, user.profile)
+    if not text:
+        return False
     # Define a list of possible headings and their corresponding variable names
     headings = [("Name:", "name"),
                 ("Description:", "description"),

@@ -1,10 +1,7 @@
 from datetime import date
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
-from django.urls import reverse
 from cupboard.forms import EditProfileIngredientForm, EmptyForm
-from kitchenlife import openai_link
-from kitchenlife.openai_link import sendPromptForgottenDetails, sendPromptIngredientDetails
 from recipes.models import Recipe
 from .models import Ingredient
 from recipes.forms import SearchForm
@@ -65,7 +62,6 @@ def ingredient_detail(request, ingredient_id):
     
     try:
         days_until_expiry = (profile_ingredient.expiry_date - date.today()).days
-        print(profile_ingredient.expiry_date)
     except:
         days_until_expiry = 0
     recipes = Recipe.objects.filter(recipe_ingredient__profile_ingredient=profile_ingredient)
