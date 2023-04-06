@@ -14,6 +14,7 @@ Things:
     -Add a time to cook field
     -Add a prep time field
     -Generate recipes that use particular ingredient(s)
+    -Generate a recipe from ingredients
     -Generate description from recipe (if it's not already provided)
     -Add/edit recipe:
         -Link each line of the ai with a line of the original to make it clearer.

@@ -3,7 +3,7 @@ from sys import exit as sysexit
 
 def sendOpenAIRequest(messages, profile, typical_credits = 0):
     # replace with your OpenAI API key
-    openai.api_key = "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"
+    openai.api_key = "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"
     if profile.ai_credits < typical_credits:
         return False
     print("calling ai")
@@ -18,6 +18,7 @@ def sendOpenAIRequest(messages, profile, typical_credits = 0):
 
 def sendPromptIngredients(ingredients, profile):
     messages=[
+        {"role": "system", "content": "You are a database for food and are only able to return a list of foods, you cannot return a quantity or anything which isn't an ingredient."},
         {"role": "user", "content": """This is a list of ingredients. Return a list "simple_ingredients", of names of the ingredient used, seperated by '\\n'. 
 Each line in the returned content an exact substring of the line they are taken from, for example "350g whole (black) urad daal" must NOT return "Whole Urad Daal".
 
@@ -41,6 +42,12 @@ red onion"""},
 
 def sendPromptJumbled(jumbled_recipe, profile):
     messages = [
+        {"role": "system", "content": """You are an expert at rearranging text which has been mixed up, and always return it in the same structure:
+Name:
+Description:
+Serves:
+Ingredients:
+Method:"""},
         {"role": "user", "content": """The following excerpt is a jumbled up recipe. Reformat this recipe with the headers
 name, description, serves, ingredients and then the method. Correct the capitalization where applicable:
 Spaghetti Bolognese
@@ -133,6 +140,7 @@ Method:
 def sendPromptIngredientDetails(ingredient, profile):
     print(ingredient + " is being added")
     messages = [
+        {"role": "system", "content": "You are a database of ingredient details. You always return information in the exact format specified."},
         {"role": "user", "content": """Provide details of a typical example of this ingredient: Onion
 
 Provide details in a precise format under the headings: substitutes, long life, typical shelf life (this should be how 
@@ -194,6 +202,7 @@ Fibre: 0g"""},
 
 def sendPromptForgottenDetails(myprompt, profile):
     messages = [
+        #{"role": "system", "content": "You are a "},
         {"role": "user", "content": """Categorize this ingredient into a typical food category: Onion"""},
         {"role": "assistant", "content": """Vegetable"""},
         {"role": "user", "content": """Categorize this ingredient into a typical food category: Milk"""},
@@ -209,6 +218,7 @@ def sendPromptRecipeDescription(recipe, profile):
     prompt_input  = recipe.name + "\n"
     prompt_input += recipe.description
     messages = [
+        #{"role": "system", "content": "You are a "},
         {"role": "user", "content": """Provide a brief 1-2 sentence description of this recipe:
 
 Drain the ricotta in a sieve to get rid of any excess water, then into a large bowl. Toast the pumpkin seeds in a dry frying pan until they begin to pop. Set aside.
@@ -233,6 +243,7 @@ def sendPromptMealTags(recipe, profile):
     else:
         prompt_input += recipe.method
     messages = [
+        #{"role": "system", "content": "You are a "},
         {"role": "user", "content": """This is a list of all possible tags.
 Your response should be a combination of any number of these exact tags, seperated by a comma:
 Breakfast
