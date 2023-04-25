@@ -13,7 +13,7 @@ def BoxBreakerHelper(k, n, iStar, testHeight, safeHeight, attempts, failedHeight
     attempts += 1
     print(str(k) + " " + str(n)+ " "  + str(iStar)+ " test: "  + str(testHeight)+ " safe: " + str(safeHeight))
     if k == 1:
-        for floor in range(safeHeight + 1, failedHeight):
+        for floor in range(safeHeight, failedHeight):
             if floor == iStar:
                 return (floor, attempts)
             attempts += 1
