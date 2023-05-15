@@ -5,10 +5,11 @@ Created on Sun Jan 22 16:59:51 2023
 @author: Charl
 """
 
-import cv2
+# import cv2
 import pytesseract
 import openai
 import sys
+from PIL import Image
 pytesseract.pytesseract.tesseract_cmd = r'C:\\Program Files\\Tesseract-OCR\\tesseract.exe'
 
 def sendPrompt(myprompt, temperature = 0.01):
@@ -25,13 +26,15 @@ def sendPrompt(myprompt, temperature = 0.01):
     )
     return response["choices"][0]["text"]
 
-myimg = cv2.imread('PXL_20230122_160513413.jpg')
+# myimg = cv2.imread('PXL_20230122_160513413.jpg')
+# myimg = cv2.imread('G:\Big downloads\deleteme.png')
+myimg = Image.open('G:\Big downloads\deleteme.png')
 text = pytesseract.image_to_string(myimg)
 print(text)
 
-myprompt = ("The following excerpt is a jumbled up recipe. Reformat this recipe "+
-            "to be the name, the description, the ingredients and then the method."
-            + "\n\n" + text)
+# myprompt = ("The following excerpt is a jumbled up recipe. Reformat this recipe "+
+#             "to be the name, the description, the ingredients and then the method."
+#             + "\n\n" + text)
 
-recipe = sendPrompt(myprompt)
+# recipe = sendPrompt(myprompt)
 
